@@ -26,11 +26,15 @@ package com.sonyericsson.hudson.plugins.metadata.model;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
 import hudson.Extension;
+import hudson.ExtensionList;
 import hudson.model.AbstractProject;
+import hudson.model.Hudson;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -75,6 +79,23 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> {
         @Override
         public String getDisplayName() {
             return Messages.MetaDataJobProperty_DisplayName();
+        }
+
+        /**
+         * All registered meta data descriptors. To be used by a hetero-list.
+         *
+         * @param request the current http request.
+         * @return a list.
+         */
+        public List<AbstractMetaDataValue.AbstractMetaDataValueDescriptor> getValueDescriptors(StaplerRequest request) {
+            List<AbstractMetaDataValue.AbstractMetaDataValueDescriptor> list =
+                    new LinkedList<AbstractMetaDataValue.AbstractMetaDataValueDescriptor>();
+            ExtensionList<AbstractMetaDataValue.AbstractMetaDataValueDescriptor> extensionList =
+                    Hudson.getInstance().getExtensionList(AbstractMetaDataValue.AbstractMetaDataValueDescriptor.class);
+            for (AbstractMetaDataValue.AbstractMetaDataValueDescriptor d : extensionList) {
+                list.add(d);
+            }
+            return list;
         }
     }
 }

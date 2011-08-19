@@ -100,10 +100,19 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
     }
 
     /**
-     * Attempts to merge two values with each other. This value could
-     * already be created by another contributing plugin or parts of
-     * a tree of metadata information is already created. This method
-     * tries to merge these values.
+     * Checks if the two values can be merged or not. It is good to do this check before calling {@link
+     * #merge(AbstractMetaDataValue)} since a failed merge could leave this value in a semi merged state.
+     *
+     * @param other the other value to check for mergeability.
+     * @return true if they can be merged.
+     */
+    public boolean canMerge(AbstractMetaDataValue other) {
+        return false;
+    }
+
+    /**
+     * Attempts to merge two values with each other. This value could already be created by another contributing plugin
+     * or parts of a tree of metadata information is already created. This method tries to merge these values.
      *
      * @param other The other value to merge with
      * @return true if successful, false if not
