@@ -69,12 +69,15 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
      * @return the values.
      */
     public synchronized List<AbstractMetaDataValue> getValues() {
+        if (values == null) {
+            values = new LinkedList<AbstractMetaDataValue>();
+        }
         return values;
     }
 
     @Override
     public synchronized AbstractMetaDataValue getChildValue(String name) {
-        for (AbstractMetaDataValue value : values) {
+        for (AbstractMetaDataValue value : getValues()) {
             if (value.getName().equalsIgnoreCase(name)) {
                 return value;
             }
