@@ -25,6 +25,7 @@ package com.sonyericsson.hudson.plugins.metadata.model;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.MetaDataValueParent;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.AbstractProject;
@@ -42,7 +43,7 @@ import java.util.List;
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> {
+public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> implements MetaDataValueParent {
 
     private List<AbstractMetaDataValue> values;
 
@@ -67,8 +68,34 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> {
      *
      * @return the values.
      */
-    public List<AbstractMetaDataValue> getValues() {
+    public synchronized List<AbstractMetaDataValue> getValues() {
         return values;
+    }
+
+    @Override
+    public synchronized AbstractMetaDataValue getChildValue(String name) {
+        for (AbstractMetaDataValue value : values) {
+            if (value.getName().equalsIgnoreCase(name)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public synchronized boolean addChildValue(AbstractMetaDataValue value) {
+        AbstractMetaDataValue my = getChildValue(value.getName());
+        if (my != null) {
+            if (my.canMerge(value)) {
+                return my.merge(value);
+            } else {
+                return false;
+            }
+        } else {
+            values.add(value);
+            value.setParent(this);
+            return true;
+        }
     }
 
     /**

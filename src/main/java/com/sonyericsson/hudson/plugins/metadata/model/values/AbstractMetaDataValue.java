@@ -41,6 +41,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      */
     protected final String name;
     private String description;
+    private MetaDataValueParent parent;
 
     /**
      * Constructor with name and description.
@@ -67,7 +68,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      *
      * @return the description.
      */
-    public String getDescription() {
+    public synchronized String getDescription() {
         return description;
     }
 
@@ -76,7 +77,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      *
      * @param description the description.
      */
-    public void setDescription(String description) {
+    public synchronized void setDescription(String description) {
         this.description = description;
     }
 
@@ -86,7 +87,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      * @return the name.
      */
     @Exported
-    public final String getName() {
+    public final synchronized String getName() {
         return name;
     }
 
@@ -95,8 +96,24 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      *
      * @return the value.
      */
-    public Object getValue() {
+    public synchronized Object getValue() {
         return null;
+    }
+
+    /**
+     * This value's parent.
+     * @return the parent.
+     */
+    public synchronized MetaDataValueParent getParent() {
+        return parent;
+    }
+
+    /**
+     * This value's parent.
+     * @param parent the parent.
+     */
+    public synchronized void setParent(MetaDataValueParent parent) {
+        this.parent = parent;
     }
 
     /**
@@ -106,7 +123,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      * @param other the other value to check for mergeability.
      * @return true if they can be merged.
      */
-    public boolean canMerge(AbstractMetaDataValue other) {
+    public synchronized boolean canMerge(AbstractMetaDataValue other) {
         return false;
     }
 
@@ -117,7 +134,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      * @param other The other value to merge with
      * @return true if successful, false if not
      */
-    public boolean merge(AbstractMetaDataValue other) {
+    public synchronized boolean merge(AbstractMetaDataValue other) {
         return false;
     }
 

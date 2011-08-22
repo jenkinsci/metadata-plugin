@@ -39,7 +39,7 @@ import java.util.List;
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public class TreeNodeMetaDataValue extends AbstractMetaDataValue {
+public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements MetaDataValueParent {
 
     private List<AbstractMetaDataValue> children;
 
@@ -89,7 +89,7 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue {
     }
 
     @Override
-    public List<AbstractMetaDataValue> getValue() {
+    public synchronized List<AbstractMetaDataValue> getValue() {
         return children;
     }
 
@@ -99,7 +99,8 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue {
      * @param name the name to search for.
      * @return the value.
      */
-    public AbstractMetaDataValue getChildValue(String name) {
+    @Override
+    public synchronized AbstractMetaDataValue getChildValue(String name) {
         for (AbstractMetaDataValue value : children) {
             if (value.getName().equalsIgnoreCase(name)) {
                 return value;
@@ -109,7 +110,23 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue {
     }
 
     @Override
-    public boolean canMerge(AbstractMetaDataValue other) {
+    public synchronized boolean addChildValue(AbstractMetaDataValue value) {
+        AbstractMetaDataValue my = getChildValue(value.getName());
+        if (my != null) {
+            if (my.canMerge(value)) {
+                return my.merge(value);
+            } else {
+                return false;
+            }
+        } else {
+            children.add(value);
+            value.setParent(this);
+            return true;
+        }
+    }
+
+    @Override
+    public synchronized boolean canMerge(AbstractMetaDataValue other) {
         if (other instanceof TreeNodeMetaDataValue) {
             TreeNodeMetaDataValue otherTree = (TreeNodeMetaDataValue)other;
             for (AbstractMetaDataValue otherChild : otherTree.getValue()) {
@@ -127,7 +144,7 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue {
     }
 
     @Override
-    public boolean merge(AbstractMetaDataValue other) {
+    public synchronized boolean merge(AbstractMetaDataValue other) {
         if (other instanceof TreeNodeMetaDataValue) {
             TreeNodeMetaDataValue otherTree = (TreeNodeMetaDataValue)other;
             for (AbstractMetaDataValue otherChild : otherTree.getValue()) {
