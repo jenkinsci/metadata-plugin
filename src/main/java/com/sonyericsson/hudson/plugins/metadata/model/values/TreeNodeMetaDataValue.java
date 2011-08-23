@@ -31,6 +31,7 @@ import hudson.model.Hudson;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -101,66 +102,22 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
      */
     @Override
     public synchronized AbstractMetaDataValue getChildValue(String name) {
-        for (AbstractMetaDataValue value : children) {
-            if (value.getName().equalsIgnoreCase(name)) {
-                return value;
-            }
-        }
-        return null;
+        return ParentUtil.getChildValue(children, name);
     }
 
     @Override
-    public synchronized boolean addChildValue(AbstractMetaDataValue value) {
-        AbstractMetaDataValue my = getChildValue(value.getName());
-        if (my != null) {
-            if (my.canMerge(value)) {
-                return my.merge(value);
-            } else {
-                return false;
-            }
-        } else {
-            children.add(value);
-            value.setParent(this);
-            return true;
-        }
+    public synchronized AbstractMetaDataValue addChildValue(AbstractMetaDataValue value) {
+        return ParentUtil.addChildValue(this, children, value);
     }
 
     @Override
-    public synchronized boolean canMerge(AbstractMetaDataValue other) {
-        if (other instanceof TreeNodeMetaDataValue) {
-            TreeNodeMetaDataValue otherTree = (TreeNodeMetaDataValue)other;
-            for (AbstractMetaDataValue otherChild : otherTree.getValue()) {
-                AbstractMetaDataValue myChild = getChildValue(otherChild.getName());
-                if (myChild != null) {
-                    if (!myChild.canMerge(otherChild)) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
+    public synchronized Collection<AbstractMetaDataValue> addChildValues(Collection<AbstractMetaDataValue> values) {
+        return ParentUtil.addChildValues(this, children, values);
     }
 
     @Override
-    public synchronized boolean merge(AbstractMetaDataValue other) {
-        if (other instanceof TreeNodeMetaDataValue) {
-            TreeNodeMetaDataValue otherTree = (TreeNodeMetaDataValue)other;
-            for (AbstractMetaDataValue otherChild : otherTree.getValue()) {
-                AbstractMetaDataValue myChild = getChildValue(otherChild.getName());
-                if (myChild != null) {
-                    if (!myChild.merge(otherChild)) {
-                        return false;
-                    }
-                } else {
-                    children.add(otherChild);
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
+    public synchronized Collection<AbstractMetaDataValue> getChildren() {
+        return children;
     }
 
     @Override

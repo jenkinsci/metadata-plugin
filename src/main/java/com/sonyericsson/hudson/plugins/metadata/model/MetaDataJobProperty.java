@@ -26,6 +26,7 @@ package com.sonyericsson.hudson.plugins.metadata.model;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetaDataValueParent;
+import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.AbstractProject;
@@ -35,6 +36,7 @@ import hudson.model.JobPropertyDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -75,30 +77,40 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
         return values;
     }
 
-    @Override
-    public synchronized AbstractMetaDataValue getChildValue(String name) {
-        for (AbstractMetaDataValue value : getValues()) {
-            if (value.getName().equalsIgnoreCase(name)) {
-                return value;
+    /**
+     * All the non generated values. I.e. the values that the user has put in.
+     *
+     * @return all user values.
+     */
+    public synchronized List<AbstractMetaDataValue> getUserValues() {
+        List<AbstractMetaDataValue> allValues = getValues();
+        List<AbstractMetaDataValue> userValues = new LinkedList<AbstractMetaDataValue>();
+        for (AbstractMetaDataValue value : allValues) {
+            if (!value.isGenerated()) {
+                userValues.add(value);
             }
         }
-        return null;
+        return userValues;
     }
 
     @Override
-    public synchronized boolean addChildValue(AbstractMetaDataValue value) {
-        AbstractMetaDataValue my = getChildValue(value.getName());
-        if (my != null) {
-            if (my.canMerge(value)) {
-                return my.merge(value);
-            } else {
-                return false;
-            }
-        } else {
-            values.add(value);
-            value.setParent(this);
-            return true;
-        }
+    public synchronized AbstractMetaDataValue getChildValue(String name) {
+        return ParentUtil.getChildValue(getValues(), name);
+    }
+
+    @Override
+    public synchronized AbstractMetaDataValue addChildValue(AbstractMetaDataValue value) {
+        return ParentUtil.addChildValue(this, getValues(), value);
+    }
+
+    @Override
+    public synchronized Collection<AbstractMetaDataValue> addChildValues(Collection<AbstractMetaDataValue> childValues) {
+        return ParentUtil.addChildValues(this, getValues(), childValues);
+    }
+
+    @Override
+    public Collection<AbstractMetaDataValue> getChildren() {
+        return values;
     }
 
     /**

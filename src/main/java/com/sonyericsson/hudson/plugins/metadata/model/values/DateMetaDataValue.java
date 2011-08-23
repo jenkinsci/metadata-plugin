@@ -28,6 +28,7 @@ import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.util.FormValidation;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -51,7 +52,8 @@ public class DateMetaDataValue extends AbstractMetaDataValue {
      * @param description the description
      * @param value       the value
      */
-    protected DateMetaDataValue(String name, String description, Date value) {
+    @DataBoundConstructor
+    public DateMetaDataValue(String name, String description, Date value) {
         super(name, description);
         this.value = value;
     }
@@ -62,7 +64,7 @@ public class DateMetaDataValue extends AbstractMetaDataValue {
      * @param name  the name
      * @param value the value
      */
-    protected DateMetaDataValue(String name, Date value) {
+    public DateMetaDataValue(String name, Date value) {
         super(name);
         this.value = value;
     }
@@ -89,7 +91,7 @@ public class DateMetaDataValue extends AbstractMetaDataValue {
         }
 
         /**
-         * Formvalidation for the value.
+         * Form validation for the value.
          * It will try to parse the date according to the user's locale.
          * @param value the value.
          * @param request the http request.

@@ -24,6 +24,8 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 
 /**
  * Utility methods for easier creation of tree structures of values.
@@ -50,6 +52,22 @@ public abstract class TreeStructureUtil {
      */
     public static boolean addValue(MetaDataValueParent root, String value, String description, String... path) {
         StringMetaDataValue sVal = new StringMetaDataValue(path[path.length - 1], description, value);
+        sVal.setGenerated(true);
+        return addValue(root, sVal, Arrays.copyOf(path, path.length - 1));
+    }
+
+    /**
+     * Adds a {@link DateMetaDataValue} to the root node with the specified path.
+     *
+     * @param root        the root to add the tree to.
+     * @param value       the date value of the leaf node.
+     * @param description the description of the leaf node.
+     * @param path        the path to the leaf from the root.
+     * @return true if there was no merge conflicts.
+     */
+    public static boolean addValue(MetaDataValueParent root, Date value, String description, String... path) {
+        DateMetaDataValue sVal = new DateMetaDataValue(path[path.length - 1], description, value);
+        sVal.setGenerated(true);
         return addValue(root, sVal, Arrays.copyOf(path, path.length - 1));
     }
 
@@ -63,10 +81,10 @@ public abstract class TreeStructureUtil {
      */
     public static boolean addValue(MetaDataValueParent root, AbstractMetaDataValue value, String... parentPath) {
         if (parentPath == null || parentPath.length <= 0) {
-            return root.addChildValue(value);
+            return root.addChildValue(value) == null;
         } else {
             TreeNodeMetaDataValue path = createPath(value, parentPath);
-            return root.addChildValue(path);
+            return root.addChildValue(path) == null;
         }
     }
 
@@ -80,11 +98,26 @@ public abstract class TreeStructureUtil {
      */
     public static TreeNodeMetaDataValue createPath(String value, String description, String... path) {
         StringMetaDataValue str = new StringMetaDataValue(path[path.length - 1], description, value);
+        str.setGenerated(true);
         return createPath(str, Arrays.copyOf(path, path.length - 1));
     }
 
     /**
-     * Created a tree structured path with the provided leaf at the end.
+     * Creates a path where the last element is a string with the provided value and description.
+     *
+     * @param value       the value
+     * @param description the description
+     * @param path        the full path to the leaf.
+     * @return the tree.
+     */
+    public static TreeNodeMetaDataValue createPath(Date value, String description, String... path) {
+        DateMetaDataValue val = new DateMetaDataValue(path[path.length - 1], description, value);
+        val.setGenerated(true);
+        return createPath(val, Arrays.copyOf(path, path.length - 1));
+    }
+
+    /**
+     * Creates a tree structured path with the provided leaf at the end.
      *
      * @param leaf       the leaf to put in the end.
      * @param parentPath the path to the leaf.
@@ -99,6 +132,7 @@ public abstract class TreeStructureUtil {
 
         for (String name : parentPath) {
             TreeNodeMetaDataValue val = new TreeNodeMetaDataValue(name);
+            val.setGenerated(true);
             if (parent != null) {
                 parent.addChildValue(val);
             }
@@ -109,5 +143,77 @@ public abstract class TreeStructureUtil {
         }
         parent.addChildValue(leaf);
         return root;
+    }
+
+    /**
+     * Creates a straight tree-path. The method returns an array where index 0 is the root and index 1 is the leaf.
+     *
+     * @param description the description of the root.
+     * @param path        the path to create.
+     * @return the root and the leaf.
+     */
+    public static TreeNodeMetaDataValue[] createTreePath(String description, String... path) {
+        TreeNodeMetaDataValue[] arr = new TreeNodeMetaDataValue[2];
+        arr[1] = new TreeNodeMetaDataValue(path[path.length - 1], description);
+        arr[1].setGenerated(true);
+        arr[0] = createPath(arr[1], Arrays.copyOf(path, path.length - 1));
+        return arr;
+    }
+
+    /**
+     * Returns the node with the given path.
+     *
+     * @param root the root to start from.
+     * @param path the path to get.
+     * @return the value or null if it wasn't found.
+     */
+    public static AbstractMetaDataValue getPath(MetaDataValueParent root, String... path) {
+        MetaDataValueParent parent = root;
+        AbstractMetaDataValue currentValue = null;
+        for (int i = 0; i < path.length; i++) {
+            String name = path[i];
+            currentValue = parent.getChildValue(name);
+            if (currentValue == null) {
+                return null;
+            } else if (i == path.length - 1) {
+                return currentValue;
+            } else if (currentValue instanceof MetaDataValueParent) {
+                parent = (MetaDataValueParent)currentValue;
+            } else {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Prints the value and it's child if any into a structured string.
+     *
+     * @param value the value to print
+     * @param tabs  the current level
+     * @return a pretty string.
+     */
+    public static String prettyPrint(AbstractMetaDataValue value, String tabs) {
+        StringBuffer str = new StringBuffer(tabs);
+        str.append(value.getName()).append("\n");
+        if (value instanceof MetaDataValueParent) {
+            MetaDataValueParent node = (MetaDataValueParent)value;
+            prettyPrint(node.getChildren(), tabs + "\t");
+        }
+        return str.toString();
+    }
+
+    /**
+     * Prints the values and their children if any into a structured string.
+     * @param values the values to print
+     * @param tabs the current level.
+     * @return a pretty string.
+     */
+    public static String prettyPrint(Collection<AbstractMetaDataValue> values, String tabs) {
+        StringBuffer str = new StringBuffer();
+        for (AbstractMetaDataValue subValue : values) {
+            str.append(prettyPrint(subValue, tabs));
+        }
+        return str.toString();
     }
 }

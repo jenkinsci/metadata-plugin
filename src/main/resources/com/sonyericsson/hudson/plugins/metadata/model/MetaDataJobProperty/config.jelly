@@ -28,7 +28,7 @@
             Here we should list all definitions.
         </f:entry>
         <f:entry title="${%Values}">
-            <f:hetero-list descriptors="${descriptor.getValueDescriptors(request)}" items="${instance.values}"
+            <f:hetero-list descriptors="${descriptor.getValueDescriptors(request)}" items="${instance.userValues}"
                            name="values" hasHeader="true"/>
         </f:entry>
     </f:section>

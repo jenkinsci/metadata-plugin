@@ -42,6 +42,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
     protected final String name;
     private String description;
     private MetaDataValueParent parent;
+    private boolean generated = false;
 
     /**
      * Constructor with name and description.
@@ -102,6 +103,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
 
     /**
      * This value's parent.
+     *
      * @return the parent.
      */
     public synchronized MetaDataValueParent getParent() {
@@ -110,6 +112,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
 
     /**
      * This value's parent.
+     *
      * @param parent the parent.
      */
     public synchronized void setParent(MetaDataValueParent parent) {
@@ -117,25 +120,21 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
     }
 
     /**
-     * Checks if the two values can be merged or not. It is good to do this check before calling {@link
-     * #merge(AbstractMetaDataValue)} since a failed merge could leave this value in a semi merged state.
+     * If this value is generated or user created.
      *
-     * @param other the other value to check for mergeability.
-     * @return true if they can be merged.
+     * @return true if generated.
      */
-    public synchronized boolean canMerge(AbstractMetaDataValue other) {
-        return false;
+    public boolean isGenerated() {
+        return generated;
     }
 
     /**
-     * Attempts to merge two values with each other. This value could already be created by another contributing plugin
-     * or parts of a tree of metadata information is already created. This method tries to merge these values.
+     * Set if this value is generated or user created.
      *
-     * @param other The other value to merge with
-     * @return true if successful, false if not
+     * @param generated true if generated.
      */
-    public synchronized boolean merge(AbstractMetaDataValue other) {
-        return false;
+    public void setGenerated(boolean generated) {
+        this.generated = generated;
     }
 
     /**

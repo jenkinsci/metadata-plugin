@@ -23,6 +23,8 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
+import java.util.Collection;
+
 /**
  * The Parent node of some meta-data value.
  *
@@ -40,10 +42,28 @@ public interface MetaDataValueParent {
 
     /**
      * Adds the value to this parent's list of children. If a value with the same name is already present, the values
-     * should try to be merged.
+     * should try to be merged. The returned value is either the value itself if it is a leaf or a clone of itself with
+     * the children that failed to be merged if it contains children,
+     * null indicates a fully successful merge/add.
      *
      * @param value the value to add.
-     * @return true if the operation was successful.
+     * @return null if the operation was successful.
      */
-    boolean addChildValue(AbstractMetaDataValue value);
+    AbstractMetaDataValue addChildValue(AbstractMetaDataValue value);
+
+    /**
+     * Adds the values to this parent's list of children. If a value with the same name is already present, the values
+     * should try to be merged.
+     *
+     * @param values the value to add.
+     * @return the values that failed to be added/merged or null if all succeeded.
+     */
+    Collection<AbstractMetaDataValue> addChildValues(Collection<AbstractMetaDataValue> values);
+
+    /**
+     * The children of this parent.
+     *
+     * @return the children.
+     */
+    Collection<AbstractMetaDataValue> getChildren();
 }
