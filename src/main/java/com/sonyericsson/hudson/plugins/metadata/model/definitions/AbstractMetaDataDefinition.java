@@ -160,7 +160,7 @@ public abstract class AbstractMetaDataDefinition implements Describable<Abstract
      * @return default metadata values or null if no defaults are available
      */
     @Exported
-    public AbstractMetaDataValue getDefaultValue() {
+    public Object getDefaultValue() {
         return null;
     }
 

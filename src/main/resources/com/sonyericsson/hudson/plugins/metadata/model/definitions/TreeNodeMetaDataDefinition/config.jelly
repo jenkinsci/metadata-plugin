@@ -23,15 +23,12 @@
   -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <f:section title="${%Meta Data}">
-        <f:entry title="${%Preset Values}">
-            <j:forEach var="definition" items="${instance.getDefinitions(request)}">
-                <st:include it="${definition}" page="representation.jelly"/>
-            </j:forEach>
-        </f:entry>
-        <f:entry title="${%Values}">
-            <f:hetero-list descriptors="${descriptor.getValueDescriptors(request)}" items="${instance.userValues}"
-                           name="values" hasHeader="true"/>
-        </f:entry>
-    </f:section>
+    <f:entry title="${%Name}">
+        <f:textbox name="name" value="${instance.name}"/>
+    </f:entry>
+    <!--TODO fix the tree structure in jelly, current solution doesn't show correctly after a save and load-->
+    <f:entry title="${%Definitions}">
+        <f:hetero-list descriptors="${descriptor.getDefinitionDescriptors(request)}" items="${instance.children}"
+                       name="children" hasHeader="true"/>
+    </f:entry>
 </j:jelly>

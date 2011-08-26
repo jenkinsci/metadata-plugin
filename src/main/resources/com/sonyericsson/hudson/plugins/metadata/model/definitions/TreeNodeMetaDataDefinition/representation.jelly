@@ -21,17 +21,14 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
-         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <f:section title="${%Meta Data}">
-        <f:entry title="${%Preset Values}">
-            <j:forEach var="definition" items="${instance.getDefinitions(request)}">
-                <st:include it="${definition}" page="representation.jelly"/>
-            </j:forEach>
-        </f:entry>
-        <f:entry title="${%Values}">
-            <f:hetero-list descriptors="${descriptor.getValueDescriptors(request)}" items="${instance.userValues}"
-                           name="values" hasHeader="true"/>
-        </f:entry>
-    </f:section>
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+         xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+         xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+    <!--TODO fix the tree structure in jelly, current solution doesn't show correctly-->
+    <f:entry title="${it.name}">
+        <j:forEach var="child" items="${it.children}">
+            <st:include it="${child}" page="representation.jelly"/>
+        </j:forEach>
+    </f:entry>
 </j:jelly>
