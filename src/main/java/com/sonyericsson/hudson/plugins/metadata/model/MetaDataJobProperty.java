@@ -31,13 +31,16 @@ import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.AbstractProject;
+import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
+import java.util.ArrayList;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -92,6 +95,17 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
             }
         }
         return userValues;
+    }
+
+    public AbstractProject<?, ?> getOwner() {
+        return owner;
+    }
+
+    @Override
+    public Collection<? extends Action> getJobActions(AbstractProject<?, ?> job) {
+        final MetaDataJobAction newAction = new MetaDataJobAction(job.getProperty(this.getClass()));
+        if(newAction==null) return Collections.emptyList();
+        return Collections.singletonList(newAction);
     }
 
     @Override
