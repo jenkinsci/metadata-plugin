@@ -24,6 +24,7 @@
 package com.sonyericsson.hudson.plugins.metadata.model;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
+import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetaDataDefinition;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetaDataValueParent;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
@@ -114,6 +115,16 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
     }
 
     /**
+     * All registered meta data descriptors. To be used by a hetero-list.
+     *
+     * @param request the current http request.
+     * @return a list.
+     */
+    public List<AbstractMetaDataDefinition> getDefinitions(StaplerRequest request) {
+        return PluginImpl.getInstance().getDefinitions();
+    }
+
+    /**
      * Descriptor for the {@link MetaDataJobProperty}.
      */
     @Extension
@@ -139,5 +150,7 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
             }
             return list;
         }
+
+
     }
 }

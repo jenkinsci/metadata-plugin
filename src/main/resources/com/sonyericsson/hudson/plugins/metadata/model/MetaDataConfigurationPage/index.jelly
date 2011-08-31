@@ -23,15 +23,22 @@
   -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <f:section title="${%Meta Data}">
-        <f:entry title="${%Preset Values}">
-            <j:forEach var="definition" items="${instance.getDefinitions(request)}">
-                <st:include it="${definition}" page="representation.jelly"/>
-            </j:forEach>
-        </f:entry>
-        <f:entry title="${%Values}">
-            <f:hetero-list descriptors="${descriptor.getValueDescriptors(request)}" items="${instance.userValues}"
-                           name="values" hasHeader="true"/>
-        </f:entry>
-    </f:section>
+    <l:layout title="${%Metadata Configuration}" norefresh="true">
+        <l:main-panel>
+            <f:form action="configureSubmit" method="post" name="configForm">
+
+                <f:section title="${%Metadata}">
+                    <f:entry title="${%Definitions}">
+                        <f:hetero-list name="definitions"
+                                       hasHeader="true"
+                                       descriptors="${it.getDefinitionDescriptors(request)}"
+                                       items="${it.getDefinitions()}"/>
+                    </f:entry>
+                </f:section>
+                <f:block>
+                    <f:submit value="${%Save}"/>
+                </f:block>
+            </f:form>
+        </l:main-panel>
+    </l:layout>
 </j:jelly>

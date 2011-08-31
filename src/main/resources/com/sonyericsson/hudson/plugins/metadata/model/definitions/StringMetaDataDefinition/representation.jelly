@@ -21,17 +21,11 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
-         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <f:section title="${%Meta Data}">
-        <f:entry title="${%Preset Values}">
-            <j:forEach var="definition" items="${instance.getDefinitions(request)}">
-                <st:include it="${definition}" page="representation.jelly"/>
-            </j:forEach>
-        </f:entry>
-        <f:entry title="${%Values}">
-            <f:hetero-list descriptors="${descriptor.getValueDescriptors(request)}" items="${instance.userValues}"
-                           name="values" hasHeader="true"/>
-        </f:entry>
-    </f:section>
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+         xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+         xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+    <f:entry title="${it.name}" description="${it.description}">
+        <f:textbox name="defaultValue" value="${it.defaultValue}"/>
+    </f:entry>
 </j:jelly>
