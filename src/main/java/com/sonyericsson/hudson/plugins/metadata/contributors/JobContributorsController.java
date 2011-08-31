@@ -175,6 +175,8 @@ public class JobContributorsController extends SaveableListener {
                 project.save();
             } catch (IOException e) {
                 logger.severe("Failed to save the project: " + project);
+            } finally {
+                controller.setCurrentProject(null);
             }
         }
     }
