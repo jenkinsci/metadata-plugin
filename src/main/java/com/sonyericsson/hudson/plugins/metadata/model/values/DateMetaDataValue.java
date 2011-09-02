@@ -24,6 +24,7 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
@@ -41,6 +42,7 @@ import java.util.Date;
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
+@XStreamAlias("metadata-date")
 public class DateMetaDataValue extends AbstractMetaDataValue {
 
     private Date value;

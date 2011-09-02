@@ -28,6 +28,7 @@ import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetaDa
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetaDataValueParent;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.AbstractProject;
@@ -48,6 +49,7 @@ import java.util.List;
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
+@XStreamAlias("job-metadata")
 public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> implements MetaDataValueParent {
 
     private List<AbstractMetaDataValue> values;

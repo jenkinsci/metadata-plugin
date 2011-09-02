@@ -24,6 +24,7 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Descriptor;
@@ -40,6 +41,7 @@ import java.util.List;
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
+@XStreamAlias("metadata-tree")
 public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements MetaDataValueParent {
 
     private List<AbstractMetaDataValue> children;

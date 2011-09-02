@@ -24,9 +24,16 @@
 package com.sonyericsson.hudson.plugins.metadata.model;
 
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetaDataDefinition;
+import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.DateMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.NumberMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetaDataValue;
 import hudson.Extension;
 import hudson.Plugin;
 import hudson.model.Hudson;
+import hudson.model.Items;
+import hudson.model.Run;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +47,28 @@ import java.util.List;
 public class PluginImpl extends Plugin {
 
     private List<AbstractMetaDataDefinition> definitions = new LinkedList<AbstractMetaDataDefinition>();
+
+    @Override
+    public void start() throws Exception {
+        performXStreamRegistrations();
+    }
+
+    /**
+     * Process the XStream annotations.
+     */
+    private void performXStreamRegistrations() {
+        Class[] types = {
+                AbstractMetaDataValue.class,
+                DateMetaDataValue.class,
+                NumberMetaDataValue.class,
+                StringMetaDataValue.class,
+                TreeNodeMetaDataValue.class,
+                MetaDataJobProperty.class, };
+        //Register it in all known XStreams just to be sure.
+        Hudson.XSTREAM.processAnnotations(types);
+        Items.XSTREAM.processAnnotations(types);
+        Run.XSTREAM.processAnnotations(types);
+    }
 
     /**
      * Setter for the list of AbstractMetaDataDefinitions.

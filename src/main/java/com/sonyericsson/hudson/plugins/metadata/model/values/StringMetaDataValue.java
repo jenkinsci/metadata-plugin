@@ -24,6 +24,7 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
@@ -34,6 +35,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
+@XStreamAlias("metadata-string")
 public class StringMetaDataValue extends AbstractMetaDataValue {
 
     private String value;
