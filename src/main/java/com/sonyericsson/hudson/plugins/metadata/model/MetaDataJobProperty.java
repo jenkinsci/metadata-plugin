@@ -35,7 +35,6 @@ import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
-import java.util.ArrayList;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -52,7 +51,7 @@ import java.util.List;
 public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> implements MetaDataValueParent {
 
     private List<AbstractMetaDataValue> values;
-
+    private transient MetaDataJobAction metaDataJobAction;
     /**
      * Standard DataBound Constructor.
      *
@@ -97,15 +96,21 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
         return userValues;
     }
 
+    /**
+     * The current Project.
+     *
+     * @return the owner.
+     */
     public AbstractProject<?, ?> getOwner() {
         return owner;
     }
 
     @Override
-    public Collection<? extends Action> getJobActions(AbstractProject<?, ?> job) {
-        final MetaDataJobAction newAction = new MetaDataJobAction(job.getProperty(this.getClass()));
-        if(newAction==null) return Collections.emptyList();
-        return Collections.singletonList(newAction);
+    public synchronized Collection<? extends Action> getJobActions(AbstractProject<?, ?> job) {
+        if (metaDataJobAction == null) {
+            metaDataJobAction = new MetaDataJobAction(job.getProperty(this.getClass()));
+        }
+        return Collections.singletonList(metaDataJobAction);
     }
 
     @Override
@@ -136,6 +141,11 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
      */
     public List<AbstractMetaDataDefinition> getDefinitions(StaplerRequest request) {
         return PluginImpl.getInstance().getDefinitions();
+    }
+
+    @Override
+    public String getFullName() {
+        return "";
     }
 
     /**

@@ -66,4 +66,10 @@ public interface MetaDataValueParent {
      * @return the children.
      */
     Collection<AbstractMetaDataValue> getChildren();
+    /**
+     * The full name of the element.
+     *
+     * @return the fullName.
+     */
+    String getFullName();
 }

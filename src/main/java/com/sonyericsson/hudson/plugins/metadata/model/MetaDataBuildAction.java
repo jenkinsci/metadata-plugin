@@ -113,4 +113,9 @@ public class MetaDataBuildAction implements Action, MetaDataValueParent {
     public Collection<AbstractMetaDataValue> getChildren() {
         return getValues();
     }
+
+    @Override
+    public String getFullName() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

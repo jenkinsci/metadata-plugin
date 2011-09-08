@@ -27,13 +27,12 @@ import com.sonyericsson.hudson.plugins.metadata.Messages;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
 
-
 /**
  * Holds the meta data for a job.
  *
  * @author Shemeer S;
  */
-public class MetaDataJobAction implements Action{
+public class MetaDataJobAction implements Action {
 
     /**
      * The URL to this action.
@@ -43,17 +42,14 @@ public class MetaDataJobAction implements Action{
      * The icon to display for this action.
      */
     protected static final String ICON = "clipboard.png";
-
     /** The project. */
     private final transient AbstractProject<?, ?> project;
-
     /** The MetadataJobProperty. */
     private MetaDataJobProperty jobProperty;
 
     /**
      * Standard constructor.
-     *
-     * @param jobProperty.
+     * @param jobProperty the current jobProperty.
      */
     public MetaDataJobAction(MetaDataJobProperty jobProperty) {
         this.jobProperty = jobProperty;
@@ -75,7 +71,7 @@ public class MetaDataJobAction implements Action{
         return URL_NAME;
     }
 
-     /**
+    /**
      * Returns the project.
      *
      * @return project
@@ -84,4 +80,12 @@ public class MetaDataJobAction implements Action{
         return project;
     }
 
+    /**
+     * Returns the metaDataJobProperty.
+     *
+     * @return property
+     */
+    public final MetaDataJobProperty getJobProperty() {
+        return jobProperty;
+    }
 }

@@ -43,6 +43,10 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
     private String description;
     private MetaDataValueParent parent;
     private boolean generated = false;
+    /**
+     * The dot Seperator constant.
+     */
+    public static final String SEPERATER_DOT = ".";
 
     /**
      * Constructor with name and description.
@@ -137,6 +141,17 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
         this.generated = generated;
     }
 
+    /**
+     * This function will generate the full name.
+     *
+     * @return the full name.
+     */
+    public String getFullName() {
+        if (getParent() != null && getParent() instanceof AbstractMetaDataValue) {
+            return getParent().getFullName() + SEPERATER_DOT + getName();
+        }
+        return getName();
+    }
     /**
      * The descriptor for the AbstractMetaDataValue.
      */
