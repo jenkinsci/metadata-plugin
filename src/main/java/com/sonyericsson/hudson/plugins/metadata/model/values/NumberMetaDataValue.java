@@ -29,7 +29,6 @@ import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.util.FormValidation;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Meta data containing a non-decimal number.
@@ -42,9 +41,10 @@ public class NumberMetaDataValue extends AbstractMetaDataValue {
 
     /**
      * Standard Constructor.
-     * @param name the name
+     *
+     * @param name        the name
      * @param description the description.
-     * @param value the value
+     * @param value       the value
      */
     public NumberMetaDataValue(String name, String description, long value) {
         super(name, description);
@@ -53,7 +53,8 @@ public class NumberMetaDataValue extends AbstractMetaDataValue {
 
     /**
      * Standard Constructor.
-     * @param name the name
+     *
+     * @param name  the name
      * @param value the value
      */
     public NumberMetaDataValue(String name, long value) {
@@ -85,11 +86,10 @@ public class NumberMetaDataValue extends AbstractMetaDataValue {
         /**
          * Form validation for the value. It will try to parse the value to a long.
          *
-         * @param value   the value.
-         * @param request the http request.
+         * @param value the value.
          * @return {@link hudson.util.FormValidation#ok()} if the value can be parsed to a long.
          */
-        public FormValidation doCheckValue(@QueryParameter String value, StaplerRequest request) {
+        public FormValidation doCheckValue(@QueryParameter("value") final String value) {
             try {
                 Long.parseLong(value);
                 return FormValidation.ok();

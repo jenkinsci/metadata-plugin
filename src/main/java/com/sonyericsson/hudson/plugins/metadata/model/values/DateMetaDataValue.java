@@ -87,7 +87,7 @@ public class DateMetaDataValue extends AbstractMetaDataValue {
 
         @Override
         public String getDisplayName() {
-            return Messages.StringMetaDataValue_DisplayName();
+            return Messages.DateMetaDataValue_DisplayName();
         }
 
         /**
