@@ -21,38 +21,12 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package com.sonyericsson.hudson.plugins.metadata.contributors;
+package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 
-import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
-import hudson.ExtensionList;
-import hudson.ExtensionPoint;
-import hudson.model.AbstractBuild;
-import hudson.model.Hudson;
-
-import java.util.List;
+import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
 
 /**
- * Extension point for plugins to contribute meta data to builds. When a build is done all contributors will be asked to
- * contribute meta data for that build.
- *
- * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
+ * A metadata definition interface.
  */
-public abstract class BuildMetaDataContributor implements ExtensionPoint {
-
-    /**
-     * Provides the meta-data that should be inserted into the build.
-     *
-     * @param build the build.
-     * @return a list of meta data.
-     */
-    public abstract List<MetadataValue> getMetaDataFor(AbstractBuild build);
-
-    /**
-     * All the registered build-contributors.
-     *
-     * @return the list.
-     */
-    public static ExtensionList<BuildMetaDataContributor> all() {
-        return Hudson.getInstance().getExtensionList(BuildMetaDataContributor.class);
-    }
+public interface MetadataDefinition extends Metadata {
 }

@@ -25,7 +25,7 @@ package com.sonyericsson.hudson.plugins.metadata.contributors;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.MetaDataBuildAction;
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 import hudson.Extension;
 import hudson.ExtensionList;
@@ -59,8 +59,8 @@ public class BuildContributorsController extends RunListener<AbstractBuild> {
         logger.finest("Starting collection.");
         ExtensionList<BuildMetaDataContributor> contributors = BuildMetaDataContributor.all();
         for (BuildMetaDataContributor contributor : contributors) {
-            List<AbstractMetaDataValue> values = contributor.getMetaDataFor(build);
-            Collection<AbstractMetaDataValue> leftovers = action.addChildValues(values);
+            List<MetadataValue> values = contributor.getMetaDataFor(build);
+            Collection<MetadataValue> leftovers = action.addChildren(values);
             if (leftovers != null && !leftovers.isEmpty()) {
                 String pretty = "\n" + TreeStructureUtil.prettyPrint(leftovers, "\t");
                 listener.getLogger().println(

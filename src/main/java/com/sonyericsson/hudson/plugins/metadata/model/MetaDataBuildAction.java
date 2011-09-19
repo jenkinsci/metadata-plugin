@@ -24,8 +24,7 @@
 package com.sonyericsson.hudson.plugins.metadata.model;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.MetaDataValueParent;
+import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import hudson.model.Action;
 
@@ -38,7 +37,7 @@ import java.util.List;
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public class MetaDataBuildAction implements Action, MetaDataValueParent {
+public class MetaDataBuildAction implements Action, MetaDataParent<MetadataValue> {
 
     /**
      * The URL to this action.
@@ -48,14 +47,15 @@ public class MetaDataBuildAction implements Action, MetaDataValueParent {
      * The icon to display for this action.
      */
     protected static final String ICON = "clipboard.png";
-    private List<AbstractMetaDataValue> values;
+
+    private List<MetadataValue> values;
 
     /**
      * Standard constructor.
      *
      * @param values the meta data for this build.
      */
-    public MetaDataBuildAction(List<AbstractMetaDataValue> values) {
+    public MetaDataBuildAction(List<MetadataValue> values) {
         this.values = values;
     }
 
@@ -84,38 +84,37 @@ public class MetaDataBuildAction implements Action, MetaDataValueParent {
      * The meta data in this action.
      *
      * @return the meta data.
-     *
      * @see #getChildren()
      */
-    public List<AbstractMetaDataValue> getValues() {
+    public List<MetadataValue> getValues() {
         if (values == null) {
-            values = new LinkedList<AbstractMetaDataValue>();
+            values = new LinkedList<MetadataValue>();
         }
         return values;
     }
 
     @Override
-    public AbstractMetaDataValue getChildValue(String name) {
+    public MetadataValue getChild(String name) {
         return ParentUtil.getChildValue(getValues(), name);
     }
 
     @Override
-    public AbstractMetaDataValue addChildValue(AbstractMetaDataValue value) {
+    public Collection<MetadataValue> addChild(MetadataValue value) {
         return ParentUtil.addChildValue(this, getValues(), value);
     }
 
     @Override
-    public Collection<AbstractMetaDataValue> addChildValues(Collection<AbstractMetaDataValue> childValues) {
+    public Collection<MetadataValue> addChildren(Collection<MetadataValue> childValues) {
         return ParentUtil.addChildValues(this, getValues(), childValues);
     }
 
     @Override
-    public Collection<AbstractMetaDataValue> getChildren() {
+    public Collection<MetadataValue> getChildren() {
         return getValues();
     }
 
     @Override
     public String getFullName() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return "";
     }
 }

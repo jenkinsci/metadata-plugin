@@ -23,6 +23,7 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 
+import com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
 import hudson.AbortException;
 import hudson.DescriptorExtensionList;
@@ -41,8 +42,10 @@ import java.io.Serializable;
  * A metadata definition.
  */
 @ExportedBean
-public abstract class AbstractMetaDataDefinition implements Describable<AbstractMetaDataDefinition>, Serializable {
+public abstract class AbstractMetaDataDefinition implements
+        Describable<AbstractMetaDataDefinition>, Serializable, MetadataDefinition {
 
+    private MetaDataParent parent;
     private final String name;
     private final String description;
 
@@ -76,14 +79,22 @@ public abstract class AbstractMetaDataDefinition implements Describable<Abstract
         return this.getClass().getSimpleName();
     }
 
-    /**
-     * Returns the name of this definition.
-     *
-     * @return the name of this definition.
-     */
     @Exported
+    @Override
     public String getName() {
         return name;
+    }
+
+
+    @Override
+    public synchronized MetaDataParent getParent() {
+        return parent;
+    }
+
+
+    @Override
+    public synchronized void setParent(MetaDataParent parent) {
+        this.parent = parent;
     }
 
     /**
@@ -92,6 +103,7 @@ public abstract class AbstractMetaDataDefinition implements Describable<Abstract
      * @return The description of this definition.
      */
     @Exported
+    @Override
     public String getDescription() {
         return description;
     }
@@ -113,7 +125,7 @@ public abstract class AbstractMetaDataDefinition implements Describable<Abstract
      * and submits it to the server.
      *
      * @param req the stapler request.
-     * @param jo  the JSON object.
+     * @param jo the JSON object.
      * @return the metadata values.
      */
 
@@ -162,6 +174,11 @@ public abstract class AbstractMetaDataDefinition implements Describable<Abstract
     @Exported
     public Object getDefaultValue() {
         return null;
+    }
+
+    @Override
+    public Object getValue() {
+        return getDefaultValue();
     }
 
     /**

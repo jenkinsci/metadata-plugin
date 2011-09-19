@@ -26,7 +26,7 @@ package com.sonyericsson.hudson.plugins.metadata.model;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetaDataDefinition;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.MetaDataValueParent;
+import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
@@ -53,11 +53,12 @@ import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_ME
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
+
 @XStreamAlias("job-metadata")
 @ExportedBean
-public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> implements MetaDataValueParent {
+public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> implements MetaDataParent<MetadataValue> {
 
-    private List<AbstractMetaDataValue> values;
+    private List<MetadataValue> values;
     private transient MetaDataJobAction metaDataJobAction;
 
     /**
@@ -66,7 +67,7 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
      * @param values the meta data.
      */
     @DataBoundConstructor
-    public MetaDataJobProperty(List<AbstractMetaDataValue> values) {
+    public MetaDataJobProperty(List<MetadataValue> values) {
         this.values = values;
     }
 
@@ -81,9 +82,9 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
      *
      * @return the values.
      */
-    public synchronized List<AbstractMetaDataValue> getValues() {
+    public synchronized List<MetadataValue> getValues() {
         if (values == null) {
-            values = new LinkedList<AbstractMetaDataValue>();
+            values = new LinkedList<MetadataValue>();
         }
         return values;
     }
@@ -93,13 +94,13 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
      *
      * @return all user values.
      */
-    public synchronized List<AbstractMetaDataValue> getUserValues() {
-        List<AbstractMetaDataValue> allValues = getValues();
-        List<AbstractMetaDataValue> userValues = new LinkedList<AbstractMetaDataValue>();
-        for (AbstractMetaDataValue value : allValues) {
-            if (!value.isGenerated()) {
-                userValues.add(value);
-            }
+    public synchronized List<MetadataValue> getUserValues() {
+        List<MetadataValue> allValues = getValues();
+        List<MetadataValue> userValues = new LinkedList<MetadataValue>();
+        for (MetadataValue value : allValues) {
+                if (!value.isGenerated()) {
+                    userValues.add(value);
+                }
         }
         return userValues;
     }
@@ -122,23 +123,23 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
     }
 
     @Override
-    public synchronized AbstractMetaDataValue getChildValue(String name) {
+    public synchronized MetadataValue getChild(String name) {
         return ParentUtil.getChildValue(getValues(), name);
     }
 
     @Override
-    public synchronized AbstractMetaDataValue addChildValue(AbstractMetaDataValue value) {
+    public synchronized Collection<MetadataValue> addChild(MetadataValue value) {
         return ParentUtil.addChildValue(this, getValues(), value);
     }
 
     @Override
-    public synchronized Collection<AbstractMetaDataValue> addChildValues(Collection<AbstractMetaDataValue> childValues) {
+    public synchronized Collection<MetadataValue> addChildren(Collection<MetadataValue> childValues) {
         return ParentUtil.addChildValues(this, getValues(), childValues);
     }
 
     @Override
     @Exported
-    public Collection<AbstractMetaDataValue> getChildren() {
+    public Collection<MetadataValue> getChildren() {
         return values;
     }
 
@@ -187,7 +188,5 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
             }
             return list;
         }
-
-
     }
 }

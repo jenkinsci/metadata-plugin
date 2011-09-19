@@ -23,7 +23,10 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
-import hudson.model.Descriptor;
+import com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent;
+import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
+import com.sonyericsson.hudson.plugins.metadata.model.definitions.MetadataDefinition;
+import com.sonyericsson.hudson.plugins.metadata.model.definitions.TreeNodeMetaDataDefinition;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -31,7 +34,7 @@ import java.util.List;
 
 /**
  * Utility class for handling merge operation inside
- * {@link com.sonyericsson.hudson.plugins.metadata.model.values.MetaDataValueParent}s.
+ * {@link MetaDataParent}s.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
@@ -46,32 +49,50 @@ public final class ParentUtil {
 
     /**
      * Adds the value as a child to the parent. Help utility for those who implement {@link
-     * MetaDataValueParent#addChildValue(com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue)}
+     * MetaDataParent#addChild(com.sonyericsson.hudson.plugins.metadata.model.Metadata)}
      *
      * @param parent   the parent
      * @param children the direct list of the parents children.
      * @param value    the value to add.
+     * @param <T> the type for parent, children, value and the return value.
      * @return the value(s) that failed to be added.
+     *
      */
-    public static AbstractMetaDataValue addChildValue(MetaDataValueParent parent, List<AbstractMetaDataValue> children,
-                                                      AbstractMetaDataValue value) {
-        AbstractMetaDataValue my = parent.getChildValue(value.getName());
+    public static<T extends Metadata> Collection<T> addChildValue(MetaDataParent<T> parent, List<T> children,
+                                                      T value) {
+
+        if (value == null) {
+            throw new IllegalArgumentException("The added child value is null");
+        }
+        T my = parent.getChild(value.getName());
         if (my != null) {
-            if (my instanceof MetaDataValueParent && value instanceof MetaDataValueParent) {
+            Collection<T> returnList = null;
+            if (my instanceof MetaDataParent && value instanceof MetaDataParent) {
                 //they are both a path, let's try to merge as much as possible.
-                Collection<AbstractMetaDataValue> subValues = ((MetaDataValueParent)value).getChildren();
-                Collection<AbstractMetaDataValue> leftOvers = ((MetaDataValueParent)my).addChildValues(subValues);
+                Collection<T> subValues = ((MetaDataParent)value).getChildren();
+                Collection<T> leftOvers = ((MetaDataParent)my).addChildren(subValues);
                 if (leftOvers != null && !leftOvers.isEmpty()) {
                     //some of the children failed to be merged, return them to sender.
-                    return new LeftOverMetaDataValues(value.getName(),
-                            value.getDescription(), leftOvers);
-                } else {
-                    return null;
-                }
+                    Metadata treeNode = null;
+                    if (value instanceof MetadataValue) {
+                        LinkedList<MetadataValue> list = (LinkedList<MetadataValue>)leftOvers;
+                        treeNode = new TreeNodeMetaDataValue(value.getName(), value.getDescription(), list);
+                    } else if (value instanceof MetadataDefinition) {
+                        LinkedList<MetadataDefinition> list = (LinkedList<MetadataDefinition>)leftOvers;
+                        treeNode = new TreeNodeMetaDataDefinition(value.getName(), value.getDescription(), list);
+                    }
+                    returnList = new LinkedList<T>();
+                    returnList.add((T)treeNode);
+                    return returnList;
+                    }
+
             } else {
                 //one or both of them is not a parent, so we fail.
-                return value;
+                returnList = new LinkedList<T>();
+                returnList.add(value);
+
             }
+            return returnList;
         } else {
             children.add(value);
             value.setParent(parent);
@@ -81,21 +102,23 @@ public final class ParentUtil {
 
     /**
      * Adds the values as a child to the parent. Help utility for those who implement {@link
-     * MetaDataValueParent#addChildValue(com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue)}
+     * com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent#
+     * addChild(com.sonyericsson.hudson.plugins.metadata.model.Metadata)}
      *
      * @param parent   the parent to add the values to
      * @param children the direct list of the parents children.
      * @param values   the values to add.
+     * @param <T> the type for parent, children, values and the return value.
      * @return the values that failed to be added.
      */
-    public static Collection<AbstractMetaDataValue> addChildValues(MetaDataValueParent parent,
-                                                                   List<AbstractMetaDataValue> children,
-                                                                   Collection<AbstractMetaDataValue> values) {
-        List<AbstractMetaDataValue> leftovers = new LinkedList<AbstractMetaDataValue>();
-        for (AbstractMetaDataValue value : values) {
-            AbstractMetaDataValue returned = addChildValue(parent, children, value);
+    public static<T extends Metadata> Collection<T> addChildValues(MetaDataParent parent,
+                                                                   List<T> children,
+                                                                   Collection<T> values) {
+        List<T> leftovers = new LinkedList<T>();
+        for (T value : values) {
+            Collection<T> returned = addChildValue(parent, children, value);
             if (returned != null) {
-                leftovers.add(returned);
+                leftovers.addAll(returned);
             }
         }
         if (leftovers.isEmpty()) {
@@ -106,71 +129,19 @@ public final class ParentUtil {
     }
 
     /**
-     * Utility method for {@link MetaDataValueParent#getChildValue(String)}.
+     * Utility method for {@link MetaDataParent#getChild(String)}.
      *
      * @param values the list of children.
      * @param name   the name to search.
+     * @param <T> the type for values, name and the return value.
      * @return the child if found or null if not.
      */
-    public static AbstractMetaDataValue getChildValue(Collection<AbstractMetaDataValue> values, String name) {
-        for (AbstractMetaDataValue value : values) {
+    public static<T extends Metadata> T getChildValue(Collection<T> values, String name) {
+        for (T value : values) {
             if (value.getName().equalsIgnoreCase(name)) {
                 return value;
             }
         }
         return null;
-    }
-
-    /**
-     * A Dummy parent for use when informing of children failing to be added.
-     */
-    private static class LeftOverMetaDataValues extends AbstractMetaDataValue implements MetaDataValueParent {
-        private Collection<AbstractMetaDataValue> children;
-
-        /**
-         * Standard Constructor.
-         * @param name the copied name
-         * @param description the copied description
-         * @param children the leftovers.
-         */
-        LeftOverMetaDataValues(String name, String description, Collection<AbstractMetaDataValue> children) {
-            super(name, description);
-            this.children = children;
-        }
-
-        @Override
-        public Object getValue() {
-            return children;
-        }
-
-        @Override
-        public boolean isGenerated() {
-            return true;
-        }
-
-        @Override
-        public synchronized AbstractMetaDataValue getChildValue(String name) {
-            return ParentUtil.getChildValue(children, name);
-        }
-
-        @Override
-        public AbstractMetaDataValue addChildValue(AbstractMetaDataValue value) {
-            return null;
-        }
-
-        @Override
-        public Collection<AbstractMetaDataValue> addChildValues(Collection<AbstractMetaDataValue> values) {
-            return null;
-        }
-
-        @Override
-        public synchronized Collection<AbstractMetaDataValue> getChildren() {
-            return children;
-        }
-
-        @Override
-        public Descriptor<AbstractMetaDataValue> getDescriptor() {
-            return null;
-        }
     }
 }

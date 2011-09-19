@@ -23,7 +23,7 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model;
 
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 import hudson.model.Hudson;
 import hudson.model.Node;
@@ -47,7 +47,7 @@ public class MetadataNodePropertyHudsonTest extends HudsonTestCase {
     public void testConfigRoundtrip() throws Exception {
         DumbSlave slave = createSlave();
         String name = slave.getNodeName();
-        MetadataNodeProperty property = new MetadataNodeProperty(new LinkedList<AbstractMetaDataValue>());
+        MetadataNodeProperty property = new MetadataNodeProperty(new LinkedList<MetadataValue>());
         slave.getNodeProperties().add(property);
         TreeStructureUtil.addValue(property, "test", "description", "some", "kind", "of", "path");
 
@@ -55,7 +55,7 @@ public class MetadataNodePropertyHudsonTest extends HudsonTestCase {
 
         Node node = Hudson.getInstance().getNode(name);
         property = node.getNodeProperties().get(MetadataNodeProperty.class);
-        AbstractMetaDataValue value = TreeStructureUtil.getPath(property, "some", "kind", "of", "path");
+        Metadata value = TreeStructureUtil.getPath(property, "some", "kind", "of", "path");
         assertNotNull(value);
         assertEquals("test", value.getValue());
     }

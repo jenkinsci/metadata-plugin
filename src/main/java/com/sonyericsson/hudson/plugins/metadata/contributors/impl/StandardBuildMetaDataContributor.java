@@ -25,6 +25,7 @@ package com.sonyericsson.hudson.plugins.metadata.contributors.impl;
 
 import com.sonyericsson.hudson.plugins.metadata.contributors.BuildMetaDataContributor;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.NumberMetaDataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetaDataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetaDataValue;
@@ -44,7 +45,7 @@ import java.util.List;
 public class StandardBuildMetaDataContributor extends BuildMetaDataContributor {
 
     @Override
-    public List<AbstractMetaDataValue> getMetaDataFor(AbstractBuild build) {
+    public List<MetadataValue> getMetaDataFor(AbstractBuild build) {
         TreeNodeMetaDataValue buildNode = TreeStructureUtil.createPath(build.getResult().toString(), "",
                 "build", "result");
         AbstractMetaDataValue mdv = new NumberMetaDataValue("ms", build.getDuration());
@@ -55,7 +56,7 @@ public class StandardBuildMetaDataContributor extends BuildMetaDataContributor {
         TreeStructureUtil.addValue(buildNode, mdv, "duration");
         TreeStructureUtil.addValue(buildNode, build.getBuiltOnStr(), null, "builtOn");
         TreeStructureUtil.addValue(buildNode, build.getTime(), null, "scheduled");
-        List<AbstractMetaDataValue> values = new LinkedList<AbstractMetaDataValue>();
+        List<MetadataValue> values = new LinkedList<MetadataValue>();
         values.add(buildNode);
         return values;
     }

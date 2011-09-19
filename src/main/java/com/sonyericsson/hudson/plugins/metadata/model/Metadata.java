@@ -21,38 +21,46 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package com.sonyericsson.hudson.plugins.metadata.contributors;
-
-import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
-import hudson.ExtensionList;
-import hudson.ExtensionPoint;
-import hudson.model.AbstractBuild;
-import hudson.model.Hudson;
-
-import java.util.List;
+package com.sonyericsson.hudson.plugins.metadata.model;
 
 /**
- * Extension point for plugins to contribute meta data to builds. When a build is done all contributors will be asked to
- * contribute meta data for that build.
+ * Common interface for definitions and values.
  *
- * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
+ * @author Tomas Westling &lt;thomas.westling@sonyericsson.com&gt;
  */
-public abstract class BuildMetaDataContributor implements ExtensionPoint {
+public interface Metadata {
+    /**
+     * Returns the name of this metadata.
+     *
+     * @return the name of this metadata.
+     */
+    String getName();
 
     /**
-     * Provides the meta-data that should be inserted into the build.
+     * Returns the description of this metadata.
      *
-     * @param build the build.
-     * @return a list of meta data.
+     * @return The description of this metadata.
      */
-    public abstract List<MetadataValue> getMetaDataFor(AbstractBuild build);
+    String getDescription();
 
     /**
-     * All the registered build-contributors.
+     * Get the value.
      *
-     * @return the list.
+     * @return the value.
      */
-    public static ExtensionList<BuildMetaDataContributor> all() {
-        return Hudson.getInstance().getExtensionList(BuildMetaDataContributor.class);
-    }
+    Object getValue();
+
+    /**
+     * The parent of this metadata.
+     *
+     * @return the parent.
+     */
+    MetaDataParent getParent();
+
+    /**
+     * The parent of this metadata.
+     *
+     * @param parent the metadata.
+     */
+    void setParent(MetaDataParent parent);
 }

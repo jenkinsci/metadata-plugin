@@ -39,6 +39,11 @@ public abstract class Constants {
     public static final String REQUEST_ATTR_METADATA_CONTAINER = "jenkins-metadata-container";
 
     /**
+     * The dot separator constant.
+     */
+    public static final String SEPARATOR_DOT = ".";
+
+    /**
      * Empty utility constructor.
      */
     private Constants() {

@@ -24,6 +24,7 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.model.MetaDataJobProperty;
+import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -36,7 +37,8 @@ import static org.junit.Assert.*;
 public class TreeStructureUtilTest {
 
     /**
-     * Tests {@link TreeStructureUtil#addValue(MetaDataValueParent, String, String, String...)}.
+     * Tests {@link TreeStructureUtil#
+     * addValue(com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent, String, String, String...)}.
      *
      * @throws Exception if so.
      */
@@ -45,13 +47,13 @@ public class TreeStructureUtilTest {
         TreeNodeMetaDataValue root = new TreeNodeMetaDataValue("root");
         boolean result = TreeStructureUtil.addValue(root, "value", "description", "one", "two", "three");
         assertTrue(result);
-        TreeNodeMetaDataValue one = (TreeNodeMetaDataValue)root.getChildValue("one");
+        TreeNodeMetaDataValue one = (TreeNodeMetaDataValue)root.getChild("one");
         assertNotNull(one);
         assertSame(root, one.getParent());
-        TreeNodeMetaDataValue two = (TreeNodeMetaDataValue)one.getChildValue("two");
+        TreeNodeMetaDataValue two = (TreeNodeMetaDataValue)one.getChild("two");
         assertNotNull(two);
         assertSame(one, two.getParent());
-        AbstractMetaDataValue three = two.getChildValue("three");
+        Metadata three = two.getChild("three");
         assertNotNull(three);
         assertSame(two, three.getParent());
         assertEquals("value", three.getValue());
@@ -59,7 +61,8 @@ public class TreeStructureUtilTest {
     }
 
     /**
-     * Tests {@link TreeStructureUtil#addValue(MetaDataValueParent, String, String, String...)}.
+     * Tests {@link TreeStructureUtil#
+     * addValue(com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent, String, String, String...)}.
      *
      * @throws Exception if so.
      */
@@ -68,10 +71,10 @@ public class TreeStructureUtilTest {
         MetaDataJobProperty root = new MetaDataJobProperty();
         boolean result = TreeStructureUtil.addValue(root, "value", "description", "one", "two");
         assertTrue(result);
-        TreeNodeMetaDataValue one = (TreeNodeMetaDataValue)root.getChildValue("one");
+        TreeNodeMetaDataValue one = (TreeNodeMetaDataValue)root.getChild("one");
         assertNotNull(one);
         assertSame(root, one.getParent());
-        AbstractMetaDataValue two = one.getChildValue("two");
+        Metadata two = one.getChild("two");
         assertNotNull(two);
         assertSame(one, two.getParent());
         assertEquals("value", two.getValue());
@@ -79,7 +82,9 @@ public class TreeStructureUtilTest {
     }
 
     /**
-     * Tests {@link TreeStructureUtil#addValue(MetaDataValueParent, String, String, String...)}. With null description.
+     * Tests {@link TreeStructureUtil#
+     * addValue(com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent, String, String, String...)}.
+     * With null description.
      *
      * @throws Exception if so.
      */
@@ -88,8 +93,8 @@ public class TreeStructureUtilTest {
         TreeNodeMetaDataValue root = new TreeNodeMetaDataValue("root");
         boolean result = TreeStructureUtil.addValue(root, "value", null, "one");
         assertTrue(result);
-        assertNotNull(root.getChildValue("one"));
-        assertNull(root.getChildValue("one").getDescription());
+        assertNotNull(root.getChild("one"));
+        assertNull(root.getChild("one").getDescription());
     }
 
     /**
@@ -99,10 +104,10 @@ public class TreeStructureUtilTest {
     public void testCreatePath() {
         TreeNodeMetaDataValue root = TreeStructureUtil.createPath("value", "description", "one", "two");
         assertEquals("one", root.getName());
-        assertNotNull(root.getChildValue("two"));
-        assertSame(root, root.getChildValue("two").getParent());
-        assertEquals("value", root.getChildValue("two").getValue());
-        assertEquals("description", root.getChildValue("two").getDescription());
+        assertNotNull(root.getChild("two"));
+        assertSame(root, root.getChild("two").getParent());
+        assertEquals("value", root.getChild("two").getValue());
+        assertEquals("description", root.getChild("two").getDescription());
     }
 
     /**

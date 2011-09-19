@@ -23,6 +23,9 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
+import com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent;
+import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -50,7 +53,7 @@ public abstract class TreeStructureUtil {
      * @param path        the path to the leaf from the root.
      * @return true if there was no merge conflicts.
      */
-    public static boolean addValue(MetaDataValueParent root, String value, String description, String... path) {
+    public static boolean addValue(MetaDataParent root, String value, String description, String... path) {
         StringMetaDataValue sVal = new StringMetaDataValue(path[path.length - 1], description, value);
         sVal.setGenerated(true);
         return addValue(root, sVal, Arrays.copyOf(path, path.length - 1));
@@ -65,7 +68,7 @@ public abstract class TreeStructureUtil {
      * @param path        the path to the leaf from the root.
      * @return true if there was no merge conflicts.
      */
-    public static boolean addValue(MetaDataValueParent root, Date value, String description, String... path) {
+    public static boolean addValue(MetaDataParent root, Date value, String description, String... path) {
         DateMetaDataValue sVal = new DateMetaDataValue(path[path.length - 1], description, value);
         sVal.setGenerated(true);
         return addValue(root, sVal, Arrays.copyOf(path, path.length - 1));
@@ -79,12 +82,12 @@ public abstract class TreeStructureUtil {
      * @param parentPath the path of the parent of the leaf from the root.
      * @return true if there was no merge conflicts.
      */
-    public static boolean addValue(MetaDataValueParent root, AbstractMetaDataValue value, String... parentPath) {
+    public static boolean addValue(MetaDataParent root, AbstractMetaDataValue value, String... parentPath) {
         if (parentPath == null || parentPath.length <= 0) {
-            return root.addChildValue(value) == null;
+            return root.addChild(value) == null;
         } else {
             TreeNodeMetaDataValue path = createPath(value, parentPath);
-            return root.addChildValue(path) == null;
+            return root.addChild(path) == null;
         }
     }
 
@@ -134,14 +137,14 @@ public abstract class TreeStructureUtil {
             TreeNodeMetaDataValue val = new TreeNodeMetaDataValue(name);
             val.setGenerated(true);
             if (parent != null) {
-                parent.addChildValue(val);
+                parent.addChild(val);
             }
             parent = val;
             if (root == null) {
                 root = val;
             }
         }
-        parent.addChildValue(leaf);
+        parent.addChild(leaf);
         return root;
     }
 
@@ -167,18 +170,18 @@ public abstract class TreeStructureUtil {
      * @param path the path to get.
      * @return the value or null if it wasn't found.
      */
-    public static AbstractMetaDataValue getPath(MetaDataValueParent root, String... path) {
-        MetaDataValueParent parent = root;
-        AbstractMetaDataValue currentValue = null;
+    public static Metadata getPath(MetaDataParent root, String... path) {
+        MetaDataParent parent = root;
+        Metadata currentValue = null;
         for (int i = 0; i < path.length; i++) {
             String name = path[i];
-            currentValue = parent.getChildValue(name);
+            currentValue = parent.getChild(name);
             if (currentValue == null) {
                 return null;
             } else if (i == path.length - 1) {
                 return currentValue;
-            } else if (currentValue instanceof MetaDataValueParent) {
-                parent = (MetaDataValueParent)currentValue;
+            } else if (currentValue instanceof MetaDataParent) {
+                parent = (MetaDataParent)currentValue;
             } else {
                 return null;
             }
@@ -193,11 +196,11 @@ public abstract class TreeStructureUtil {
      * @param tabs  the current level
      * @return a pretty string.
      */
-    public static String prettyPrint(AbstractMetaDataValue value, String tabs) {
+    public static String prettyPrint(MetadataValue value, String tabs) {
         StringBuffer str = new StringBuffer(tabs);
         str.append(value.getName()).append("\n");
-        if (value instanceof MetaDataValueParent) {
-            MetaDataValueParent node = (MetaDataValueParent)value;
+        if (value instanceof MetaDataParent) {
+            MetaDataParent node = (MetaDataParent)value;
             prettyPrint(node.getChildren(), tabs + "\t");
         }
         return str.toString();
@@ -209,9 +212,9 @@ public abstract class TreeStructureUtil {
      * @param tabs the current level.
      * @return a pretty string.
      */
-    public static String prettyPrint(Collection<AbstractMetaDataValue> values, String tabs) {
+    public static String prettyPrint(Collection<MetadataValue> values, String tabs) {
         StringBuffer str = new StringBuffer();
-        for (AbstractMetaDataValue subValue : values) {
+        for (MetadataValue subValue : values) {
             str.append(prettyPrint(subValue, tabs));
         }
         return str.toString();

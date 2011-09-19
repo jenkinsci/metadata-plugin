@@ -24,7 +24,7 @@
 package com.sonyericsson.hudson.plugins.metadata.contributors;
 
 import com.sonyericsson.hudson.plugins.metadata.model.MetaDataJobProperty;
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetaDataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 import hudson.Extension;
@@ -157,13 +157,13 @@ public class JobContributorsController extends SaveableListener {
             TreeStructureUtil.addValue(lastSaved, currentUser.getFullName(), "", "user", "full-name");
             //TODO lower the level
             logger.info("Adding standard generated metadata");
-            property.addChildValue(jobInfo);
+            property.addChild(jobInfo);
 
             ExtensionList<JobMetaDataContributor> contributors = JobMetaDataContributor.all();
             for (JobMetaDataContributor contributor : contributors) {
-                List<AbstractMetaDataValue> dataFor = contributor.getMetaDataFor(project);
+                List<MetadataValue> dataFor = contributor.getMetaDataFor(project);
                 if (dataFor != null && !dataFor.isEmpty()) {
-                    Collection<AbstractMetaDataValue> leftover = property.addChildValues(dataFor);
+                    Collection<MetadataValue> leftover = property.addChildren(dataFor);
                     logger.warning("Failed to add the following contributor's[" + contributor + "] metadata to "
                             + project + "\n"
                             + TreeStructureUtil.prettyPrint(leftover, "\t"));

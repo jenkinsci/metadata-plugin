@@ -25,6 +25,7 @@
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
     <f:section title="${%Meta Data}">
         <f:entry title="${%Preset Values}">
+            <j:set var="property" value="${instance}"/>
             <j:forEach var="definition" items="${instance.getDefinitions(request)}">
                 <st:include it="${definition}" page="representation.jelly"/>
             </j:forEach>

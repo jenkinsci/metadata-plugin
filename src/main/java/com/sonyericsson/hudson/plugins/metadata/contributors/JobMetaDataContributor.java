@@ -23,7 +23,7 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.contributors;
 
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.AbstractProject;
@@ -45,7 +45,7 @@ public abstract class JobMetaDataContributor implements ExtensionPoint {
      * @param job the project.
      * @return a list of meta data.
      */
-    public abstract List<AbstractMetaDataValue> getMetaDataFor(AbstractProject job);
+    public abstract List<MetadataValue> getMetaDataFor(AbstractProject job);
 
     /**
      * All the registered job contributors.

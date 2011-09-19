@@ -21,51 +21,53 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package com.sonyericsson.hudson.plugins.metadata.model.values;
+package com.sonyericsson.hudson.plugins.metadata.model;
 
 import java.util.Collection;
 
 /**
- * The Parent node of some meta-data value.
+ * The Parent node of some metadata.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
+ * @param <T> the type to work with, either MetadataValue or MetadataDefinition.
  */
-public interface MetaDataValueParent {
+public interface MetaDataParent<T extends Metadata> {
 
     /**
      * Returns the child with the given name, or null if there is none. comparison is case insensitive.
      *
      * @param name the name to search for.
-     * @return the value.
+     * @return the child.
      */
-    AbstractMetaDataValue getChildValue(String name);
+    T getChild(String name);
 
     /**
-     * Adds the value to this parent's list of children. If a value with the same name is already present, the values
-     * should try to be merged. The returned value is either the value itself if it is a leaf or a clone of itself with
-     * the children that failed to be merged if it contains children,
+     * Adds the child to this parent's list of children. If a child with the same name is already present, the
+     * children should try to be merged. The returned child is either the child itself if it is a leaf or a
+     * clone of itself with the children that failed to be merged if it contains children,
      * null indicates a fully successful merge/add.
      *
-     * @param value the value to add.
+     * @param child the child to add.
      * @return null if the operation was successful.
      */
-    AbstractMetaDataValue addChildValue(AbstractMetaDataValue value);
+    Collection<T> addChild(T child);
 
     /**
-     * Adds the values to this parent's list of children. If a value with the same name is already present, the values
-     * should try to be merged.
+     * Adds the children to this parent's list of children. If a child with the same name is already present, the
+     * children should try to be merged.
      *
-     * @param values the value to add.
-     * @return the values that failed to be added/merged or null if all succeeded.
+     * @param children the children to add.
+     * @return the children that failed to be added/merged or null if all succeeded.
      */
-    Collection<AbstractMetaDataValue> addChildValues(Collection<AbstractMetaDataValue> values);
+    Collection<T> addChildren(Collection<T> children);
 
     /**
      * The children of this parent.
      *
      * @return the children.
      */
-    Collection<AbstractMetaDataValue> getChildren();
+    Collection<T> getChildren();
+
     /**
      * The full name of the element.
      *

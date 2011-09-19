@@ -29,6 +29,7 @@ import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.util.FormValidation;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 /**
@@ -48,6 +49,7 @@ public class NumberMetaDataValue extends AbstractMetaDataValue {
      * @param description the description.
      * @param value       the value
      */
+    @DataBoundConstructor
     public NumberMetaDataValue(String name, String description, long value) {
         super(name, description);
         this.value = value;

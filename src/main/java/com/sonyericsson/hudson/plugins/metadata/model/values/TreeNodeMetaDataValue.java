@@ -24,7 +24,9 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Descriptor;
@@ -43,10 +45,11 @@ import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_ME
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-@XStreamAlias("metadata-tree")
-public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements MetaDataValueParent {
 
-    private List<AbstractMetaDataValue> children;
+@XStreamAlias("metadata-tree")
+public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements MetaDataParent<MetadataValue> {
+
+    private List<MetadataValue> children;
 
     /**
      * Standard Constructor.
@@ -56,7 +59,7 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
      * @param children    its children.
      */
     @DataBoundConstructor
-    public TreeNodeMetaDataValue(String name, String description, List<AbstractMetaDataValue> children) {
+    public TreeNodeMetaDataValue(String name, String description, List<MetadataValue> children) {
         super(name, description);
         setChildren(children);
     }
@@ -69,7 +72,7 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
      */
     public TreeNodeMetaDataValue(String name, String description) {
         super(name, description);
-        this.children = new LinkedList<AbstractMetaDataValue>();
+        this.children = new LinkedList<MetadataValue>();
     }
 
     /**
@@ -78,7 +81,7 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
      * @param name     the name.
      * @param children its children.
      */
-    public TreeNodeMetaDataValue(String name, List<AbstractMetaDataValue> children) {
+    public TreeNodeMetaDataValue(String name, List<MetadataValue> children) {
         super(name);
         setChildren(children);
     }
@@ -88,10 +91,12 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
      *
      * @param children the children.
      */
-    private synchronized void setChildren(List<AbstractMetaDataValue> children) {
+    private synchronized void setChildren(List<MetadataValue> children) {
         this.children = children;
-        for (AbstractMetaDataValue value : this.children) {
-            value.setParent(this);
+        if (this.children != null) {
+            for (MetadataValue value : this.children) {
+                value.setParent(this);
+            }
         }
     }
 
@@ -102,11 +107,11 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
      */
     public TreeNodeMetaDataValue(String name) {
         super(name);
-        this.children = new LinkedList<AbstractMetaDataValue>();
+        this.children = new LinkedList<MetadataValue>();
     }
 
     @Override
-    public synchronized List<AbstractMetaDataValue> getValue() {
+    public synchronized List<MetadataValue> getValue() {
         return children;
     }
 
@@ -117,22 +122,22 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
      * @return the value.
      */
     @Override
-    public synchronized AbstractMetaDataValue getChildValue(String name) {
+    public synchronized MetadataValue getChild(String name) {
         return ParentUtil.getChildValue(children, name);
     }
 
     @Override
-    public synchronized AbstractMetaDataValue addChildValue(AbstractMetaDataValue value) {
+    public synchronized Collection<MetadataValue> addChild(MetadataValue value) {
         return ParentUtil.addChildValue(this, children, value);
     }
 
     @Override
-    public synchronized Collection<AbstractMetaDataValue> addChildValues(Collection<AbstractMetaDataValue> values) {
+    public synchronized Collection<MetadataValue> addChildren(Collection<MetadataValue> values) {
         return ParentUtil.addChildValues(this, children, values);
     }
 
     @Override
-    public synchronized Collection<AbstractMetaDataValue> getChildren() {
+    public synchronized Collection<MetadataValue> getChildren() {
         return children;
     }
 

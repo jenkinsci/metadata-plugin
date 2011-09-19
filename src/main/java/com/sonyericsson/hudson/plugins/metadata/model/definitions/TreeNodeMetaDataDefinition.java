@@ -23,8 +23,11 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 
+import com.sonyericsson.hudson.plugins.metadata.Constants;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
+import com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetaDataValue;
 import hudson.Extension;
 import hudson.ExtensionList;
@@ -32,7 +35,9 @@ import hudson.model.Hudson;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.export.Exported;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,9 +46,10 @@ import java.util.List;
  *
  * @author Tomas Westling &lt;thomas.westling@sonyericsson.com&gt;
  */
-public class TreeNodeMetaDataDefinition extends AbstractMetaDataDefinition {
+public class TreeNodeMetaDataDefinition extends AbstractMetaDataDefinition
+        implements MetaDataParent<MetadataDefinition> {
 
-    private List<AbstractMetaDataDefinition> children;
+    private List<MetadataDefinition> children;
 
     /**
      * Standard constructor.
@@ -52,7 +58,7 @@ public class TreeNodeMetaDataDefinition extends AbstractMetaDataDefinition {
      * @param children the children of this node.
      */
     @DataBoundConstructor
-    public TreeNodeMetaDataDefinition(String name, String description, List<AbstractMetaDataDefinition> children) {
+    public TreeNodeMetaDataDefinition(String name, String description, List<MetadataDefinition> children) {
         super(name, description);
         this.children = children;
     }
@@ -64,8 +70,41 @@ public class TreeNodeMetaDataDefinition extends AbstractMetaDataDefinition {
      */
     public TreeNodeMetaDataDefinition(String name) {
         super(name);
-        this.children = new LinkedList<AbstractMetaDataDefinition>();
+        this.children = new LinkedList<MetadataDefinition>();
 
+    }
+    /**
+     * Standard Constructor.
+     *
+     * @param name        the name
+     * @param description the description.
+     */
+    public TreeNodeMetaDataDefinition(String name, String description) {
+        super(name, description);
+        this.children = new LinkedList<MetadataDefinition>();
+    }
+
+    @Override
+    public MetadataDefinition getChild(String name) {
+        return ParentUtil.getChildValue(children, name);
+    }
+
+    @Override
+    public Collection<MetadataDefinition> addChild(MetadataDefinition definition) {
+        return ParentUtil.addChildValue(this, children, definition);
+    }
+
+    @Override
+    public Collection<MetadataDefinition> addChildren(Collection<MetadataDefinition> definitions) {
+        return ParentUtil.addChildValues(this, children, definitions);
+    }
+
+    /**
+     *  Getter for the children of this tree node, used by stapler to create the entire tree.
+      * @return the children.
+     */
+    public synchronized Collection<MetadataDefinition> getChildren() {
+        return children;
     }
 
     /**
@@ -74,7 +113,7 @@ public class TreeNodeMetaDataDefinition extends AbstractMetaDataDefinition {
      * @param name     the name.
      * @param children the children of this node.
      */
-    public TreeNodeMetaDataDefinition(String name, List<AbstractMetaDataDefinition> children) {
+    public TreeNodeMetaDataDefinition(String name, List<MetadataDefinition> children) {
         super(name);
         this.children = children;
     }
@@ -90,6 +129,19 @@ public class TreeNodeMetaDataDefinition extends AbstractMetaDataDefinition {
     public AbstractMetaDataValue createValue(StaplerRequest req) {
         return null;
 
+    }
+
+    /**
+     * This function will generate the full name.
+     *
+     * @return the full name.
+     */
+    @Exported
+    public String getFullName() {
+        if (getParent() != null) {
+            return getParent().getFullName() + Constants.SEPARATOR_DOT + getName();
+        }
+        return getName();
     }
 
     /**

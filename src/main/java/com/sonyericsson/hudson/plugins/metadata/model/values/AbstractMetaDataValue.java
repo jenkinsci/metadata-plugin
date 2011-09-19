@@ -24,6 +24,8 @@
 
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
+import com.sonyericsson.hudson.plugins.metadata.Constants;
+import com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import org.kohsuke.stapler.export.Exported;
@@ -35,18 +37,14 @@ import java.io.Serializable;
  * A metadata value to be set in a job or node.
  */
 @ExportedBean
-public abstract class AbstractMetaDataValue implements Serializable, Describable<AbstractMetaDataValue> {
+public abstract class AbstractMetaDataValue implements Serializable, Describable<AbstractMetaDataValue>, MetadataValue {
     /**
      * The name of this metadata value.
      */
     protected final String name;
     private String description;
-    private MetaDataValueParent parent;
+    private MetaDataParent parent;
     private boolean generated = false;
-    /**
-     * The dot Seperator constant.
-     */
-    public static final String SEPERATER_DOT = ".";
 
     /**
      * Constructor with name and description.
@@ -73,7 +71,9 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      *
      * @return the description.
      */
+
     @Exported
+    @Override
     public synchronized String getDescription() {
         return description;
     }
@@ -103,6 +103,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      * @return the value.
      */
     @Exported
+    @Override
     public synchronized Object getValue() {
         return null;
     }
@@ -112,7 +113,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      *
      * @return the parent.
      */
-    public synchronized MetaDataValueParent getParent() {
+    public synchronized MetaDataParent getParent() {
         return parent;
     }
 
@@ -121,7 +122,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      *
      * @param parent the parent.
      */
-    public synchronized void setParent(MetaDataValueParent parent) {
+    public synchronized void setParent(MetaDataParent parent) {
         this.parent = parent;
     }
 
@@ -130,6 +131,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      *
      * @return true if generated.
      */
+    @Override
     public boolean isGenerated() {
         return generated;
     }
@@ -139,6 +141,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      *
      * @param generated true if generated.
      */
+    @Override
     public void setGenerated(boolean generated) {
         this.generated = generated;
     }
@@ -150,8 +153,8 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      */
     @Exported
     public String getFullName() {
-        if (getParent() != null && getParent() instanceof AbstractMetaDataValue) {
-            return getParent().getFullName() + SEPERATER_DOT + getName();
+        if (getParent() != null) {
+            return getParent().getFullName() + Constants.SEPARATOR_DOT + getName();
         }
         return getName();
     }
