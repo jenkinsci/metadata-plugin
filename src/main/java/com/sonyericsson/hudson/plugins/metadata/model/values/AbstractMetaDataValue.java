@@ -73,6 +73,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      *
      * @return the description.
      */
+    @Exported
     public synchronized String getDescription() {
         return description;
     }
@@ -101,6 +102,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      *
      * @return the value.
      */
+    @Exported
     public synchronized Object getValue() {
         return null;
     }
@@ -146,6 +148,7 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      *
      * @return the full name.
      */
+    @Exported
     public String getFullName() {
         if (getParent() != null && getParent() instanceof AbstractMetaDataValue) {
             return getParent().getFullName() + SEPERATER_DOT + getName();
@@ -156,6 +159,18 @@ public abstract class AbstractMetaDataValue implements Serializable, Describable
      * The descriptor for the AbstractMetaDataValue.
      */
     public abstract static class AbstractMetaDataValueDescriptor extends Descriptor<AbstractMetaDataValue> {
+
+        /**
+         * Tells if values of this descriptor can be added to the specified container type or not.
+         * Some value types might not apply to be added to a node and vice versa.
+         * The default implementation always returns true.
+         * @param containerDescriptor the descriptor for the container that the values of this type can be added to.
+         *                                             Can be null.
+         * @return true if it applies.
+         */
+        public boolean appliesTo(Descriptor containerDescriptor) {
+            return true;
+        }
     }
 }
 

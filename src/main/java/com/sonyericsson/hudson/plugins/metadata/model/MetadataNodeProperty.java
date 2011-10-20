@@ -24,62 +24,65 @@
 package com.sonyericsson.hudson.plugins.metadata.model;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
-import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetaDataDefinition;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetaDataValueParent;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.ExtensionList;
-import hudson.model.AbstractProject;
-import hudson.model.Action;
+import hudson.model.Computer;
 import hudson.model.Hudson;
-import hudson.model.JobProperty;
-import hudson.model.JobPropertyDescriptor;
+import hudson.model.Node;
+import hudson.slaves.NodeProperty;
+import hudson.slaves.NodePropertyDescriptor;
+import org.kohsuke.stapler.Ancestor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_METADATA_CONTAINER;
 
 /**
- * Gives support for meta data on Projects and their builds.
+ * Stores metadata about Nodes.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-@XStreamAlias("job-metadata")
+@XStreamAlias("node-metadata")
 @ExportedBean
-public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> implements MetaDataValueParent {
+public class MetadataNodeProperty extends NodeProperty<Node> implements MetaDataValueParent {
 
     private List<AbstractMetaDataValue> values;
-    private transient MetaDataJobAction metaDataJobAction;
 
     /**
-     * Standard DataBound Constructor.
+     * Standard Constructor.
      *
-     * @param values the meta data.
+     * @param values the metadata for a Node.
      */
     @DataBoundConstructor
-    public MetaDataJobProperty(List<AbstractMetaDataValue> values) {
+    public MetadataNodeProperty(List<AbstractMetaDataValue> values) {
         this.values = values;
+        for (AbstractMetaDataValue value : this.values) {
+            value.setParent(this);
+        }
     }
 
     /**
-     * Default constructor. <strong>Do not use unless you are a serializer.</strong>
+     * Default constructor. <strong>Do not use this unless you are a serializer.</strong>
      */
-    public MetaDataJobProperty() {
+    public MetadataNodeProperty() {
     }
 
     /**
-     * The meta data.
+     * The list of metadata values.
      *
      * @return the values.
+     *
+     * @see #getChildren()
      */
     public synchronized List<AbstractMetaDataValue> getValues() {
         if (values == null) {
@@ -88,68 +91,25 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
         return values;
     }
 
-    /**
-     * All the non generated values. I.e. the values that the user has put in.
-     *
-     * @return all user values.
-     */
-    public synchronized List<AbstractMetaDataValue> getUserValues() {
-        List<AbstractMetaDataValue> allValues = getValues();
-        List<AbstractMetaDataValue> userValues = new LinkedList<AbstractMetaDataValue>();
-        for (AbstractMetaDataValue value : allValues) {
-            if (!value.isGenerated()) {
-                userValues.add(value);
-            }
-        }
-        return userValues;
-    }
-
-    /**
-     * The current Project.
-     *
-     * @return the owner.
-     */
-    public AbstractProject<?, ?> getOwner() {
-        return owner;
-    }
-
-    @Override
-    public synchronized Collection<? extends Action> getJobActions(AbstractProject<?, ?> job) {
-        if (metaDataJobAction == null) {
-            metaDataJobAction = new MetaDataJobAction(job.getProperty(this.getClass()));
-        }
-        return Collections.singletonList(metaDataJobAction);
-    }
-
     @Override
     public synchronized AbstractMetaDataValue getChildValue(String name) {
-        return ParentUtil.getChildValue(getValues(), name);
+        return ParentUtil.getChildValue(values, name);
     }
 
     @Override
     public synchronized AbstractMetaDataValue addChildValue(AbstractMetaDataValue value) {
-        return ParentUtil.addChildValue(this, getValues(), value);
+        return ParentUtil.addChildValue(this, values, value);
     }
 
     @Override
-    public synchronized Collection<AbstractMetaDataValue> addChildValues(Collection<AbstractMetaDataValue> childValues) {
-        return ParentUtil.addChildValues(this, getValues(), childValues);
+    public synchronized Collection<AbstractMetaDataValue> addChildValues(Collection<AbstractMetaDataValue> children) {
+        return ParentUtil.addChildValues(this, this.values, children);
     }
 
     @Override
     @Exported
-    public Collection<AbstractMetaDataValue> getChildren() {
-        return values;
-    }
-
-    /**
-     * All registered meta data descriptors. To be used by a hetero-list.
-     *
-     * @param request the current http request.
-     * @return a list.
-     */
-    public List<AbstractMetaDataDefinition> getDefinitions(StaplerRequest request) {
-        return PluginImpl.getInstance().getDefinitions();
+    public synchronized Collection<AbstractMetaDataValue> getChildren() {
+        return getValues();
     }
 
     @Override
@@ -158,14 +118,30 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
     }
 
     /**
-     * Descriptor for the {@link MetaDataJobProperty}.
+     * Jenkins likes to display both the master's properties summary.jelly and the node's summary.jelly on the computer
+     * page. This method determines if the request really represents the Node that this property is tied to.
+     *
+     * @param request the request.
+     * @return true if the request is for this Node and the summary should be displayed.
+     */
+    public boolean shouldDisplaySummary(StaplerRequest request) {
+        List<Ancestor> ancestors = request.getAncestors();
+        Ancestor ancestor = ancestors.get(ancestors.size() - 1);
+        if (ancestor.getObject() instanceof Computer) {
+            Computer computer = (Computer)ancestor.getObject();
+            return computer.getNode().getNodeProperties().get(MetadataNodeProperty.class) == this;
+        }
+        return false;
+    }
+
+    /**
+     * Descriptor for {@link MetadataNodeProperty}.
      */
     @Extension
-    public static class MetaDataJobPropertyDescriptor extends JobPropertyDescriptor {
-
+    public static class MetadataNodePropertyDescriptor extends NodePropertyDescriptor {
         @Override
         public String getDisplayName() {
-            return Messages.MetaDataJobProperty_DisplayName();
+            return Messages.MetadataNodeProperty_DisplayName();
         }
 
         /**
@@ -187,7 +163,5 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
             }
             return list;
         }
-
-
     }
 }

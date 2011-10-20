@@ -36,6 +36,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_METADATA_CONTAINER;
+
 /**
  * Meta data containing other meta data values. Used to create tree structures of data.
  *
@@ -56,7 +58,7 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
     @DataBoundConstructor
     public TreeNodeMetaDataValue(String name, String description, List<AbstractMetaDataValue> children) {
         super(name, description);
-        this.children = children;
+        setChildren(children);
     }
 
     /**
@@ -78,7 +80,19 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
      */
     public TreeNodeMetaDataValue(String name, List<AbstractMetaDataValue> children) {
         super(name);
+        setChildren(children);
+    }
+
+    /**
+     * Sets {@link #children} and sets their parent to this.
+     *
+     * @param children the children.
+     */
+    private synchronized void setChildren(List<AbstractMetaDataValue> children) {
         this.children = children;
+        for (AbstractMetaDataValue value : this.children) {
+            value.setParent(this);
+        }
     }
 
     /**
@@ -146,12 +160,17 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
          * @return the descriptors.
          */
         public List<AbstractMetaDataValueDescriptor> getValueDescriptors(StaplerRequest request) {
+            Object containerObj = request.getAttribute(REQUEST_ATTR_METADATA_CONTAINER);
+            Descriptor container = null;
+            if ((containerObj != null) && containerObj instanceof Descriptor) {
+                container = (Descriptor)containerObj;
+            }
             List<AbstractMetaDataValueDescriptor> list = new LinkedList<AbstractMetaDataValueDescriptor>();
             ExtensionList<AbstractMetaDataValueDescriptor> extensionList =
                     Hudson.getInstance().getExtensionList(AbstractMetaDataValueDescriptor.class);
             for (AbstractMetaDataValueDescriptor d : extensionList) {
                 //TODO fix the problem  with limitless loop, for now don't return anything nested.
-                if (!(d instanceof TreeNodeMetaDataValueDescriptor)) {
+                if (!(d instanceof TreeNodeMetaDataValueDescriptor) && d.appliesTo(container)) {
                     list.add(d);
                 }
             }

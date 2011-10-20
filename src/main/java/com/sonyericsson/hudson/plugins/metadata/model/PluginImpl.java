@@ -63,7 +63,8 @@ public class PluginImpl extends Plugin {
                 NumberMetaDataValue.class,
                 StringMetaDataValue.class,
                 TreeNodeMetaDataValue.class,
-                MetaDataJobProperty.class, };
+                MetaDataJobProperty.class,
+                MetadataNodeProperty.class, };
         //Register it in all known XStreams just to be sure.
         Hudson.XSTREAM.processAnnotations(types);
         Items.XSTREAM.processAnnotations(types);
