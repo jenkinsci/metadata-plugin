@@ -1,8 +1,8 @@
 package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetadataValue;
 import hudson.Extension;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -13,7 +13,7 @@ import org.kohsuke.stapler.StaplerRequest;
  *
  * @author Tomas Westling &lt;thomas.westling@sonyericsson.com&gt;
  */
-public class StringMetaDataDefinition extends AbstractMetaDataDefinition {
+public class StringMetadataDefinition extends AbstractMetadataDefinition {
 
     private String defaultValue;
 
@@ -25,7 +25,7 @@ public class StringMetaDataDefinition extends AbstractMetaDataDefinition {
      * @param defaultValue the default value for this definition
      */
     @DataBoundConstructor
-    public StringMetaDataDefinition(String name, String description, String defaultValue) {
+    public StringMetadataDefinition(String name, String description, String defaultValue) {
         super(name, description);
         this.defaultValue = defaultValue;
     }
@@ -36,14 +36,14 @@ public class StringMetaDataDefinition extends AbstractMetaDataDefinition {
      * @param name the name.
      * @param defaultValue the default value.
      */
-    public StringMetaDataDefinition(String name, String defaultValue) {
+    public StringMetadataDefinition(String name, String defaultValue) {
         super(name);
         this.defaultValue = defaultValue;
     }
 
     @Override
-    public AbstractMetaDataValue createValue(StaplerRequest req, JSONObject jo) {
-        StringMetaDataValue value = req.bindJSON(StringMetaDataValue.class, jo);
+    public AbstractMetadataValue createValue(StaplerRequest req, JSONObject jo) {
+        StringMetadataValue value = req.bindJSON(StringMetadataValue.class, jo);
         value.setDescription(getDescription());
         return value;
     }
@@ -59,7 +59,7 @@ public class StringMetaDataDefinition extends AbstractMetaDataDefinition {
     }
 
     @Override
-    public AbstractMetaDataValue createValue(StaplerRequest req) {
+    public AbstractMetadataValue createValue(StaplerRequest req) {
         return null;
     }
 
@@ -68,11 +68,11 @@ public class StringMetaDataDefinition extends AbstractMetaDataDefinition {
      */
     @Extension
     public static class StringMetaDataDefinitionDescriptor extends
-            AbstractMetaDataDefinition.AbstractMetaDataDefinitionDescriptor {
+            AbstractMetadataDefinition.AbstractMetaDataDefinitionDescriptor {
 
         @Override
         public String getDisplayName() {
-            return Messages.StringMetaDataDefinition_DisplayName();
+            return Messages.StringMetadataDefinition_DisplayName();
         }
     }
 }

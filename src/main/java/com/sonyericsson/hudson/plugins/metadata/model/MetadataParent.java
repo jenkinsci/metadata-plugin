@@ -31,7 +31,7 @@ import java.util.Collection;
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  * @param <T> the type to work with, either MetadataValue or MetadataDefinition.
  */
-public interface MetaDataParent<T extends Metadata> {
+public interface MetadataParent<T extends Metadata> {
 
     /**
      * Returns the child with the given name, or null if there is none. comparison is case insensitive.

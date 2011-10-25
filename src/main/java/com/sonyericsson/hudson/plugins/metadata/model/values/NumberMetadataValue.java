@@ -38,7 +38,7 @@ import org.kohsuke.stapler.QueryParameter;
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
 @XStreamAlias("metadata-number")
-public class NumberMetaDataValue extends AbstractMetaDataValue {
+public class NumberMetadataValue extends AbstractMetadataValue {
 
     private long value;
 
@@ -50,7 +50,7 @@ public class NumberMetaDataValue extends AbstractMetaDataValue {
      * @param value       the value
      */
     @DataBoundConstructor
-    public NumberMetaDataValue(String name, String description, long value) {
+    public NumberMetadataValue(String name, String description, long value) {
         super(name, description);
         this.value = value;
     }
@@ -61,7 +61,7 @@ public class NumberMetaDataValue extends AbstractMetaDataValue {
      * @param name  the name
      * @param value the value
      */
-    public NumberMetaDataValue(String name, long value) {
+    public NumberMetadataValue(String name, long value) {
         super(name);
         this.value = value;
     }
@@ -72,19 +72,19 @@ public class NumberMetaDataValue extends AbstractMetaDataValue {
     }
 
     @Override
-    public Descriptor<AbstractMetaDataValue> getDescriptor() {
+    public Descriptor<AbstractMetadataValue> getDescriptor() {
         return Hudson.getInstance().getDescriptorByType(NumberMetaDataValueDescriptor.class);
     }
 
     /**
-     * Descriptor for {@link NumberMetaDataValue}s.
+     * Descriptor for {@link NumberMetadataValue}s.
      */
     @Extension
     public static class NumberMetaDataValueDescriptor extends AbstractMetaDataValueDescriptor {
 
         @Override
         public String getDisplayName() {
-            return Messages.NumberMetaDataValue_DisplayName();
+            return Messages.NumberMetadataValue_DisplayName();
         }
 
         /**

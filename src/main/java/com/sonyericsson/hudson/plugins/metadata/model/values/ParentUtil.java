@@ -23,10 +23,10 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
-import com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.MetadataDefinition;
-import com.sonyericsson.hudson.plugins.metadata.model.definitions.TreeNodeMetaDataDefinition;
+import com.sonyericsson.hudson.plugins.metadata.model.definitions.TreeNodeMetadataDefinition;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -34,7 +34,7 @@ import java.util.List;
 
 /**
  * Utility class for handling merge operation inside
- * {@link MetaDataParent}s.
+ * {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataParent}s.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
@@ -49,7 +49,7 @@ public final class ParentUtil {
 
     /**
      * Adds the value as a child to the parent. Help utility for those who implement {@link
-     * MetaDataParent#addChild(com.sonyericsson.hudson.plugins.metadata.model.Metadata)}
+     * com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#addChild(Metadata)}
      *
      * @param parent   the parent
      * @param children the direct list of the parents children.
@@ -58,7 +58,7 @@ public final class ParentUtil {
      * @return the value(s) that failed to be added.
      *
      */
-    public static<T extends Metadata> Collection<T> addChildValue(MetaDataParent<T> parent, List<T> children,
+    public static<T extends Metadata> Collection<T> addChildValue(MetadataParent<T> parent, List<T> children,
                                                       T value) {
 
         if (value == null) {
@@ -67,19 +67,19 @@ public final class ParentUtil {
         T my = parent.getChild(value.getName());
         if (my != null) {
             Collection<T> returnList = null;
-            if (my instanceof MetaDataParent && value instanceof MetaDataParent) {
+            if (my instanceof MetadataParent && value instanceof MetadataParent) {
                 //they are both a path, let's try to merge as much as possible.
-                Collection<T> subValues = ((MetaDataParent)value).getChildren();
-                Collection<T> leftOvers = ((MetaDataParent)my).addChildren(subValues);
+                Collection<T> subValues = ((MetadataParent)value).getChildren();
+                Collection<T> leftOvers = ((MetadataParent)my).addChildren(subValues);
                 if (leftOvers != null && !leftOvers.isEmpty()) {
                     //some of the children failed to be merged, return them to sender.
                     Metadata treeNode = null;
                     if (value instanceof MetadataValue) {
                         LinkedList<MetadataValue> list = (LinkedList<MetadataValue>)leftOvers;
-                        treeNode = new TreeNodeMetaDataValue(value.getName(), value.getDescription(), list);
+                        treeNode = new TreeNodeMetadataValue(value.getName(), value.getDescription(), list);
                     } else if (value instanceof MetadataDefinition) {
                         LinkedList<MetadataDefinition> list = (LinkedList<MetadataDefinition>)leftOvers;
-                        treeNode = new TreeNodeMetaDataDefinition(value.getName(), value.getDescription(), list);
+                        treeNode = new TreeNodeMetadataDefinition(value.getName(), value.getDescription(), list);
                     }
                     returnList = new LinkedList<T>();
                     returnList.add((T)treeNode);
@@ -102,7 +102,7 @@ public final class ParentUtil {
 
     /**
      * Adds the values as a child to the parent. Help utility for those who implement {@link
-     * com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent#
+     * com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#
      * addChild(com.sonyericsson.hudson.plugins.metadata.model.Metadata)}
      *
      * @param parent   the parent to add the values to
@@ -111,7 +111,7 @@ public final class ParentUtil {
      * @param <T> the type for parent, children, values and the return value.
      * @return the values that failed to be added.
      */
-    public static<T extends Metadata> Collection<T> addChildValues(MetaDataParent parent,
+    public static<T extends Metadata> Collection<T> addChildValues(MetadataParent parent,
                                                                    List<T> children,
                                                                    Collection<T> values) {
         List<T> leftovers = new LinkedList<T>();
@@ -129,7 +129,7 @@ public final class ParentUtil {
     }
 
     /**
-     * Utility method for {@link MetaDataParent#getChild(String)}.
+     * Utility method for {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#getChild(String)}.
      *
      * @param values the list of children.
      * @param name   the name to search.

@@ -25,8 +25,8 @@ package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.TimeDetails;
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.DateMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.DateMetadataValue;
 import hudson.Extension;
 import hudson.util.FormValidation;
 import net.sf.json.JSONObject;
@@ -42,7 +42,7 @@ import java.util.Date;
  *
  * @author Tomas Westling &lt;thomas.westling@sonyericsson.com&gt;
  */
-public class DateMetaDataDefinition extends AbstractMetaDataDefinition {
+public class DateMetadataDefinition extends AbstractMetadataDefinition {
 
     private Calendar defaultCal;
     //Default hour,minute,second if no defaults are added.
@@ -132,7 +132,7 @@ public class DateMetaDataDefinition extends AbstractMetaDataDefinition {
      * @param details      the optional time details, hour/minute/second.
      */
     @DataBoundConstructor
-    public DateMetaDataDefinition(String name, String description, int defaultYear,
+    public DateMetadataDefinition(String name, String description, int defaultYear,
                                   int defaultMonth, int defaultDay, TimeDetails details) {
         super(name, description);
         defaultCal = Calendar.getInstance();
@@ -155,26 +155,26 @@ public class DateMetaDataDefinition extends AbstractMetaDataDefinition {
 
     //TODO as with the other definitions, creating values isn't tested yet. Add support for this.
     @Override
-    public AbstractMetaDataValue createValue(StaplerRequest req, JSONObject jo) {
-        DateMetaDataValue value = req.bindJSON(DateMetaDataValue.class, jo);
+    public AbstractMetadataValue createValue(StaplerRequest req, JSONObject jo) {
+        DateMetadataValue value = req.bindJSON(DateMetadataValue.class, jo);
         value.setDescription(getDescription());
         return value;
     }
 
     @Override
-    public AbstractMetaDataValue createValue(StaplerRequest req) {
+    public AbstractMetadataValue createValue(StaplerRequest req) {
         return null;
     }
 
     /**
-     * Descriptor for {@link DateMetaDataDefinition}s.
+     * Descriptor for {@link DateMetadataDefinition}s.
      */
     @Extension
     public static class DateMetaDataDefinitionDescriptor extends AbstractMetaDataDefinitionDescriptor {
 
         @Override
         public String getDisplayName() {
-            return Messages.DateMetaDataDefinition_DisplayName();
+            return Messages.DateMetadataDefinition_DisplayName();
         }
 
         //TODO The below checkers are not in use since I could not get them to work with
@@ -192,7 +192,7 @@ public class DateMetaDataDefinition extends AbstractMetaDataDefinition {
             try {
                 long longValue = Long.parseLong(value);
                 if (longValue <= MIN_TIME_DETAILS_VALUE || longValue > MAX_TIME_DETAILS_MONTH_VALUE) {
-                    return FormValidation.error(Messages.DateMetaDataDefinition_BadMonth());
+                    return FormValidation.error(Messages.DateMetadataDefinition_BadMonth());
                 } else {
                     return FormValidation.ok();
                 }
@@ -213,7 +213,7 @@ public class DateMetaDataDefinition extends AbstractMetaDataDefinition {
             try {
                 long longValue = Long.parseLong(value);
                 if (longValue <= MIN_TIME_DETAILS_VALUE || longValue > MAX_TIME_DETAILS_DAY_VALUE) {
-                    return FormValidation.error(Messages.DateMetaDataDefinition_BadDay());
+                    return FormValidation.error(Messages.DateMetadataDefinition_BadDay());
                 } else {
                     return FormValidation.ok();
                 }
@@ -234,7 +234,7 @@ public class DateMetaDataDefinition extends AbstractMetaDataDefinition {
             try {
                 long longValue = Long.parseLong(value);
                 if (longValue < MIN_TIME_DETAILS_VALUE || longValue > MAX_TIME_DETAILS_HOUR_VALUE) {
-                    return FormValidation.error(Messages.DateMetaDataDefinition_BadHour());
+                    return FormValidation.error(Messages.DateMetadataDefinition_BadHour());
                 } else {
                     return FormValidation.ok();
                 }
@@ -256,7 +256,7 @@ public class DateMetaDataDefinition extends AbstractMetaDataDefinition {
             try {
                 long longValue = Long.parseLong(value);
                 if (longValue < MIN_TIME_DETAILS_VALUE || longValue > MAX_TIME_DETAILS_MINUTE_SECOND_VALUE) {
-                    return FormValidation.error(Messages.DateMetaDataDefinition_BadMinute());
+                    return FormValidation.error(Messages.DateMetadataDefinition_BadMinute());
                 } else {
                     return FormValidation.ok();
                 }
@@ -277,7 +277,7 @@ public class DateMetaDataDefinition extends AbstractMetaDataDefinition {
             try {
                 long longValue = Long.parseLong(value);
                 if (longValue < MIN_TIME_DETAILS_VALUE || longValue > MAX_TIME_DETAILS_MINUTE_SECOND_VALUE) {
-                    return FormValidation.error(Messages.DateMetaDataDefinition_BadSecond());
+                    return FormValidation.error(Messages.DateMetadataDefinition_BadSecond());
                 } else {
                     return FormValidation.ok();
                 }

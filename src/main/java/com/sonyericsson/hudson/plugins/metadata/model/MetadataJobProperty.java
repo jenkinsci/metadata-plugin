@@ -24,8 +24,8 @@
 package com.sonyericsson.hudson.plugins.metadata.model;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
-import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetaDataDefinition;
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetadataDefinition;
+import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -56,10 +56,10 @@ import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_ME
 
 @XStreamAlias("job-metadata")
 @ExportedBean
-public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> implements MetaDataParent<MetadataValue> {
+public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> implements MetadataParent<MetadataValue> {
 
     private List<MetadataValue> values;
-    private transient MetaDataJobAction metaDataJobAction;
+    private transient MetadataJobAction metadataJobAction;
 
     /**
      * Standard DataBound Constructor.
@@ -67,14 +67,14 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
      * @param values the meta data.
      */
     @DataBoundConstructor
-    public MetaDataJobProperty(List<MetadataValue> values) {
+    public MetadataJobProperty(List<MetadataValue> values) {
         this.values = values;
     }
 
     /**
      * Default constructor. <strong>Do not use unless you are a serializer.</strong>
      */
-    public MetaDataJobProperty() {
+    public MetadataJobProperty() {
     }
 
     /**
@@ -116,10 +116,10 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
 
     @Override
     public synchronized Collection<? extends Action> getJobActions(AbstractProject<?, ?> job) {
-        if (metaDataJobAction == null) {
-            metaDataJobAction = new MetaDataJobAction(job.getProperty(this.getClass()));
+        if (metadataJobAction == null) {
+            metadataJobAction = new MetadataJobAction(job.getProperty(this.getClass()));
         }
-        return Collections.singletonList(metaDataJobAction);
+        return Collections.singletonList(metadataJobAction);
     }
 
     @Override
@@ -149,7 +149,7 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
      * @param request the current http request.
      * @return a list.
      */
-    public List<AbstractMetaDataDefinition> getDefinitions(StaplerRequest request) {
+    public List<AbstractMetadataDefinition> getDefinitions(StaplerRequest request) {
         return PluginImpl.getInstance().getDefinitions();
     }
 
@@ -159,14 +159,14 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
     }
 
     /**
-     * Descriptor for the {@link MetaDataJobProperty}.
+     * Descriptor for the {@link MetadataJobProperty}.
      */
     @Extension
     public static class MetaDataJobPropertyDescriptor extends JobPropertyDescriptor {
 
         @Override
         public String getDisplayName() {
-            return Messages.MetaDataJobProperty_DisplayName();
+            return Messages.MetadataJobProperty_DisplayName();
         }
 
         /**
@@ -175,13 +175,13 @@ public class MetaDataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
          * @param request the current http request.
          * @return a list.
          */
-        public List<AbstractMetaDataValue.AbstractMetaDataValueDescriptor> getValueDescriptors(StaplerRequest request) {
+        public List<AbstractMetadataValue.AbstractMetaDataValueDescriptor> getValueDescriptors(StaplerRequest request) {
             request.setAttribute(REQUEST_ATTR_METADATA_CONTAINER, this);
-            List<AbstractMetaDataValue.AbstractMetaDataValueDescriptor> list =
-                    new LinkedList<AbstractMetaDataValue.AbstractMetaDataValueDescriptor>();
-            ExtensionList<AbstractMetaDataValue.AbstractMetaDataValueDescriptor> extensionList =
-                    Hudson.getInstance().getExtensionList(AbstractMetaDataValue.AbstractMetaDataValueDescriptor.class);
-            for (AbstractMetaDataValue.AbstractMetaDataValueDescriptor d : extensionList) {
+            List<AbstractMetadataValue.AbstractMetaDataValueDescriptor> list =
+                    new LinkedList<AbstractMetadataValue.AbstractMetaDataValueDescriptor>();
+            ExtensionList<AbstractMetadataValue.AbstractMetaDataValueDescriptor> extensionList =
+                    Hudson.getInstance().getExtensionList(AbstractMetadataValue.AbstractMetaDataValueDescriptor.class);
+            for (AbstractMetadataValue.AbstractMetaDataValueDescriptor d : extensionList) {
                 if (d.appliesTo(this)) {
                     list.add(d);
                 }

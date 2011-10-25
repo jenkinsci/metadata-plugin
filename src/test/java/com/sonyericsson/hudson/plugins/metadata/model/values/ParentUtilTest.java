@@ -23,12 +23,12 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
-import com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
-import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetaDataDefinition;
+import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetadataDefinition;
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.MetadataDefinition;
-import com.sonyericsson.hudson.plugins.metadata.model.definitions.StringMetaDataDefinition;
-import com.sonyericsson.hudson.plugins.metadata.model.definitions.TreeNodeMetaDataDefinition;
+import com.sonyericsson.hudson.plugins.metadata.model.definitions.StringMetadataDefinition;
+import com.sonyericsson.hudson.plugins.metadata.model.definitions.TreeNodeMetadataDefinition;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -52,8 +52,8 @@ public class ParentUtilTest {
      */
     @Test
     public void testAddChildValue() throws Exception {
-        TreeNodeMetaDataValue parent = new TreeNodeMetaDataValue("root");
-        assertNull(parent.addChild(new StringMetaDataValue("child1", "value")));
+        TreeNodeMetadataValue parent = new TreeNodeMetadataValue("root");
+        assertNull(parent.addChild(new StringMetadataValue("child1", "value")));
         assertNotNull(parent.getChild("child1"));
     }
 
@@ -64,7 +64,7 @@ public class ParentUtilTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testAddChildValueNull() throws Exception {
-        TreeNodeMetaDataValue parent = new TreeNodeMetaDataValue("root");
+        TreeNodeMetadataValue parent = new TreeNodeMetadataValue("root");
         parent.addChild(null);
     }
 
@@ -76,9 +76,9 @@ public class ParentUtilTest {
     @Test
     public void testAddChildrenNonEmpty() throws Exception {
         List<MetadataValue> nonEmptyList = new LinkedList<MetadataValue>();
-        StringMetaDataValue sampleValue = new StringMetaDataValue("sampleName", "sampleValue", "sampleDescription");
+        StringMetadataValue sampleValue = new StringMetadataValue("sampleName", "sampleValue", "sampleDescription");
         nonEmptyList.add(sampleValue);
-        TreeNodeMetaDataValue parent = new TreeNodeMetaDataValue("parentName", "parentDescription", nonEmptyList);
+        TreeNodeMetadataValue parent = new TreeNodeMetadataValue("parentName", "parentDescription", nonEmptyList);
         assertNotNull(parent.getChild("sampleName"));
     }
 
@@ -90,7 +90,7 @@ public class ParentUtilTest {
     @Test
     public void testAddChildrenEmpty() throws Exception {
         List<MetadataValue> emptyList = new LinkedList<MetadataValue>();
-        TreeNodeMetaDataValue parent = new TreeNodeMetaDataValue("parentName", "parentDescription", emptyList);
+        TreeNodeMetadataValue parent = new TreeNodeMetadataValue("parentName", "parentDescription", emptyList);
         assertNull(parent.getChild("someName"));
     }
 
@@ -101,10 +101,10 @@ public class ParentUtilTest {
      */
     @Test
     public void testAddChildValueTree() throws Exception {
-        TreeNodeMetaDataValue parent = new TreeNodeMetaDataValue("root");
-        AbstractMetaDataValue path = TreeStructureUtil.createPath("value", "description", "one", "two", "three");
+        TreeNodeMetadataValue parent = new TreeNodeMetadataValue("root");
+        AbstractMetadataValue path = TreeStructureUtil.createPath("value", "description", "one", "two", "three");
         assertNull(parent.addChild(path));
-        assertEquals("value", ((MetaDataParent)((MetaDataParent)parent.getChild("one"))
+        assertEquals("value", ((MetadataParent)((MetadataParent)parent.getChild("one"))
                 .getChild("two")).getChild("three").getValue());
     }
 
@@ -153,15 +153,15 @@ public class ParentUtilTest {
                         child31
                             child312=something else
              */
-        TreeNodeMetaDataValue[] startTree = TreeStructureUtil.createTreePath("", "root", "child1");
-        TreeNodeMetaDataValue startChild1 = startTree[1];
-        startChild1.addChild(new StringMetaDataValue("child11", "something"));
-        TreeNodeMetaDataValue startRoot = startTree[0];
-        startRoot.addChild(new StringMetaDataValue("child2", "something"));
+        TreeNodeMetadataValue[] startTree = TreeStructureUtil.createTreePath("", "root", "child1");
+        TreeNodeMetadataValue startChild1 = startTree[1];
+        startChild1.addChild(new StringMetadataValue("child11", "something"));
+        TreeNodeMetadataValue startRoot = startTree[0];
+        startRoot.addChild(new StringMetadataValue("child2", "something"));
         TreeStructureUtil.addValue(startRoot, "something", "", "child3", "child31", "child311");
         TreeStructureUtil.addValue(startRoot, "something", "", "child3", "child31", "child312");
 
-        TreeNodeMetaDataValue addRoot = TreeStructureUtil.createPath("something", "", "root", "child1", "child12");
+        TreeNodeMetadataValue addRoot = TreeStructureUtil.createPath("something", "", "root", "child1", "child12");
         TreeStructureUtil.addValue(addRoot, "something else", "", "child2");
         TreeStructureUtil.addValue(addRoot, "something else", "", "child3", "child31", "child312");
         TreeStructureUtil.addValue(addRoot, "something", "", "child3", "child31", "child313");
@@ -204,9 +204,9 @@ public class ParentUtilTest {
         assertNotNull(child2);
         assertEquals("something else", child2.getValue());
         assertNotNull(child3);
-        Metadata child31 = ((MetaDataParent)child3).getChild("child31");
+        Metadata child31 = ((MetadataParent)child3).getChild("child31");
         assertNotNull(child31);
-        assertEquals("something else", ((MetaDataParent)child31).getChild("child312").getValue());
+        assertEquals("something else", ((MetadataParent)child31).getChild("child312").getValue());
     }
 
     /**
@@ -254,15 +254,15 @@ public class ParentUtilTest {
                         child31
                             child312=something else
              */
-        TreeNodeMetaDataDefinition[] startTree = createTreePath("", "root", "child1");
-        TreeNodeMetaDataDefinition startChild1 = startTree[1];
-        startChild1.addChild(new StringMetaDataDefinition("child11", "something"));
-        TreeNodeMetaDataDefinition startRoot = startTree[0];
-        startRoot.addChild(new StringMetaDataDefinition("child2", "something"));
+        TreeNodeMetadataDefinition[] startTree = createTreePath("", "root", "child1");
+        TreeNodeMetadataDefinition startChild1 = startTree[1];
+        startChild1.addChild(new StringMetadataDefinition("child11", "something"));
+        TreeNodeMetadataDefinition startRoot = startTree[0];
+        startRoot.addChild(new StringMetadataDefinition("child2", "something"));
         addValue(startRoot, "something", "", "child3", "child31", "child311");
         addValue(startRoot, "something", "", "child3", "child31", "child312");
 
-        TreeNodeMetaDataDefinition addRoot = createPath("something", "", "root", "child1", "child12");
+        TreeNodeMetadataDefinition addRoot = createPath("something", "", "root", "child1", "child12");
         addValue(addRoot, "something else", "", "child2");
         addValue(addRoot, "something else", "", "child3", "child31", "child312");
         addValue(addRoot, "something", "", "child3", "child31", "child313");
@@ -305,9 +305,9 @@ public class ParentUtilTest {
         assertNotNull(child2);
         assertEquals("something else", child2.getValue());
         assertNotNull(child3);
-        Metadata child31 = ((MetaDataParent)child3).getChild("child31");
+        Metadata child31 = ((MetadataParent)child3).getChild("child31");
         assertNotNull(child31);
-        assertEquals("something else", ((MetaDataParent)child31).getChild("child312").getValue());
+        assertEquals("something else", ((MetadataParent)child31).getChild("child312").getValue());
     }
 
 
@@ -359,14 +359,14 @@ public class ParentUtilTest {
                     child2
                         child21=something else
              */
-        TreeNodeMetaDataValue[] startTree = TreeStructureUtil.createTreePath("", "root", "child1");
-        TreeNodeMetaDataValue startChild1 = startTree[1];
-        startChild1.addChild(new StringMetaDataValue("child11", "something"));
-        TreeNodeMetaDataValue startRoot = startTree[0];
+        TreeNodeMetadataValue[] startTree = TreeStructureUtil.createTreePath("", "root", "child1");
+        TreeNodeMetadataValue startChild1 = startTree[1];
+        startChild1.addChild(new StringMetadataValue("child11", "something"));
+        TreeNodeMetadataValue startRoot = startTree[0];
         TreeStructureUtil.addValue(startRoot, "something", "", "child2", "child21", "child211");
-        startRoot.addChild(new StringMetaDataValue("child3", "something"));
+        startRoot.addChild(new StringMetadataValue("child3", "something"));
 
-        TreeNodeMetaDataValue addRoot = TreeStructureUtil.createPath("something else", "",
+        TreeNodeMetadataValue addRoot = TreeStructureUtil.createPath("something else", "",
                 "root", "child1", "child11", "child111");
         TreeStructureUtil.addValue(addRoot, "something else", "", "child2", "child21");
         TreeStructureUtil.addValue(addRoot, "something", "", "child4");
@@ -401,13 +401,13 @@ public class ParentUtilTest {
             }
         }
         assertNotNull(child1);
-        Metadata child11 = ((MetaDataParent)child1).getChild("child11");
+        Metadata child11 = ((MetadataParent)child1).getChild("child11");
         assertNotNull(child11);
-        Metadata child111 = ((MetaDataParent)child11).getChild("child111");
+        Metadata child111 = ((MetadataParent)child11).getChild("child111");
         assertEquals("something else", child111.getValue());
         assertNotNull(child2);
 
-        assertEquals("something else", ((MetaDataParent)child2).getChild("child21").getValue());
+        assertEquals("something else", ((MetadataParent)child2).getChild("child21").getValue());
     }
     /**
      * Creates a straight tree-path. The method returns an array where index 0 is the root and index 1 is the leaf.
@@ -416,9 +416,9 @@ public class ParentUtilTest {
      * @param path        the path to create.
      * @return the root and the leaf.
      */
-    public static TreeNodeMetaDataDefinition[] createTreePath(String description, String... path) {
-        TreeNodeMetaDataDefinition[] arr = new TreeNodeMetaDataDefinition[2];
-        arr[1] = new TreeNodeMetaDataDefinition(path[path.length - 1], description);
+    public static TreeNodeMetadataDefinition[] createTreePath(String description, String... path) {
+        TreeNodeMetadataDefinition[] arr = new TreeNodeMetadataDefinition[2];
+        arr[1] = new TreeNodeMetadataDefinition(path[path.length - 1], description);
         arr[0] = createPath(arr[1], Arrays.copyOf(path, path.length - 1));
         return arr;
     }
@@ -429,15 +429,15 @@ public class ParentUtilTest {
      * @param parentPath the path to the leaf.
      * @return the root node of the path.
      */
-    public static TreeNodeMetaDataDefinition createPath(AbstractMetaDataDefinition leaf, String... parentPath) {
+    public static TreeNodeMetadataDefinition createPath(AbstractMetadataDefinition leaf, String... parentPath) {
         if (parentPath == null || parentPath.length < 1) {
             throw new IllegalArgumentException("The leaf must have at least one parent.");
         }
-        TreeNodeMetaDataDefinition root = null;
-        TreeNodeMetaDataDefinition parent = null;
+        TreeNodeMetadataDefinition root = null;
+        TreeNodeMetadataDefinition parent = null;
 
         for (String name : parentPath) {
-            TreeNodeMetaDataDefinition val = new TreeNodeMetaDataDefinition(name);
+            TreeNodeMetadataDefinition val = new TreeNodeMetadataDefinition(name);
             if (parent != null) {
                 parent.addChild(val);
             }
@@ -458,13 +458,13 @@ public class ParentUtilTest {
      * @param path        the full path to the leaf.
      * @return the tree.
      */
-    public static TreeNodeMetaDataDefinition createPath(String value, String description, String... path) {
-        StringMetaDataDefinition str = new StringMetaDataDefinition(path[path.length - 1], description, value);
+    public static TreeNodeMetadataDefinition createPath(String value, String description, String... path) {
+        StringMetadataDefinition str = new StringMetadataDefinition(path[path.length - 1], description, value);
         return createPath(str, Arrays.copyOf(path, path.length - 1));
     }
 
     /**
-     * Adds a {@link StringMetaDataValue} to the root node with the specified path.
+     * Adds a {@link StringMetadataValue} to the root node with the specified path.
      *
      * @param root        the root to add the tree to.
      * @param value       the string value of the leaf node.
@@ -472,8 +472,8 @@ public class ParentUtilTest {
      * @param path        the path to the leaf from the root.
      * @return true if there was no merge conflicts.
      */
-    public static boolean addValue(MetaDataParent root, String value, String description, String... path) {
-        StringMetaDataDefinition sVal = new StringMetaDataDefinition(path[path.length - 1], description, value);
+    public static boolean addValue(MetadataParent root, String value, String description, String... path) {
+        StringMetadataDefinition sVal = new StringMetadataDefinition(path[path.length - 1], description, value);
         return addValue(root, sVal, Arrays.copyOf(path, path.length - 1));
     }
     /**
@@ -484,11 +484,11 @@ public class ParentUtilTest {
      * @param parentPath the path of the parent of the leaf from the root.
      * @return true if there was no merge conflicts.
      */
-    public static boolean addValue(MetaDataParent root, AbstractMetaDataDefinition value, String... parentPath) {
+    public static boolean addValue(MetadataParent root, AbstractMetadataDefinition value, String... parentPath) {
         if (parentPath == null || parentPath.length <= 0) {
             return root.addChild(value) == null;
         } else {
-            TreeNodeMetaDataDefinition path = createPath(value, parentPath);
+            TreeNodeMetadataDefinition path = createPath(value, parentPath);
             return root.addChild(path) == null;
         }
     }

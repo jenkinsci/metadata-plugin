@@ -26,33 +26,33 @@ package com.sonyericsson.hudson.plugins.metadata.contributors;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
-import hudson.model.AbstractProject;
+import hudson.model.AbstractBuild;
 import hudson.model.Hudson;
 
 import java.util.List;
 
 /**
- * Extension point for plugins to contribute meta data to jobs. When ever a project is saved all contributors will be
- * asked to provide their meta-data for that project.
+ * Extension point for plugins to contribute meta data to builds. When a build is done all contributors will be asked to
+ * contribute meta data for that build.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public abstract class JobMetaDataContributor implements ExtensionPoint {
+public abstract class BuildMetadataContributor implements ExtensionPoint {
 
     /**
-     * Provides the meta-data that should be inserted into the project.
+     * Provides the meta-data that should be inserted into the build.
      *
-     * @param job the project.
+     * @param build the build.
      * @return a list of meta data.
      */
-    public abstract List<MetadataValue> getMetaDataFor(AbstractProject job);
+    public abstract List<MetadataValue> getMetaDataFor(AbstractBuild build);
 
     /**
-     * All the registered job contributors.
+     * All the registered build-contributors.
      *
      * @return the list.
      */
-    public static ExtensionList<JobMetaDataContributor> all() {
-        return Hudson.getInstance().getExtensionList(JobMetaDataContributor.class);
+    public static ExtensionList<BuildMetadataContributor> all() {
+        return Hudson.getInstance().getExtensionList(BuildMetadataContributor.class);
     }
 }

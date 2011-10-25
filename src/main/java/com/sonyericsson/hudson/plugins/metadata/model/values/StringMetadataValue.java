@@ -36,7 +36,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
 @XStreamAlias("metadata-string")
-public class StringMetaDataValue extends AbstractMetaDataValue {
+public class StringMetadataValue extends AbstractMetadataValue {
 
     private String value;
 
@@ -48,7 +48,7 @@ public class StringMetaDataValue extends AbstractMetaDataValue {
      * @param value       the value.
      */
     @DataBoundConstructor
-    public StringMetaDataValue(String name, String description, String value) {
+    public StringMetadataValue(String name, String description, String value) {
         super(name, description);
         this.value = value;
     }
@@ -59,7 +59,7 @@ public class StringMetaDataValue extends AbstractMetaDataValue {
      * @param name  the name
      * @param value the value.
      */
-    public StringMetaDataValue(String name, String value) {
+    public StringMetadataValue(String name, String value) {
         super(name);
         this.value = value;
     }
@@ -70,7 +70,7 @@ public class StringMetaDataValue extends AbstractMetaDataValue {
     }
 
     @Override
-    public Descriptor<AbstractMetaDataValue> getDescriptor() {
+    public Descriptor<AbstractMetadataValue> getDescriptor() {
         return Hudson.getInstance().getDescriptorByType(StringMetaDataValueDescriptor.class);
     }
 
@@ -82,7 +82,7 @@ public class StringMetaDataValue extends AbstractMetaDataValue {
 
         @Override
         public String getDisplayName() {
-            return Messages.StringMetaDataValue_DisplayName();
+            return Messages.StringMetadataValue_DisplayName();
         }
     }
 }

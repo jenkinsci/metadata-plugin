@@ -23,9 +23,9 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.contributors;
 
-import com.sonyericsson.hudson.plugins.metadata.model.MetaDataJobProperty;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 import hudson.Extension;
 import hudson.ExtensionList;
@@ -44,7 +44,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Logger;
 
 /**
- * The controller for all {@link JobMetaDataContributor}s. When a project is saved the controller will ask all
+ * The controller for all {@link JobMetadataContributor}s. When a project is saved the controller will ask all
  * contributors for whatever metadata they please.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
@@ -137,21 +137,21 @@ public class JobContributorsController extends SaveableListener {
             } catch (InterruptedException e) {
                 logger.finest("interrupted");
             }
-            MetaDataJobProperty property = (MetaDataJobProperty)project.getProperty(MetaDataJobProperty.class);
+            MetadataJobProperty property = (MetadataJobProperty)project.getProperty(MetadataJobProperty.class);
             if (property == null) {
-                property = new MetaDataJobProperty();
+                property = new MetadataJobProperty();
                 try {
                     project.addProperty(property);
                 } catch (IOException e) {
-                    logger.severe("Failed to add the MetaDataJobProperty to the project " + project);
+                    logger.severe("Failed to add the MetadataJobProperty to the project " + project);
                     return;
                 }
             }
 
             //TODO add a translatable description
-            TreeNodeMetaDataValue[] tree = TreeStructureUtil.createTreePath("", "job-info", "last-saved");
-            TreeNodeMetaDataValue jobInfo = tree[0];
-            TreeNodeMetaDataValue lastSaved = tree[1];
+            TreeNodeMetadataValue[] tree = TreeStructureUtil.createTreePath("", "job-info", "last-saved");
+            TreeNodeMetadataValue jobInfo = tree[0];
+            TreeNodeMetadataValue lastSaved = tree[1];
             TreeStructureUtil.addValue(lastSaved, new Date(), "", "time");
             TreeStructureUtil.addValue(lastSaved, currentUser.getDisplayName(), "", "user", "display-name");
             TreeStructureUtil.addValue(lastSaved, currentUser.getFullName(), "", "user", "full-name");
@@ -159,8 +159,8 @@ public class JobContributorsController extends SaveableListener {
             logger.info("Adding standard generated metadata");
             property.addChild(jobInfo);
 
-            ExtensionList<JobMetaDataContributor> contributors = JobMetaDataContributor.all();
-            for (JobMetaDataContributor contributor : contributors) {
+            ExtensionList<JobMetadataContributor> contributors = JobMetadataContributor.all();
+            for (JobMetadataContributor contributor : contributors) {
                 List<MetadataValue> dataFor = contributor.getMetaDataFor(project);
                 if (dataFor != null && !dataFor.isEmpty()) {
                     Collection<MetadataValue> leftover = property.addChildren(dataFor);

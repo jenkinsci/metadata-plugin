@@ -55,12 +55,12 @@ public interface Metadata {
      *
      * @return the parent.
      */
-    MetaDataParent getParent();
+    MetadataParent getParent();
 
     /**
      * The parent of this metadata.
      *
      * @param parent the metadata.
      */
-    void setParent(MetaDataParent parent);
+    void setParent(MetadataParent parent);
 }

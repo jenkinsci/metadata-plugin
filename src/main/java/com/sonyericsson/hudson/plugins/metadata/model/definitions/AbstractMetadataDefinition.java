@@ -23,8 +23,8 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 
-import com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent;
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
+import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
 import hudson.AbortException;
 import hudson.DescriptorExtensionList;
 import hudson.cli.CLICommand;
@@ -42,10 +42,10 @@ import java.io.Serializable;
  * A metadata definition.
  */
 @ExportedBean
-public abstract class AbstractMetaDataDefinition implements
-        Describable<AbstractMetaDataDefinition>, Serializable, MetadataDefinition {
+public abstract class AbstractMetadataDefinition implements
+        Describable<AbstractMetadataDefinition>, Serializable, MetadataDefinition {
 
-    private MetaDataParent parent;
+    private MetadataParent parent;
     private final String name;
     private final String description;
 
@@ -54,7 +54,7 @@ public abstract class AbstractMetaDataDefinition implements
      *
      * @param name the name of the definition.
      */
-    public AbstractMetaDataDefinition(String name) {
+    public AbstractMetadataDefinition(String name) {
         this(name, null);
     }
 
@@ -64,7 +64,7 @@ public abstract class AbstractMetaDataDefinition implements
      * @param name        the name of the definition.
      * @param description the description of the definition.
      */
-    public AbstractMetaDataDefinition(String name, String description) {
+    public AbstractMetadataDefinition(String name, String description) {
         this.name = name;
         this.description = description;
     }
@@ -87,13 +87,13 @@ public abstract class AbstractMetaDataDefinition implements
 
 
     @Override
-    public synchronized MetaDataParent getParent() {
+    public synchronized MetadataParent getParent() {
         return parent;
     }
 
 
     @Override
-    public synchronized void setParent(MetaDataParent parent) {
+    public synchronized void setParent(MetadataParent parent) {
         this.parent = parent;
     }
 
@@ -129,7 +129,7 @@ public abstract class AbstractMetaDataDefinition implements
      * @return the metadata values.
      */
 
-    public abstract AbstractMetaDataValue createValue(StaplerRequest req, JSONObject jo);
+    public abstract AbstractMetadataValue createValue(StaplerRequest req, JSONObject jo);
 
     /**
      * Create a metadata values from a GET with query string.
@@ -141,14 +141,14 @@ public abstract class AbstractMetaDataDefinition implements
      * the tree form), but it's more scriptable.
      * <p/>
      * <p/>
-     * If a {@link AbstractMetaDataDefinition} can't really support this mode of creating a values,
+     * If a {@link AbstractMetadataDefinition} can't really support this mode of creating a values,
      * you may just always return null.
      *
      * @param req the stapler request.
      * @return the metadata values.
      */
 
-    public abstract AbstractMetaDataValue createValue(StaplerRequest req);
+    public abstract AbstractMetadataValue createValue(StaplerRequest req);
 
     /**
      * Create a metadata values from the string given in the CLI.
@@ -161,7 +161,7 @@ public abstract class AbstractMetaDataDefinition implements
      *                        without stack trace, and then exits this command. Useful for graceful termination.
      */
 
-    public AbstractMetaDataValue createValue(CLICommand command, String value) throws AbortException {
+    public AbstractMetadataValue createValue(CLICommand command, String value) throws AbortException {
         throw new AbortException("CLI parameter submission is not supported for the " + getClass()
                 + " type. Please file a bug report for this");
     }
@@ -182,19 +182,19 @@ public abstract class AbstractMetaDataDefinition implements
     }
 
     /**
-     * Returns all the registered {@link AbstractMetaDataDefinition} descriptors.
+     * Returns all the registered {@link AbstractMetadataDefinition} descriptors.
      *
      * @return A DescriptorExtensionList of the descriptors.
      */
-    public static DescriptorExtensionList<AbstractMetaDataDefinition, AbstractMetaDataDefinitionDescriptor> getAll() {
-        return Hudson.getInstance().<AbstractMetaDataDefinition, AbstractMetaDataDefinitionDescriptor>
-                getDescriptorList(AbstractMetaDataDefinition.class);
+    public static DescriptorExtensionList<AbstractMetadataDefinition, AbstractMetaDataDefinitionDescriptor> getAll() {
+        return Hudson.getInstance().<AbstractMetadataDefinition, AbstractMetaDataDefinitionDescriptor>
+                getDescriptorList(AbstractMetadataDefinition.class);
     }
 
     /**
-     * The descriptor for the AbstractMetaDataDefinition.
+     * The descriptor for the AbstractMetadataDefinition.
      */
-    public abstract static class AbstractMetaDataDefinitionDescriptor extends Descriptor<AbstractMetaDataDefinition> {
+    public abstract static class AbstractMetaDataDefinitionDescriptor extends Descriptor<AbstractMetadataDefinition> {
     }
 
 }

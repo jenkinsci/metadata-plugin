@@ -24,7 +24,7 @@
 package com.sonyericsson.hudson.plugins.metadata.model;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -54,7 +54,7 @@ import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_ME
  */
 @XStreamAlias("node-metadata")
 @ExportedBean
-public class MetadataNodeProperty extends NodeProperty<Node> implements MetaDataParent<MetadataValue> {
+public class MetadataNodeProperty extends NodeProperty<Node> implements MetadataParent<MetadataValue> {
 
     private List<MetadataValue> values;
 
@@ -150,13 +150,13 @@ public class MetadataNodeProperty extends NodeProperty<Node> implements MetaData
          * @param request the current http request.
          * @return a list.
          */
-        public List<AbstractMetaDataValue.AbstractMetaDataValueDescriptor> getValueDescriptors(StaplerRequest request) {
+        public List<AbstractMetadataValue.AbstractMetaDataValueDescriptor> getValueDescriptors(StaplerRequest request) {
             request.setAttribute(REQUEST_ATTR_METADATA_CONTAINER, this);
-            List<AbstractMetaDataValue.AbstractMetaDataValueDescriptor> list =
-                    new LinkedList<AbstractMetaDataValue.AbstractMetaDataValueDescriptor>();
-            ExtensionList<AbstractMetaDataValue.AbstractMetaDataValueDescriptor> extensionList =
-                    Hudson.getInstance().getExtensionList(AbstractMetaDataValue.AbstractMetaDataValueDescriptor.class);
-            for (AbstractMetaDataValue.AbstractMetaDataValueDescriptor d : extensionList) {
+            List<AbstractMetadataValue.AbstractMetaDataValueDescriptor> list =
+                    new LinkedList<AbstractMetadataValue.AbstractMetaDataValueDescriptor>();
+            ExtensionList<AbstractMetadataValue.AbstractMetaDataValueDescriptor> extensionList =
+                    Hudson.getInstance().getExtensionList(AbstractMetadataValue.AbstractMetaDataValueDescriptor.class);
+            for (AbstractMetadataValue.AbstractMetaDataValueDescriptor d : extensionList) {
                 if (d.appliesTo(this)) {
                     list.add(d);
                 }

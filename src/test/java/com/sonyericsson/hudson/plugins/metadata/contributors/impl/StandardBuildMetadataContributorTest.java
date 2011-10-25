@@ -23,9 +23,9 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.contributors.impl;
 
-import com.sonyericsson.hudson.plugins.metadata.model.MetaDataBuildAction;
-import com.sonyericsson.hudson.plugins.metadata.model.values.NumberMetaDataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataBuildAction;
+import com.sonyericsson.hudson.plugins.metadata.model.values.NumberMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
@@ -39,12 +39,12 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 //CS IGNORE MagicNumber FOR NEXT 200 LINES. REASON: test data.
 
 /**
- * Tests for {@link StandardBuildMetaDataContributor} and indirect of
+ * Tests for {@link StandardBuildMetadataContributor} and indirect of
  * {@link com.sonyericsson.hudson.plugins.metadata.contributors.BuildContributorsController}.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public class StandardBuildMetaDataContributorTest extends HudsonTestCase {
+public class StandardBuildMetadataContributorTest extends HudsonTestCase {
 
     /**
      * Tests that standard metadata is attached to a simple FreeStyleBuild.
@@ -57,13 +57,13 @@ public class StandardBuildMetaDataContributorTest extends HudsonTestCase {
 
         FreeStyleBuild build = buildAndAssertSuccess(project);
 
-        MetaDataBuildAction action = build.getAction(MetaDataBuildAction.class);
+        MetadataBuildAction action = build.getAction(MetadataBuildAction.class);
         assertNotNull(action);
-        StringMetaDataValue value = (StringMetaDataValue)TreeStructureUtil.getPath(action, "build", "result");
+        StringMetadataValue value = (StringMetadataValue)TreeStructureUtil.getPath(action, "build", "result");
         assertNotNull(value);
         assertEquals(Result.SUCCESS.toString(), value.getValue());
         assertNotNull(TreeStructureUtil.getPath(action, "build", "duration", "display"));
-        NumberMetaDataValue longValue = (NumberMetaDataValue)TreeStructureUtil.getPath(action,
+        NumberMetadataValue longValue = (NumberMetadataValue)TreeStructureUtil.getPath(action,
                 "build", "duration", "ms");
         assertNotNull(longValue);
         Assert.assertThat(longValue.getValue(), greaterThanOrEqualTo(1000L));

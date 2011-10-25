@@ -24,7 +24,7 @@
 package com.sonyericsson.hudson.plugins.metadata.model;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
-import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetaDataDefinition;
+import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetadataDefinition;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Descriptor;
@@ -47,7 +47,7 @@ import java.util.List;
  * @author Tomas Westling &lt;thomas.westling@sonyericsson.com&gt;
  */
 @Extension
-public class MetaDataConfigurationPage implements RootAction {
+public class MetadataConfigurationPage implements RootAction {
     private static final String URL_NAME = "MetaDataConfiguration";
 
     /**
@@ -56,14 +56,14 @@ public class MetaDataConfigurationPage implements RootAction {
      * @param definitions the meta data definitions.
      */
     @DataBoundConstructor
-    public MetaDataConfigurationPage(List<AbstractMetaDataDefinition> definitions) {
+    public MetadataConfigurationPage(List<AbstractMetadataDefinition> definitions) {
         PluginImpl.getInstance().setDefinitions(definitions);
     }
 
     /**
      * Default constructor. <strong>Do not use unless you are a serializer.</strong>
      */
-    public MetaDataConfigurationPage() {
+    public MetadataConfigurationPage() {
     }
 
     @Override
@@ -87,14 +87,14 @@ public class MetaDataConfigurationPage implements RootAction {
      * @param request the current http request.
      * @return the list of descriptors.
      */
-    public List<AbstractMetaDataDefinition.AbstractMetaDataDefinitionDescriptor>
+    public List<AbstractMetadataDefinition.AbstractMetaDataDefinitionDescriptor>
     getDefinitionDescriptors(StaplerRequest request) {
-        List<AbstractMetaDataDefinition.AbstractMetaDataDefinitionDescriptor> list =
-                new LinkedList<AbstractMetaDataDefinition.AbstractMetaDataDefinitionDescriptor>();
-        ExtensionList<AbstractMetaDataDefinition.AbstractMetaDataDefinitionDescriptor> extensionList =
+        List<AbstractMetadataDefinition.AbstractMetaDataDefinitionDescriptor> list =
+                new LinkedList<AbstractMetadataDefinition.AbstractMetaDataDefinitionDescriptor>();
+        ExtensionList<AbstractMetadataDefinition.AbstractMetaDataDefinitionDescriptor> extensionList =
                 Hudson.getInstance().getExtensionList(
-                        AbstractMetaDataDefinition.AbstractMetaDataDefinitionDescriptor.class);
-        for (AbstractMetaDataDefinition.AbstractMetaDataDefinitionDescriptor d : extensionList) {
+                        AbstractMetadataDefinition.AbstractMetaDataDefinitionDescriptor.class);
+        for (AbstractMetadataDefinition.AbstractMetaDataDefinitionDescriptor d : extensionList) {
             list.add(d);
         }
         return list;
@@ -105,7 +105,7 @@ public class MetaDataConfigurationPage implements RootAction {
      *
      * @return the list.
      */
-    public List<AbstractMetaDataDefinition> getDefinitions() {
+    public List<AbstractMetadataDefinition> getDefinitions() {
         return PluginImpl.getInstance().getDefinitions();
     }
 
@@ -121,7 +121,7 @@ public class MetaDataConfigurationPage implements RootAction {
     public void doConfigureSubmit(StaplerRequest request, StaplerResponse response)
             throws ServletException, Descriptor.FormException, IOException {
         JSONObject formData = request.getSubmittedForm();
-        List<AbstractMetaDataDefinition> list = Descriptor.
+        List<AbstractMetadataDefinition> list = Descriptor.
                 newInstancesFromHeteroList(request, formData, "definitions", getDefinitionDescriptors(request));
         PluginImpl.getInstance().setDefinitions(list);
         PluginImpl.getInstance().save();

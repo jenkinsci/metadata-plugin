@@ -32,7 +32,7 @@ import hudson.model.Action;
  *
  * @author Shemeer S;
  */
-public class MetaDataJobAction implements Action {
+public class MetadataJobAction implements Action {
 
     /**
      * The URL to this action.
@@ -45,13 +45,13 @@ public class MetaDataJobAction implements Action {
     /** The project. */
     private final transient AbstractProject<?, ?> project;
     /** The MetadataJobProperty. */
-    private MetaDataJobProperty jobProperty;
+    private MetadataJobProperty jobProperty;
 
     /**
      * Standard constructor.
      * @param jobProperty the current jobProperty.
      */
-    public MetaDataJobAction(MetaDataJobProperty jobProperty) {
+    public MetadataJobAction(MetadataJobProperty jobProperty) {
         this.jobProperty = jobProperty;
         this.project = jobProperty.getOwner();
     }
@@ -85,7 +85,7 @@ public class MetaDataJobAction implements Action {
      *
      * @return property
      */
-    public final MetaDataJobProperty getJobProperty() {
+    public final MetadataJobProperty getJobProperty() {
         return jobProperty;
     }
 }

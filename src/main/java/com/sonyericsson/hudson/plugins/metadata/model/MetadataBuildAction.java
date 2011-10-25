@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public class MetaDataBuildAction implements Action, MetaDataParent<MetadataValue> {
+public class MetadataBuildAction implements Action, MetadataParent<MetadataValue> {
 
     /**
      * The URL to this action.
@@ -55,14 +55,14 @@ public class MetaDataBuildAction implements Action, MetaDataParent<MetadataValue
      *
      * @param values the meta data for this build.
      */
-    public MetaDataBuildAction(List<MetadataValue> values) {
+    public MetadataBuildAction(List<MetadataValue> values) {
         this.values = values;
     }
 
     /**
      * Default constructor.
      */
-    public MetaDataBuildAction() {
+    public MetadataBuildAction() {
     }
 
     @Override

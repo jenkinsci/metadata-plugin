@@ -25,10 +25,10 @@ package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 
 import com.sonyericsson.hudson.plugins.metadata.Constants;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
-import com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent;
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
+import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
-import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Hudson;
@@ -46,8 +46,8 @@ import java.util.List;
  *
  * @author Tomas Westling &lt;thomas.westling@sonyericsson.com&gt;
  */
-public class TreeNodeMetaDataDefinition extends AbstractMetaDataDefinition
-        implements MetaDataParent<MetadataDefinition> {
+public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
+        implements MetadataParent<MetadataDefinition> {
 
     private List<MetadataDefinition> children;
 
@@ -58,7 +58,7 @@ public class TreeNodeMetaDataDefinition extends AbstractMetaDataDefinition
      * @param children the children of this node.
      */
     @DataBoundConstructor
-    public TreeNodeMetaDataDefinition(String name, String description, List<MetadataDefinition> children) {
+    public TreeNodeMetadataDefinition(String name, String description, List<MetadataDefinition> children) {
         super(name, description);
         this.children = children;
     }
@@ -68,7 +68,7 @@ public class TreeNodeMetaDataDefinition extends AbstractMetaDataDefinition
      *
      * @param name the name.
      */
-    public TreeNodeMetaDataDefinition(String name) {
+    public TreeNodeMetadataDefinition(String name) {
         super(name);
         this.children = new LinkedList<MetadataDefinition>();
 
@@ -79,7 +79,7 @@ public class TreeNodeMetaDataDefinition extends AbstractMetaDataDefinition
      * @param name        the name
      * @param description the description.
      */
-    public TreeNodeMetaDataDefinition(String name, String description) {
+    public TreeNodeMetadataDefinition(String name, String description) {
         super(name, description);
         this.children = new LinkedList<MetadataDefinition>();
     }
@@ -113,20 +113,20 @@ public class TreeNodeMetaDataDefinition extends AbstractMetaDataDefinition
      * @param name     the name.
      * @param children the children of this node.
      */
-    public TreeNodeMetaDataDefinition(String name, List<MetadataDefinition> children) {
+    public TreeNodeMetadataDefinition(String name, List<MetadataDefinition> children) {
         super(name);
         this.children = children;
     }
 
     @Override
-    public AbstractMetaDataValue createValue(StaplerRequest req, JSONObject jo) {
-        TreeNodeMetaDataValue value = req.bindJSON(TreeNodeMetaDataValue.class, jo);
+    public AbstractMetadataValue createValue(StaplerRequest req, JSONObject jo) {
+        TreeNodeMetadataValue value = req.bindJSON(TreeNodeMetadataValue.class, jo);
         value.setDescription(getDescription());
         return value;
     }
 
     @Override
-    public AbstractMetaDataValue createValue(StaplerRequest req) {
+    public AbstractMetadataValue createValue(StaplerRequest req) {
         return null;
 
     }
@@ -149,11 +149,11 @@ public class TreeNodeMetaDataDefinition extends AbstractMetaDataDefinition
      */
     @Extension
     public static class TreeNodeMetaDataDefinitionDescriptor extends
-            AbstractMetaDataDefinition.AbstractMetaDataDefinitionDescriptor {
+            AbstractMetadataDefinition.AbstractMetaDataDefinitionDescriptor {
 
         @Override
         public String getDisplayName() {
-            return Messages.TreeNodeMetaDataDefinition_DisplayName();
+            return Messages.TreeNodeMetadataDefinition_DisplayName();
         }
 
         /**

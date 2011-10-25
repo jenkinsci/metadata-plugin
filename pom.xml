@@ -14,7 +14,7 @@
     <artifactId>metadata</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>hpi</packaging>
-    <name>MetaData plugin</name>
+    <name>Metadata plugin</name>
 
     <licenses>
         <license>

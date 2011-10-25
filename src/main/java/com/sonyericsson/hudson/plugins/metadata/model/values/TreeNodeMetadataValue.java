@@ -25,8 +25,8 @@ package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Descriptor;
@@ -47,7 +47,7 @@ import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_ME
  */
 
 @XStreamAlias("metadata-tree")
-public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements MetaDataParent<MetadataValue> {
+public class TreeNodeMetadataValue extends AbstractMetadataValue implements MetadataParent<MetadataValue> {
 
     private List<MetadataValue> children;
 
@@ -59,7 +59,7 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
      * @param children    its children.
      */
     @DataBoundConstructor
-    public TreeNodeMetaDataValue(String name, String description, List<MetadataValue> children) {
+    public TreeNodeMetadataValue(String name, String description, List<MetadataValue> children) {
         super(name, description);
         setChildren(children);
     }
@@ -70,7 +70,7 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
      * @param name        the name
      * @param description the description.
      */
-    public TreeNodeMetaDataValue(String name, String description) {
+    public TreeNodeMetadataValue(String name, String description) {
         super(name, description);
         this.children = new LinkedList<MetadataValue>();
     }
@@ -81,7 +81,7 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
      * @param name     the name.
      * @param children its children.
      */
-    public TreeNodeMetaDataValue(String name, List<MetadataValue> children) {
+    public TreeNodeMetadataValue(String name, List<MetadataValue> children) {
         super(name);
         setChildren(children);
     }
@@ -105,7 +105,7 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
      *
      * @param name the name.
      */
-    public TreeNodeMetaDataValue(String name) {
+    public TreeNodeMetadataValue(String name) {
         super(name);
         this.children = new LinkedList<MetadataValue>();
     }
@@ -142,12 +142,12 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
     }
 
     @Override
-    public Descriptor<AbstractMetaDataValue> getDescriptor() {
+    public Descriptor<AbstractMetadataValue> getDescriptor() {
         return Hudson.getInstance().getDescriptorByType(TreeNodeMetaDataValueDescriptor.class);
     }
 
     /**
-     * Descriptor for {@link TreeNodeMetaDataValue}s.
+     * Descriptor for {@link TreeNodeMetadataValue}s.
      */
     @Extension
     public static class TreeNodeMetaDataValueDescriptor extends AbstractMetaDataValueDescriptor {
@@ -155,7 +155,7 @@ public class TreeNodeMetaDataValue extends AbstractMetaDataValue implements Meta
         @Override
         public String getDisplayName() {
             //TODO Find a better display name.
-            return Messages.TreeNodeMetaDataValue_DisplayName();
+            return Messages.TreeNodeMetadataValue_DisplayName();
         }
 
         /**

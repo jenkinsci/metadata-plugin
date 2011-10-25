@@ -23,7 +23,7 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
-import com.sonyericsson.hudson.plugins.metadata.model.MetaDataJobProperty;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty;
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
 import org.junit.Test;
 
@@ -38,19 +38,19 @@ public class TreeStructureUtilTest {
 
     /**
      * Tests {@link TreeStructureUtil#
-     * addValue(com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent, String, String, String...)}.
+     * addValue(com.sonyericsson.hudson.plugins.metadata.model.MetadataParent, String, String, String...)}.
      *
      * @throws Exception if so.
      */
     @Test
     public void testAddStringValue() throws Exception {
-        TreeNodeMetaDataValue root = new TreeNodeMetaDataValue("root");
+        TreeNodeMetadataValue root = new TreeNodeMetadataValue("root");
         boolean result = TreeStructureUtil.addValue(root, "value", "description", "one", "two", "three");
         assertTrue(result);
-        TreeNodeMetaDataValue one = (TreeNodeMetaDataValue)root.getChild("one");
+        TreeNodeMetadataValue one = (TreeNodeMetadataValue)root.getChild("one");
         assertNotNull(one);
         assertSame(root, one.getParent());
-        TreeNodeMetaDataValue two = (TreeNodeMetaDataValue)one.getChild("two");
+        TreeNodeMetadataValue two = (TreeNodeMetadataValue)one.getChild("two");
         assertNotNull(two);
         assertSame(one, two.getParent());
         Metadata three = two.getChild("three");
@@ -62,16 +62,16 @@ public class TreeStructureUtilTest {
 
     /**
      * Tests {@link TreeStructureUtil#
-     * addValue(com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent, String, String, String...)}.
+     * addValue(com.sonyericsson.hudson.plugins.metadata.model.MetadataParent, String, String, String...)}.
      *
      * @throws Exception if so.
      */
     @Test
     public void testAddStringValueToJobProperty() throws Exception {
-        MetaDataJobProperty root = new MetaDataJobProperty();
+        MetadataJobProperty root = new MetadataJobProperty();
         boolean result = TreeStructureUtil.addValue(root, "value", "description", "one", "two");
         assertTrue(result);
-        TreeNodeMetaDataValue one = (TreeNodeMetaDataValue)root.getChild("one");
+        TreeNodeMetadataValue one = (TreeNodeMetadataValue)root.getChild("one");
         assertNotNull(one);
         assertSame(root, one.getParent());
         Metadata two = one.getChild("two");
@@ -83,14 +83,14 @@ public class TreeStructureUtilTest {
 
     /**
      * Tests {@link TreeStructureUtil#
-     * addValue(com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent, String, String, String...)}.
+     * addValue(com.sonyericsson.hudson.plugins.metadata.model.MetadataParent, String, String, String...)}.
      * With null description.
      *
      * @throws Exception if so.
      */
     @Test
     public void testAddStringValueNoDescription() throws Exception {
-        TreeNodeMetaDataValue root = new TreeNodeMetaDataValue("root");
+        TreeNodeMetadataValue root = new TreeNodeMetadataValue("root");
         boolean result = TreeStructureUtil.addValue(root, "value", null, "one");
         assertTrue(result);
         assertNotNull(root.getChild("one"));
@@ -102,7 +102,7 @@ public class TreeStructureUtilTest {
      */
     @Test
     public void testCreatePath() {
-        TreeNodeMetaDataValue root = TreeStructureUtil.createPath("value", "description", "one", "two");
+        TreeNodeMetadataValue root = TreeStructureUtil.createPath("value", "description", "one", "two");
         assertEquals("one", root.getName());
         assertNotNull(root.getChild("two"));
         assertSame(root, root.getChild("two").getParent());

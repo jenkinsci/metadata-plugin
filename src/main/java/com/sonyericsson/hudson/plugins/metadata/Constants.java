@@ -32,8 +32,8 @@ public abstract class Constants {
     /**
      * Request attribute on the /computer/name page set by
      * {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataNodeProperty}
-     * and {@link com.sonyericsson.hudson.plugins.metadata.model.MetaDataJobProperty},
-     * read by {@link com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetaDataValue}
+     * and {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty},
+     * read by {@link com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue}
      * to determine what container type that is currently edited.
      */
     public static final String REQUEST_ATTR_METADATA_CONTAINER = "jenkins-metadata-container";

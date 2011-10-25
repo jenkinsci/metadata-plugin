@@ -23,7 +23,7 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
-import com.sonyericsson.hudson.plugins.metadata.model.MetaDataParent;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
 
 import java.util.Arrays;
@@ -45,7 +45,7 @@ public abstract class TreeStructureUtil {
     }
 
     /**
-     * Adds a {@link StringMetaDataValue} to the root node with the specified path.
+     * Adds a {@link StringMetadataValue} to the root node with the specified path.
      *
      * @param root        the root to add the tree to.
      * @param value       the string value of the leaf node.
@@ -53,14 +53,14 @@ public abstract class TreeStructureUtil {
      * @param path        the path to the leaf from the root.
      * @return true if there was no merge conflicts.
      */
-    public static boolean addValue(MetaDataParent root, String value, String description, String... path) {
-        StringMetaDataValue sVal = new StringMetaDataValue(path[path.length - 1], description, value);
+    public static boolean addValue(MetadataParent root, String value, String description, String... path) {
+        StringMetadataValue sVal = new StringMetadataValue(path[path.length - 1], description, value);
         sVal.setGenerated(true);
         return addValue(root, sVal, Arrays.copyOf(path, path.length - 1));
     }
 
     /**
-     * Adds a {@link DateMetaDataValue} to the root node with the specified path.
+     * Adds a {@link DateMetadataValue} to the root node with the specified path.
      *
      * @param root        the root to add the tree to.
      * @param value       the date value of the leaf node.
@@ -68,8 +68,8 @@ public abstract class TreeStructureUtil {
      * @param path        the path to the leaf from the root.
      * @return true if there was no merge conflicts.
      */
-    public static boolean addValue(MetaDataParent root, Date value, String description, String... path) {
-        DateMetaDataValue sVal = new DateMetaDataValue(path[path.length - 1], description, value);
+    public static boolean addValue(MetadataParent root, Date value, String description, String... path) {
+        DateMetadataValue sVal = new DateMetadataValue(path[path.length - 1], description, value);
         sVal.setGenerated(true);
         return addValue(root, sVal, Arrays.copyOf(path, path.length - 1));
     }
@@ -82,11 +82,11 @@ public abstract class TreeStructureUtil {
      * @param parentPath the path of the parent of the leaf from the root.
      * @return true if there was no merge conflicts.
      */
-    public static boolean addValue(MetaDataParent root, AbstractMetaDataValue value, String... parentPath) {
+    public static boolean addValue(MetadataParent root, AbstractMetadataValue value, String... parentPath) {
         if (parentPath == null || parentPath.length <= 0) {
             return root.addChild(value) == null;
         } else {
-            TreeNodeMetaDataValue path = createPath(value, parentPath);
+            TreeNodeMetadataValue path = createPath(value, parentPath);
             return root.addChild(path) == null;
         }
     }
@@ -99,8 +99,8 @@ public abstract class TreeStructureUtil {
      * @param path        the full path to the leaf.
      * @return the tree.
      */
-    public static TreeNodeMetaDataValue createPath(String value, String description, String... path) {
-        StringMetaDataValue str = new StringMetaDataValue(path[path.length - 1], description, value);
+    public static TreeNodeMetadataValue createPath(String value, String description, String... path) {
+        StringMetadataValue str = new StringMetadataValue(path[path.length - 1], description, value);
         str.setGenerated(true);
         return createPath(str, Arrays.copyOf(path, path.length - 1));
     }
@@ -113,8 +113,8 @@ public abstract class TreeStructureUtil {
      * @param path        the full path to the leaf.
      * @return the tree.
      */
-    public static TreeNodeMetaDataValue createPath(Date value, String description, String... path) {
-        DateMetaDataValue val = new DateMetaDataValue(path[path.length - 1], description, value);
+    public static TreeNodeMetadataValue createPath(Date value, String description, String... path) {
+        DateMetadataValue val = new DateMetadataValue(path[path.length - 1], description, value);
         val.setGenerated(true);
         return createPath(val, Arrays.copyOf(path, path.length - 1));
     }
@@ -126,15 +126,15 @@ public abstract class TreeStructureUtil {
      * @param parentPath the path to the leaf.
      * @return the root node of the path.
      */
-    public static TreeNodeMetaDataValue createPath(AbstractMetaDataValue leaf, String... parentPath) {
+    public static TreeNodeMetadataValue createPath(AbstractMetadataValue leaf, String... parentPath) {
         if (parentPath == null || parentPath.length < 1) {
             throw new IllegalArgumentException("The leaf must have at least one parent.");
         }
-        TreeNodeMetaDataValue root = null;
-        TreeNodeMetaDataValue parent = null;
+        TreeNodeMetadataValue root = null;
+        TreeNodeMetadataValue parent = null;
 
         for (String name : parentPath) {
-            TreeNodeMetaDataValue val = new TreeNodeMetaDataValue(name);
+            TreeNodeMetadataValue val = new TreeNodeMetadataValue(name);
             val.setGenerated(true);
             if (parent != null) {
                 parent.addChild(val);
@@ -155,9 +155,9 @@ public abstract class TreeStructureUtil {
      * @param path        the path to create.
      * @return the root and the leaf.
      */
-    public static TreeNodeMetaDataValue[] createTreePath(String description, String... path) {
-        TreeNodeMetaDataValue[] arr = new TreeNodeMetaDataValue[2];
-        arr[1] = new TreeNodeMetaDataValue(path[path.length - 1], description);
+    public static TreeNodeMetadataValue[] createTreePath(String description, String... path) {
+        TreeNodeMetadataValue[] arr = new TreeNodeMetadataValue[2];
+        arr[1] = new TreeNodeMetadataValue(path[path.length - 1], description);
         arr[1].setGenerated(true);
         arr[0] = createPath(arr[1], Arrays.copyOf(path, path.length - 1));
         return arr;
@@ -170,8 +170,8 @@ public abstract class TreeStructureUtil {
      * @param path the path to get.
      * @return the value or null if it wasn't found.
      */
-    public static Metadata getPath(MetaDataParent root, String... path) {
-        MetaDataParent parent = root;
+    public static Metadata getPath(MetadataParent root, String... path) {
+        MetadataParent parent = root;
         Metadata currentValue = null;
         for (int i = 0; i < path.length; i++) {
             String name = path[i];
@@ -180,8 +180,8 @@ public abstract class TreeStructureUtil {
                 return null;
             } else if (i == path.length - 1) {
                 return currentValue;
-            } else if (currentValue instanceof MetaDataParent) {
-                parent = (MetaDataParent)currentValue;
+            } else if (currentValue instanceof MetadataParent) {
+                parent = (MetadataParent)currentValue;
             } else {
                 return null;
             }
@@ -199,8 +199,8 @@ public abstract class TreeStructureUtil {
     public static String prettyPrint(MetadataValue value, String tabs) {
         StringBuffer str = new StringBuffer(tabs);
         str.append(value.getName()).append("\n");
-        if (value instanceof MetaDataParent) {
-            MetaDataParent node = (MetaDataParent)value;
+        if (value instanceof MetadataParent) {
+            MetadataParent node = (MetadataParent)value;
             prettyPrint(node.getChildren(), tabs + "\t");
         }
         return str.toString();

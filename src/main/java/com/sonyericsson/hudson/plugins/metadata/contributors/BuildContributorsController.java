@@ -24,7 +24,7 @@
 package com.sonyericsson.hudson.plugins.metadata.contributors;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
-import com.sonyericsson.hudson.plugins.metadata.model.MetaDataBuildAction;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataBuildAction;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 import hudson.Extension;
@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * The controller for {@link BuildMetaDataContributor}s.
+ * The controller for {@link BuildMetadataContributor}s.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
@@ -50,15 +50,15 @@ public class BuildContributorsController extends RunListener<AbstractBuild> {
     @Override
     public void onCompleted(AbstractBuild build, TaskListener listener) {
         logger.entering(BuildContributorsController.class.getName(), "onCompleted({0})", build);
-        MetaDataBuildAction action = build.getAction(MetaDataBuildAction.class);
+        MetadataBuildAction action = build.getAction(MetadataBuildAction.class);
         if (action == null) {
-            action = new MetaDataBuildAction();
+            action = new MetadataBuildAction();
             build.addAction(action);
         }
         listener.getLogger().println(Messages.BuildContributorsController_LogMessage_Collecting());
         logger.finest("Starting collection.");
-        ExtensionList<BuildMetaDataContributor> contributors = BuildMetaDataContributor.all();
-        for (BuildMetaDataContributor contributor : contributors) {
+        ExtensionList<BuildMetadataContributor> contributors = BuildMetadataContributor.all();
+        for (BuildMetadataContributor contributor : contributors) {
             List<MetadataValue> values = contributor.getMetaDataFor(build);
             Collection<MetadataValue> leftovers = action.addChildren(values);
             if (leftovers != null && !leftovers.isEmpty()) {

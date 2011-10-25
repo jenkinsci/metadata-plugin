@@ -43,7 +43,7 @@ import java.util.Date;
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
 @XStreamAlias("metadata-date")
-public class DateMetaDataValue extends AbstractMetaDataValue {
+public class DateMetadataValue extends AbstractMetadataValue {
 
     private Date value;
 
@@ -55,7 +55,7 @@ public class DateMetaDataValue extends AbstractMetaDataValue {
      * @param value       the value
      */
     @DataBoundConstructor
-    public DateMetaDataValue(String name, String description, Date value) {
+    public DateMetadataValue(String name, String description, Date value) {
         super(name, description);
         this.value = value;
     }
@@ -66,7 +66,7 @@ public class DateMetaDataValue extends AbstractMetaDataValue {
      * @param name  the name
      * @param value the value
      */
-    public DateMetaDataValue(String name, Date value) {
+    public DateMetadataValue(String name, Date value) {
         super(name);
         this.value = value;
     }
@@ -77,19 +77,19 @@ public class DateMetaDataValue extends AbstractMetaDataValue {
     }
 
     @Override
-    public Descriptor<AbstractMetaDataValue> getDescriptor() {
+    public Descriptor<AbstractMetadataValue> getDescriptor() {
         return Hudson.getInstance().getDescriptorByType(DateMetaDataValueDescriptor.class);
     }
 
     /**
-     * Descriptor for {@link DateMetaDataValue}s.
+     * Descriptor for {@link DateMetadataValue}s.
      */
     @Extension
     public static class DateMetaDataValueDescriptor extends AbstractMetaDataValueDescriptor {
 
         @Override
         public String getDisplayName() {
-            return Messages.DateMetaDataValue_DisplayName();
+            return Messages.DateMetadataValue_DisplayName();
         }
 
         /**
@@ -107,7 +107,7 @@ public class DateMetaDataValue extends AbstractMetaDataValue {
                 if (format.parse(value) != null) {
                     return FormValidation.ok();
                 } else {
-                    return FormValidation.error(Messages.DateMetaDataValue_BadDate());
+                    return FormValidation.error(Messages.DateMetadataValue_BadDate());
                 }
             } catch (ParseException e) {
                 return FormValidation.error(e.getMessage());

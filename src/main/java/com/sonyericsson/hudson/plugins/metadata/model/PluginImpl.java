@@ -23,12 +23,12 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model;
 
-import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetaDataDefinition;
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.DateMetaDataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.NumberMetaDataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetaDataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetadataDefinition;
+import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.DateMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.NumberMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue;
 import hudson.Extension;
 import hudson.Plugin;
 import hudson.model.Hudson;
@@ -46,7 +46,7 @@ import java.util.List;
 @Extension
 public class PluginImpl extends Plugin {
 
-    private List<AbstractMetaDataDefinition> definitions = new LinkedList<AbstractMetaDataDefinition>();
+    private List<AbstractMetadataDefinition> definitions = new LinkedList<AbstractMetadataDefinition>();
 
     @Override
     public void start() throws Exception {
@@ -58,12 +58,12 @@ public class PluginImpl extends Plugin {
      */
     private void performXStreamRegistrations() {
         Class[] types = {
-                AbstractMetaDataValue.class,
-                DateMetaDataValue.class,
-                NumberMetaDataValue.class,
-                StringMetaDataValue.class,
-                TreeNodeMetaDataValue.class,
-                MetaDataJobProperty.class,
+                AbstractMetadataValue.class,
+                DateMetadataValue.class,
+                NumberMetadataValue.class,
+                StringMetadataValue.class,
+                TreeNodeMetadataValue.class,
+                MetadataJobProperty.class,
                 MetadataNodeProperty.class, };
         //Register it in all known XStreams just to be sure.
         Hudson.XSTREAM.processAnnotations(types);
@@ -76,7 +76,7 @@ public class PluginImpl extends Plugin {
      *
      * @param definitions the list of AbstractMetaDataDefinitions
      */
-    public void setDefinitions(List<AbstractMetaDataDefinition> definitions) {
+    public void setDefinitions(List<AbstractMetadataDefinition> definitions) {
         this.definitions = definitions;
     }
 
@@ -85,7 +85,7 @@ public class PluginImpl extends Plugin {
      *
      * @return the list of AbstractMetaDataDefinitions
      */
-    public List<AbstractMetaDataDefinition> getDefinitions() {
+    public List<AbstractMetadataDefinition> getDefinitions() {
         return definitions;
     }
 

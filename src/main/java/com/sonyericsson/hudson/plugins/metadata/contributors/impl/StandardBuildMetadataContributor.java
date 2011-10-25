@@ -23,12 +23,12 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.contributors.impl;
 
-import com.sonyericsson.hudson.plugins.metadata.contributors.BuildMetaDataContributor;
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.contributors.BuildMetadataContributor;
+import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.NumberMetaDataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetaDataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetaDataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.NumberMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 import hudson.Extension;
 import hudson.model.AbstractBuild;
@@ -42,16 +42,16 @@ import java.util.List;
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
 @Extension
-public class StandardBuildMetaDataContributor extends BuildMetaDataContributor {
+public class StandardBuildMetadataContributor extends BuildMetadataContributor {
 
     @Override
     public List<MetadataValue> getMetaDataFor(AbstractBuild build) {
-        TreeNodeMetaDataValue buildNode = TreeStructureUtil.createPath(build.getResult().toString(), "",
+        TreeNodeMetadataValue buildNode = TreeStructureUtil.createPath(build.getResult().toString(), "",
                 "build", "result");
-        AbstractMetaDataValue mdv = new NumberMetaDataValue("ms", build.getDuration());
+        AbstractMetadataValue mdv = new NumberMetadataValue("ms", build.getDuration());
         mdv.setGenerated(true);
         TreeStructureUtil.addValue(buildNode, mdv, "duration");
-        mdv = new StringMetaDataValue("display", build.getDurationString());
+        mdv = new StringMetadataValue("display", build.getDurationString());
         mdv.setGenerated(true);
         TreeStructureUtil.addValue(buildNode, mdv, "duration");
         TreeStructureUtil.addValue(buildNode, build.getBuiltOnStr(), null, "builtOn");
