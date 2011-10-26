@@ -44,6 +44,41 @@ public abstract class Constants {
     public static final String SEPARATOR_DOT = ".";
 
     /**
+     * The URL to the actions.
+     */
+    public static final String COMMON_URL_NAME = "metadata";
+
+    /**
+     * The icon to display for the actions.
+     */
+    public static final String COMMON_ICON = "clipboard.png";
+
+    /**
+     * Serialization alias (XStream and JSON) for
+     * {@link com.sonyericsson.hudson.plugins.metadata.model.values.DateMetadataValue}.
+     */
+    public static final String SERIALIZATION_ALIAS_DATE = "metadata-date";
+
+    /**
+     * Serialization alias (XStream and JSON) for
+     * {@link com.sonyericsson.hudson.plugins.metadata.model.values.NumberMetadataValue}.
+     */
+    public static final String SERIALIZATION_ALIAS_NUMBER = "metadata-number";
+
+    /**
+     * Serialization alias (XStream and JSON) for
+     * {@link com.sonyericsson.hudson.plugins.metadata.model.values.StringMetadataValue}.
+     */
+    public static final String SERIALIZATION_ALIAS_STRING = "metadata-string";
+
+    /**
+     * Serialization alias (XStream and JSON) for
+     * {@link com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue}.
+     */
+    public static final String SERIALIZATION_ALIAS_TREE = "metadata-tree";
+
+
+    /**
      * Empty utility constructor.
      */
     private Constants() {

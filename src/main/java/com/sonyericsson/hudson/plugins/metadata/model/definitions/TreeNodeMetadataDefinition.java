@@ -32,6 +32,7 @@ import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataVal
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Hudson;
+import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -142,6 +143,11 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
             return getParent().getFullName() + Constants.SEPARATOR_DOT + getName();
         }
         return getName();
+    }
+
+    @Override
+    public JSON toJson() {
+        throw new UnsupportedOperationException("Not implemented!");
     }
 
     /**

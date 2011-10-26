@@ -23,6 +23,8 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model;
 
+import net.sf.json.JSON;
+
 import java.util.Collection;
 
 /**
@@ -74,4 +76,10 @@ public interface MetadataParent<T extends Metadata> {
      * @return the fullName.
      */
     String getFullName();
+
+    /**
+     * Convert this object into a JSON object.
+     * @return the JSON version.
+     */
+    JSON toJson();
 }

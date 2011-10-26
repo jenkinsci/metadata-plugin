@@ -23,8 +23,8 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
-import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,9 +54,26 @@ public abstract class TreeStructureUtil {
      * @return true if there was no merge conflicts.
      */
     public static boolean addValue(MetadataParent root, String value, String description, String... path) {
+        return addValue(root, value, description, true, path);
+    }
+
+    /**
+     * Adds a {@link StringMetadataValue} to the root node with the specified path.
+     *
+     * @param root        the root to add the tree to.
+     * @param value       the string value of the leaf node.
+     * @param description the description of the leaf node.
+     * @param generated what the value's
+     *                   {@link com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue#isGenerated()}
+     *                   should be.
+     * @param path        the path to the leaf from the root.
+     * @return true if there was no merge conflicts.
+     */
+    public static boolean addValue(MetadataParent root, String value, String description,
+                                   boolean generated, String... path) {
         StringMetadataValue sVal = new StringMetadataValue(path[path.length - 1], description, value);
-        sVal.setGenerated(true);
-        return addValue(root, sVal, Arrays.copyOf(path, path.length - 1));
+        sVal.setGenerated(generated);
+        return addValue(root, sVal, generated, Arrays.copyOf(path, path.length - 1));
     }
 
     /**
@@ -83,10 +100,24 @@ public abstract class TreeStructureUtil {
      * @return true if there was no merge conflicts.
      */
     public static boolean addValue(MetadataParent root, AbstractMetadataValue value, String... parentPath) {
+        return addValue(root, value, true, parentPath);
+    }
+
+    /**
+     * Adds a value with the specified path to the root.
+     *
+     * @param root       the root to add the tree to.
+     * @param value      the value of the leaf.
+     * @param generated  the parentPath should be marked as generated or not.
+     * @param parentPath the path of the parent of the leaf from the root.
+     * @return true if there was no merge conflicts.
+     */
+    public static boolean addValue(MetadataParent root, AbstractMetadataValue value,
+                                   boolean generated, String... parentPath) {
         if (parentPath == null || parentPath.length <= 0) {
             return root.addChild(value) == null;
         } else {
-            TreeNodeMetadataValue path = createPath(value, parentPath);
+            TreeNodeMetadataValue path = createPath(value, generated, parentPath);
             return root.addChild(path) == null;
         }
     }
@@ -100,9 +131,25 @@ public abstract class TreeStructureUtil {
      * @return the tree.
      */
     public static TreeNodeMetadataValue createPath(String value, String description, String... path) {
+        return createPath(value, description, true, path);
+    }
+
+    /**
+     * Creates a path where the last element is a string with the provided value and description.
+     *
+     * @param value       the value
+     * @param description the description
+     * @param generated what the value's
+     *                   {@link com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue#isGenerated()}
+     *                   should be.
+     * @param path        the full path to the leaf.
+     * @return the tree.
+     */
+    public static TreeNodeMetadataValue createPath(String value, String description,
+                                                   boolean generated, String... path) {
         StringMetadataValue str = new StringMetadataValue(path[path.length - 1], description, value);
-        str.setGenerated(true);
-        return createPath(str, Arrays.copyOf(path, path.length - 1));
+        str.setGenerated(generated);
+        return createPath(str, generated, Arrays.copyOf(path, path.length - 1));
     }
 
     /**
@@ -120,13 +167,28 @@ public abstract class TreeStructureUtil {
     }
 
     /**
-     * Creates a tree structured path with the provided leaf at the end.
+     * Creates a tree structured path with the provided leaf at the end. The value's {@link
+     * com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue#isGenerated()} will be true.
      *
      * @param leaf       the leaf to put in the end.
      * @param parentPath the path to the leaf.
      * @return the root node of the path.
      */
     public static TreeNodeMetadataValue createPath(AbstractMetadataValue leaf, String... parentPath) {
+        return createPath(leaf, true, parentPath);
+    }
+
+    /**
+     * Creates a tree structured path with the provided leaf at the end.
+     *
+     * @param leaf       the leaf to put in the end.
+     * @param generated  what the value's
+     *                   {@link com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue#isGenerated()}
+     *                   should be.
+     * @param parentPath the path to the leaf.
+     * @return the root node of the path.
+     */
+    public static TreeNodeMetadataValue createPath(AbstractMetadataValue leaf, boolean generated, String... parentPath) {
         if (parentPath == null || parentPath.length < 1) {
             throw new IllegalArgumentException("The leaf must have at least one parent.");
         }
@@ -135,7 +197,7 @@ public abstract class TreeStructureUtil {
 
         for (String name : parentPath) {
             TreeNodeMetadataValue val = new TreeNodeMetadataValue(name);
-            val.setGenerated(true);
+            val.setGenerated(generated);
             if (parent != null) {
                 parent.addChild(val);
             }
@@ -149,17 +211,32 @@ public abstract class TreeStructureUtil {
     }
 
     /**
-     * Creates a straight tree-path. The method returns an array where index 0 is the root and index 1 is the leaf.
+     * Creates a straight tree-path. The method returns an array where index 0 is the root and index 1 is the leaf. The
+     * value's {@link com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue#isGenerated()} will be true.
      *
      * @param description the description of the root.
      * @param path        the path to create.
      * @return the root and the leaf.
      */
     public static TreeNodeMetadataValue[] createTreePath(String description, String... path) {
+        return createTreePath(description, true, path);
+    }
+
+    /**
+     * Creates a straight tree-path. The method returns an array where index 0 is the root and index 1 is the leaf.
+     *
+     * @param description the description of the root.
+     * @param generated   what the value's
+     *                    {@link com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue#isGenerated()}
+     *                    should be.
+     * @param path        the path to create.
+     * @return the root and the leaf.
+     */
+    public static TreeNodeMetadataValue[] createTreePath(String description, boolean generated, String... path) {
         TreeNodeMetadataValue[] arr = new TreeNodeMetadataValue[2];
         arr[1] = new TreeNodeMetadataValue(path[path.length - 1], description);
-        arr[1].setGenerated(true);
-        arr[0] = createPath(arr[1], Arrays.copyOf(path, path.length - 1));
+        arr[1].setGenerated(generated);
+        arr[0] = createPath(arr[1], generated, Arrays.copyOf(path, path.length - 1));
         return arr;
     }
 
@@ -168,11 +245,12 @@ public abstract class TreeStructureUtil {
      *
      * @param root the root to start from.
      * @param path the path to get.
+     * @param <T>  The type of metadata.
      * @return the value or null if it wasn't found.
      */
-    public static Metadata getPath(MetadataParent root, String... path) {
-        MetadataParent parent = root;
-        Metadata currentValue = null;
+    public static <T extends Metadata> T getPath(MetadataParent<T> root, String... path) {
+        MetadataParent<T> parent = root;
+        T currentValue = null;
         for (int i = 0; i < path.length; i++) {
             String name = path[i];
             currentValue = parent.getChild(name);
@@ -208,8 +286,9 @@ public abstract class TreeStructureUtil {
 
     /**
      * Prints the values and their children if any into a structured string.
+     *
      * @param values the values to print
-     * @param tabs the current level.
+     * @param tabs   the current level.
      * @return a pretty string.
      */
     public static String prettyPrint(Collection<MetadataValue> values, String tabs) {

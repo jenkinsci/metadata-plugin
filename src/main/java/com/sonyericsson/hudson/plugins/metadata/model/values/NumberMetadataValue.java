@@ -24,20 +24,25 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
+import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.util.FormValidation;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+
+import static com.sonyericsson.hudson.plugins.metadata.Constants.SERIALIZATION_ALIAS_NUMBER;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.*;
 
 /**
  * Meta data containing a non-decimal number.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-@XStreamAlias("metadata-number")
+@XStreamAlias(SERIALIZATION_ALIAS_NUMBER)
 public class NumberMetadataValue extends AbstractMetadataValue {
 
     private long value;
@@ -72,6 +77,13 @@ public class NumberMetadataValue extends AbstractMetadataValue {
     }
 
     @Override
+    public JSONObject toJson() {
+        JSONObject obj = toAbstractJson();
+        obj.put(VALUE, value);
+        return obj;
+    }
+
+    @Override
     public Descriptor<AbstractMetadataValue> getDescriptor() {
         return Hudson.getInstance().getDescriptorByType(NumberMetaDataValueDescriptor.class);
     }
@@ -85,6 +97,27 @@ public class NumberMetadataValue extends AbstractMetadataValue {
         @Override
         public String getDisplayName() {
             return Messages.NumberMetadataValue_DisplayName();
+        }
+
+        @Override
+        public String getJsonType() {
+            return SERIALIZATION_ALIAS_NUMBER;
+        }
+
+        @Override
+        public MetadataValue fromJson(JSONObject json) throws JsonUtils.ParseException {
+            checkRequiredJsonAttribute(json, NAME);
+            checkRequiredJsonAttribute(json, VALUE);
+
+            NumberMetadataValue value = new NumberMetadataValue(
+                    json.getString(NAME), json.optString(DESCRIPTION), json.getLong(VALUE));
+            if (json.has(GENERATED)) {
+                value.setGenerated(json.getBoolean(GENERATED));
+            } else {
+                //TODO Should we do this?
+                value.setGenerated(true);
+            }
+            return value;
         }
 
         /**

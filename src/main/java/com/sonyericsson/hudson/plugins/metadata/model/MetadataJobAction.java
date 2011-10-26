@@ -23,6 +23,7 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model;
 
+import com.sonyericsson.hudson.plugins.metadata.Constants;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
@@ -34,14 +35,6 @@ import hudson.model.Action;
  */
 public class MetadataJobAction implements Action {
 
-    /**
-     * The URL to this action.
-     */
-    protected static final String URL_NAME = "metadata";
-    /**
-     * The icon to display for this action.
-     */
-    protected static final String ICON = "clipboard.png";
     /** The project. */
     private final transient AbstractProject<?, ?> project;
     /** The MetadataJobProperty. */
@@ -58,7 +51,7 @@ public class MetadataJobAction implements Action {
 
     @Override
     public String getIconFileName() {
-        return ICON;
+        return Constants.COMMON_ICON;
     }
 
     @Override
@@ -68,7 +61,7 @@ public class MetadataJobAction implements Action {
 
     @Override
     public String getUrlName() {
-        return URL_NAME;
+        return Constants.COMMON_URL_NAME;
     }
 
     /**

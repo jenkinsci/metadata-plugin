@@ -24,28 +24,33 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
+import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.util.FormValidation;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.text.DateFormat;
-import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
+
+import static com.sonyericsson.hudson.plugins.metadata.Constants.SERIALIZATION_ALIAS_DATE;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.*;
 
 /**
  * Meta data with the value of a {@link java.util.Date}.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-@XStreamAlias("metadata-date")
+@XStreamAlias(SERIALIZATION_ALIAS_DATE)
 public class DateMetadataValue extends AbstractMetadataValue {
 
-    private Date value;
+    private Calendar value;
 
     /**
      * Standard Constructor.
@@ -57,7 +62,7 @@ public class DateMetadataValue extends AbstractMetadataValue {
     @DataBoundConstructor
     public DateMetadataValue(String name, String description, Date value) {
         super(name, description);
-        this.value = value;
+        setValue(value);
     }
 
     /**
@@ -68,17 +73,35 @@ public class DateMetadataValue extends AbstractMetadataValue {
      */
     public DateMetadataValue(String name, Date value) {
         super(name);
-        this.value = value;
+        setValue(value);
     }
 
     @Override
     public Date getValue() {
-        return value;
+        return value.getTime();
     }
 
     @Override
     public Descriptor<AbstractMetadataValue> getDescriptor() {
         return Hudson.getInstance().getDescriptorByType(DateMetaDataValueDescriptor.class);
+    }
+
+    /**
+     * Sets the internal Calendar value based on the provided Date.
+     *
+     * @param dateValue the value.
+     */
+    private synchronized void setValue(Date dateValue) {
+        this.value = Calendar.getInstance();
+        this.value.setTime(dateValue);
+    }
+
+    @Override
+    public synchronized JSONObject toJson() {
+        JSONObject obj = toAbstractJson();
+        //TODO Serialize timezone info?
+        obj.put(VALUE, value.getTimeInMillis());
+        return obj;
     }
 
     /**
@@ -92,24 +115,46 @@ public class DateMetadataValue extends AbstractMetadataValue {
             return Messages.DateMetadataValue_DisplayName();
         }
 
+        @Override
+        public String getJsonType() {
+            return SERIALIZATION_ALIAS_DATE;
+        }
+
+        @Override
+        public MetadataValue fromJson(JSONObject json) throws JsonUtils.ParseException {
+            checkRequiredJsonAttribute(json, NAME);
+            checkRequiredJsonAttribute(json, VALUE);
+
+            //TODO Deserialize timezone info?
+            DateMetadataValue value = new DateMetadataValue(
+                    json.getString(NAME), json.optString(DESCRIPTION), new Date(json.getLong(VALUE)));
+            if (json.has(GENERATED)) {
+                value.setGenerated(json.getBoolean(GENERATED));
+            } else {
+                //TODO Should we do this?
+                value.setGenerated(true);
+            }
+            return value;
+        }
+
         /**
-         * Form validation for the value.
-         * It will try to parse the date according to the user's locale.
-         * @param value the value.
+         * Form validation for the value. It will try to parse the date according to the user's locale.
+         *
+         * @param value   the value.
          * @param request the http request.
          * @return {@link hudson.util.FormValidation#ok()} if the value can be parsed to a date.
          */
         public FormValidation doCheckValue(@QueryParameter String value, StaplerRequest request) {
             DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
-                                                             DateFormat.MEDIUM,
-                                                             request.getLocale());
+                    DateFormat.MEDIUM,
+                    request.getLocale());
             try {
                 if (format.parse(value) != null) {
                     return FormValidation.ok();
                 } else {
                     return FormValidation.error(Messages.DateMetadataValue_BadDate());
                 }
-            } catch (ParseException e) {
+            } catch (java.text.ParseException e) {
                 return FormValidation.error(e.getMessage());
             }
         }

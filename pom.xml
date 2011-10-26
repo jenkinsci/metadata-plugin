@@ -24,10 +24,19 @@
         </license>
     </licenses>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <powermock.version>1.4.5</powermock.version>
+    </properties>
+
     <repositories>
         <repository>
             <id>maven.jenkins-ci.org</id>
             <url>http://maven.jenkins-ci.org/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>powermock-repo</id>
+            <url>http://powermock.googlecode.com/svn/repo/</url>
         </repository>
     </repositories>
 
@@ -48,6 +57,24 @@
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-library</artifactId>
             <version>1.2.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>1.9.0-rc1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock.modules</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock.api</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <version>${powermock.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

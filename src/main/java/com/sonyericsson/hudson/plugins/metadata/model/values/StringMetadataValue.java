@@ -24,18 +24,23 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
+import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
+
+import static com.sonyericsson.hudson.plugins.metadata.Constants.SERIALIZATION_ALIAS_STRING;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.*;
 
 /**
  * A Meta Data value of the type String.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-@XStreamAlias("metadata-string")
+@XStreamAlias(SERIALIZATION_ALIAS_STRING)
 public class StringMetadataValue extends AbstractMetadataValue {
 
     private String value;
@@ -74,6 +79,13 @@ public class StringMetadataValue extends AbstractMetadataValue {
         return Hudson.getInstance().getDescriptorByType(StringMetaDataValueDescriptor.class);
     }
 
+    @Override
+    public JSONObject toJson() {
+        JSONObject obj = toAbstractJson();
+        obj.put(VALUE, value);
+        return obj;
+    }
+
     /**
      * The Descriptor.
      */
@@ -83,6 +95,27 @@ public class StringMetadataValue extends AbstractMetadataValue {
         @Override
         public String getDisplayName() {
             return Messages.StringMetadataValue_DisplayName();
+        }
+
+        @Override
+        public String getJsonType() {
+            return SERIALIZATION_ALIAS_STRING;
+        }
+
+        @Override
+        public MetadataValue fromJson(JSONObject json) throws JsonUtils.ParseException {
+            JsonUtils.checkRequiredJsonAttribute(json, NAME);
+            checkRequiredJsonAttribute(json, VALUE);
+
+            StringMetadataValue value = new StringMetadataValue(
+                    json.getString(NAME), json.optString(DESCRIPTION), json.getString(VALUE));
+            if (json.has(GENERATED)) {
+                value.setGenerated(json.getBoolean(GENERATED));
+            } else {
+                //TODO Should we do this?
+                value.setGenerated(true);
+            }
+            return value;
         }
     }
 }

@@ -24,13 +24,15 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
-
+import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -39,6 +41,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_METADATA_CONTAINER;
+import static com.sonyericsson.hudson.plugins.metadata.Constants.SERIALIZATION_ALIAS_TREE;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.*;
 
 /**
  * Meta data containing other meta data values. Used to create tree structures of data.
@@ -46,7 +50,7 @@ import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_ME
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
 
-@XStreamAlias("metadata-tree")
+@XStreamAlias(SERIALIZATION_ALIAS_TREE)
 public class TreeNodeMetadataValue extends AbstractMetadataValue implements MetadataParent<MetadataValue> {
 
     private List<MetadataValue> children;
@@ -146,6 +150,17 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
         return Hudson.getInstance().getDescriptorByType(TreeNodeMetaDataValueDescriptor.class);
     }
 
+    @Override
+    public JSONObject toJson() {
+        JSONObject obj = toAbstractJson();
+        JSONArray array = new JSONArray();
+        for (MetadataValue child : children) {
+            array.add(child.toJson());
+        }
+        obj.put(CHILDREN, array);
+        return obj;
+    }
+
     /**
      * Descriptor for {@link TreeNodeMetadataValue}s.
      */
@@ -156,6 +171,33 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
         public String getDisplayName() {
             //TODO Find a better display name.
             return Messages.TreeNodeMetadataValue_DisplayName();
+        }
+
+        @Override
+        public String getJsonType() {
+            return SERIALIZATION_ALIAS_TREE;
+        }
+
+        @Override
+        public MetadataValue fromJson(JSONObject json) throws JsonUtils.ParseException {
+            checkRequiredJsonAttribute(json, NAME);
+            List<MetadataValue> children = new LinkedList<MetadataValue>();
+            if (json.has(CHILDREN)) {
+                JSONArray array = json.getJSONArray(CHILDREN);
+                for (int i = 0; i < array.size(); i++) {
+                    JSONObject obj = array.getJSONObject(i);
+                    children.add(JsonUtils.toValue(obj));
+                }
+            }
+            TreeNodeMetadataValue value = new TreeNodeMetadataValue(
+                    json.getString(NAME), json.optString(DESCRIPTION), children);
+            if (json.has(GENERATED)) {
+                value.setGenerated(json.getBoolean(GENERATED));
+            } else {
+                //TODO Decide if this is really what should be done.
+                value.setGenerated(true);
+            }
+            return value;
         }
 
         /**

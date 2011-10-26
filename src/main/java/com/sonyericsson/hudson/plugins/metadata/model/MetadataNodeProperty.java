@@ -35,12 +35,14 @@ import hudson.model.Hudson;
 import hudson.model.Node;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.NodePropertyDescriptor;
+import net.sf.json.JSON;
 import org.kohsuke.stapler.Ancestor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,7 +56,7 @@ import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_ME
  */
 @XStreamAlias("node-metadata")
 @ExportedBean
-public class MetadataNodeProperty extends NodeProperty<Node> implements MetadataParent<MetadataValue> {
+public class MetadataNodeProperty extends NodeProperty<Node> implements MetadataContainer<MetadataValue> {
 
     private List<MetadataValue> values;
 
@@ -117,6 +119,11 @@ public class MetadataNodeProperty extends NodeProperty<Node> implements Metadata
         return "";
     }
 
+    @Override
+    public JSON toJson() {
+        return ParentUtil.toJson(this);
+    }
+
     /**
      * Jenkins likes to display both the master's properties summary.jelly and the node's summary.jelly on the computer
      * page. This method determines if the request really represents the Node that this property is tied to.
@@ -132,6 +139,11 @@ public class MetadataNodeProperty extends NodeProperty<Node> implements Metadata
             return computer.getNode().getNodeProperties().get(MetadataNodeProperty.class) == this;
         }
         return false;
+    }
+
+    @Override
+    public void save() throws IOException {
+        Hudson.getInstance().save();
     }
 
     /**
@@ -162,6 +174,26 @@ public class MetadataNodeProperty extends NodeProperty<Node> implements Metadata
                 }
             }
             return list;
+        }
+
+        /**
+         * Gives the {@link MetadataNodeProperty} for the given Node. If no metadata is available on the node the
+         * property will be created and added to the node.
+         *
+         * @param node the node.
+         * @return the property created or found.
+         *
+         * @throws IOException if an error occurs when adding the property to the node.
+         */
+        public static MetadataNodeProperty instanceFor(Node node) throws IOException {
+            if (node.getNodeProperties().get(MetadataNodeProperty.class) != null) {
+                return node.getNodeProperties().get(MetadataNodeProperty.class);
+            } else {
+                MetadataNodeProperty property = new MetadataNodeProperty();
+                property.setNode(node);
+                node.getNodeProperties().add(property);
+                return property;
+            }
         }
     }
 }

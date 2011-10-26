@@ -23,40 +23,47 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model;
 
+import com.sonyericsson.hudson.plugins.metadata.Constants;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import hudson.model.Action;
+import hudson.model.Run;
+import net.sf.json.JSON;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Holds the meta data for a build.
+ * Holds the meta data for a run.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public class MetadataBuildAction implements Action, MetadataParent<MetadataValue> {
+public class MetadataBuildAction implements Action, MetadataContainer<MetadataValue> {
 
-    /**
-     * The URL to this action.
-     */
-    protected static final String URL_NAME = "metadata";
-    /**
-     * The icon to display for this action.
-     */
-    protected static final String ICON = "clipboard.png";
-
+    private Run run;
     private List<MetadataValue> values;
 
     /**
      * Standard constructor.
      *
-     * @param values the meta data for this build.
+     * @param run    The run that this action is added to.
+     * @param values the meta data for this run.
      */
-    public MetadataBuildAction(List<MetadataValue> values) {
+    public MetadataBuildAction(Run run, List<MetadataValue> values) {
+        this.run = run;
         this.values = values;
+    }
+
+    /**
+     * Standard constructor.
+     *
+     * @param run The run that this action is added to.
+     */
+    public MetadataBuildAction(Run run) {
+        this.run = run;
     }
 
     /**
@@ -67,7 +74,7 @@ public class MetadataBuildAction implements Action, MetadataParent<MetadataValue
 
     @Override
     public String getIconFileName() {
-        return ICON;
+        return Constants.COMMON_ICON;
     }
 
     @Override
@@ -77,13 +84,23 @@ public class MetadataBuildAction implements Action, MetadataParent<MetadataValue
 
     @Override
     public String getUrlName() {
-        return URL_NAME;
+        return Constants.COMMON_URL_NAME;
+    }
+
+    /**
+     * The run that this action is added to.
+     *
+     * @return the run.
+     */
+    public Run getRun() {
+        return run;
     }
 
     /**
      * The meta data in this action.
      *
      * @return the meta data.
+     *
      * @see #getChildren()
      */
     public List<MetadataValue> getValues() {
@@ -116,5 +133,19 @@ public class MetadataBuildAction implements Action, MetadataParent<MetadataValue
     @Override
     public String getFullName() {
         return "";
+    }
+
+    @Override
+    public JSON toJson() {
+        return ParentUtil.toJson(this);
+    }
+
+    @Override
+    public void save() throws IOException {
+        if (this.run != null) {
+            this.run.save();
+        } else {
+            throw new IOException("This container is not attached to any build.");
+        }
     }
 }

@@ -24,6 +24,7 @@
 package com.sonyericsson.hudson.plugins.metadata.contributors;
 
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
@@ -38,6 +39,7 @@ import hudson.model.listeners.SaveableListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -148,6 +150,8 @@ public class JobContributorsController extends SaveableListener {
                 }
             }
 
+            cleanGeneratedValues(property);
+
             //TODO add a translatable description
             TreeNodeMetadataValue[] tree = TreeStructureUtil.createTreePath("", "job-info", "last-saved");
             TreeNodeMetadataValue jobInfo = tree[0];
@@ -178,6 +182,27 @@ public class JobContributorsController extends SaveableListener {
             } finally {
                 controller.setCurrentProject(null);
             }
+        }
+
+        /**
+         * Removes all generated values from the property so that it can be refilled.
+         * This method is recursive. It also has the assumption that
+         * {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#getChildren()}
+         * returns a direct reference to the internal collection of children and not a clone.
+         *
+         * @param parent the parent to clean.
+         */
+        private void cleanGeneratedValues(MetadataParent<MetadataValue> parent) {
+            Collection<MetadataValue> values = parent.getChildren();
+            List<MetadataValue> toRemove = new LinkedList<MetadataValue>();
+            for (MetadataValue value : values) {
+                if (value.isGenerated()) {
+                    toRemove.add(value);
+                } else if (value instanceof MetadataParent) {
+                    cleanGeneratedValues((MetadataParent<MetadataValue>)value);
+                }
+            }
+            values.removeAll(toRemove);
         }
     }
 }

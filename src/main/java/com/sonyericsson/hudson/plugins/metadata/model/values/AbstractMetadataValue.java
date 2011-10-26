@@ -25,9 +25,13 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.Constants;
+import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
+import hudson.ExtensionList;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
+import hudson.model.Hudson;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
@@ -132,7 +136,7 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
      * @return true if generated.
      */
     @Override
-    public boolean isGenerated() {
+    public synchronized boolean isGenerated() {
         return generated;
     }
 
@@ -142,7 +146,7 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
      * @param generated true if generated.
      */
     @Override
-    public void setGenerated(boolean generated) {
+    public synchronized void setGenerated(boolean generated) {
         this.generated = generated;
     }
 
@@ -158,22 +162,73 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
         }
         return getName();
     }
+
+    /**
+     * Converts this into a JSON Object <strong>without the value</strong>. Implementing classes can use this as a
+     * utility method for the name, type and description. And then just add the value.
+     *
+     * @return the half finished JSON Object.
+     */
+    protected synchronized JSONObject toAbstractJson() {
+        JSONObject obj = new JSONObject();
+        obj.put(JsonUtils.NAME, name);
+        obj.put(JsonUtils.DESCRIPTION, description);
+        obj.put(JsonUtils.GENERATED, generated);
+
+        AbstractMetaDataValueDescriptor descriptor = (AbstractMetaDataValueDescriptor)getDescriptor();
+        obj.put(JsonUtils.METADATA_TYPE, descriptor.getJsonType());
+        return obj;
+    }
+
     /**
      * The descriptor for the AbstractMetadataValue.
      */
     public abstract static class AbstractMetaDataValueDescriptor extends Descriptor<AbstractMetadataValue> {
 
         /**
-         * Tells if values of this descriptor can be added to the specified container type or not.
-         * Some value types might not apply to be added to a node and vice versa.
-         * The default implementation always returns true.
-         * @param containerDescriptor the descriptor for the container that the values of this type can be added to.
-         *                                             Can be null.
+         * Tells if values of this descriptor can be added to the specified container type or not. Some value types
+         * might not apply to be added to a node and vice versa. The default implementation always returns true.
+         *
+         * @param containerDescriptor the descriptor for the container that the values of this type can be added to. Can
+         *                            be null.
          * @return true if it applies.
          */
         public boolean appliesTo(Descriptor containerDescriptor) {
             return true;
         }
+
+        /**
+         * Finds the descriptor for the given metadata-type.
+         * @param type the type to find.
+         * @return the Descriptor or null if non is found.
+         */
+        public static AbstractMetaDataValueDescriptor findForJsonType(String type) {
+            ExtensionList<AbstractMetaDataValueDescriptor> extensionList =
+                    Hudson.getInstance().getExtensionList(AbstractMetadataValue.AbstractMetaDataValueDescriptor.class);
+            for (AbstractMetadataValue.AbstractMetaDataValueDescriptor d : extensionList) {
+                if (d.getJsonType().equals(type)) {
+                    return d;
+                }
+            }
+            return null;
+        }
+
+        /**
+         * Gives the type to put into the JSON conversations.
+         *
+         * @return the JSON type field.
+         */
+        public abstract String getJsonType();
+
+        /**
+         * Converts a JSON object into a MetadataValue of this descriptors describable.
+         *
+         * @param json the json data to use.
+         * @return the converted value.
+         *
+         * @throws JsonUtils.ParseException if something is for example missing.
+         */
+        public abstract MetadataValue fromJson(JSONObject json) throws JsonUtils.ParseException;
     }
 }
 

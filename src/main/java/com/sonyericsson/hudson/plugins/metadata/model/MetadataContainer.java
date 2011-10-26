@@ -21,33 +21,23 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package com.sonyericsson.hudson.plugins.metadata.model.values;
+package com.sonyericsson.hudson.plugins.metadata.model;
 
-import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
-import net.sf.json.JSONObject;
+import java.io.IOException;
 
 /**
- * A metadata value interface.
+ * A container for metadata. i.e. {@link MetadataJobProperty} or {@link MetadataBuildAction}.
+ *
+ * @param <T> The type of Metadata that this is a container for.
+ * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-public interface MetadataValue extends Metadata {
+public interface MetadataContainer<T extends Metadata> extends MetadataParent<T> {
 
     /**
-     * If this value is generated or user created.
+     * Saves the container to disc, usually achieved by calling save on whatever
+     * {@link hudson.model.Saveable} this container is in.
      *
-     * @return true if generated.
+     * @throws IOException if the persistence.
      */
-    boolean isGenerated();
-
-    /**
-     * Set if this value is generated or user created.
-     *
-     * @param generated true if generated.
-     */
-    void setGenerated(boolean generated);
-
-    /**
-     * Convert this object into a JSON object.
-     * @return the JSON version.
-     */
-    JSONObject toJson();
+    void save() throws IOException;
 }

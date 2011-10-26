@@ -23,10 +23,12 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
-import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
+import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.MetadataDefinition;
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.TreeNodeMetadataDefinition;
+import net.sf.json.JSON;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -54,12 +56,11 @@ public final class ParentUtil {
      * @param parent   the parent
      * @param children the direct list of the parents children.
      * @param value    the value to add.
-     * @param <T> the type for parent, children, value and the return value.
+     * @param <T>      the type for parent, children, value and the return value.
      * @return the value(s) that failed to be added.
-     *
      */
-    public static<T extends Metadata> Collection<T> addChildValue(MetadataParent<T> parent, List<T> children,
-                                                      T value) {
+    public static <T extends Metadata> Collection<T> addChildValue(MetadataParent<T> parent, List<T> children,
+                                                                   T value) {
 
         if (value == null) {
             throw new IllegalArgumentException("The added child value is null");
@@ -84,7 +85,7 @@ public final class ParentUtil {
                     returnList = new LinkedList<T>();
                     returnList.add((T)treeNode);
                     return returnList;
-                    }
+                }
 
             } else {
                 //one or both of them is not a parent, so we fail.
@@ -101,19 +102,19 @@ public final class ParentUtil {
     }
 
     /**
-     * Adds the values as a child to the parent. Help utility for those who implement {@link
-     * com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#
+     * Adds the values as a child to the parent. Help utility for those who implement
+     * {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#
      * addChild(com.sonyericsson.hudson.plugins.metadata.model.Metadata)}
      *
      * @param parent   the parent to add the values to
      * @param children the direct list of the parents children.
      * @param values   the values to add.
-     * @param <T> the type for parent, children, values and the return value.
+     * @param <T>      the type for parent, children, values and the return value.
      * @return the values that failed to be added.
      */
-    public static<T extends Metadata> Collection<T> addChildValues(MetadataParent parent,
-                                                                   List<T> children,
-                                                                   Collection<T> values) {
+    public static <T extends Metadata> Collection<T> addChildValues(MetadataParent parent,
+                                                                    List<T> children,
+                                                                    Collection<T> values) {
         List<T> leftovers = new LinkedList<T>();
         for (T value : values) {
             Collection<T> returned = addChildValue(parent, children, value);
@@ -133,15 +134,29 @@ public final class ParentUtil {
      *
      * @param values the list of children.
      * @param name   the name to search.
-     * @param <T> the type for values, name and the return value.
+     * @param <T>    the type for values, name and the return value.
      * @return the child if found or null if not.
      */
-    public static<T extends Metadata> T getChildValue(Collection<T> values, String name) {
+    public static <T extends Metadata> T getChildValue(Collection<T> values, String name) {
         for (T value : values) {
             if (value.getName().equalsIgnoreCase(name)) {
                 return value;
             }
         }
         return null;
+    }
+
+    /**
+     * Converts the container into a JSON object. This processing is different from {@link
+     * com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue#toJson()} because it will only convert the
+     * children not the entire object, since a container
+     * (like {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty})
+     * in essence doesn't have a name.
+     *
+     * @param container the container
+     * @return the JSON representation.
+     */
+    public static JSON toJson(MetadataParent<MetadataValue> container) {
+        return JsonUtils.toJson(container.getChildren());
     }
 }

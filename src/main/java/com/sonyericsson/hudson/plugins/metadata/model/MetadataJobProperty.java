@@ -36,11 +36,13 @@ import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
+import net.sf.json.JSON;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -56,7 +58,7 @@ import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_ME
 
 @XStreamAlias("job-metadata")
 @ExportedBean
-public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> implements MetadataParent<MetadataValue> {
+public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> implements MetadataContainer<MetadataValue> {
 
     private List<MetadataValue> values;
     private transient MetadataJobAction metadataJobAction;
@@ -98,9 +100,9 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
         List<MetadataValue> allValues = getValues();
         List<MetadataValue> userValues = new LinkedList<MetadataValue>();
         for (MetadataValue value : allValues) {
-                if (!value.isGenerated()) {
-                    userValues.add(value);
-                }
+            if (!value.isGenerated()) {
+                userValues.add(value);
+            }
         }
         return userValues;
     }
@@ -158,6 +160,20 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
         return "";
     }
 
+    @Override
+    public JSON toJson() {
+        return ParentUtil.toJson(this);
+    }
+
+    @Override
+    public void save() throws IOException {
+        if (owner != null) {
+            owner.save();
+        } else {
+            throw new IOException("This container is not attached to any job.");
+        }
+    }
+
     /**
      * Descriptor for the {@link MetadataJobProperty}.
      */
@@ -187,6 +203,29 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
                 }
             }
             return list;
+        }
+
+        /**
+         * Gives the {@link MetadataJobProperty} for the given Job. If no metadata is available on the job the property
+         * will be created and added to it.
+         *
+         * @param project the job.
+         * @return the property created or found.
+         *
+         * @throws IOException if an error occurs when adding the property to the node.
+         */
+        public static MetadataJobProperty instanceFor(AbstractProject project) throws IOException {
+            MetadataJobProperty property = (MetadataJobProperty)project.getProperty(MetadataJobProperty.class);
+
+            if (property == null) {
+                property = new MetadataJobProperty();
+                project.addProperty(property);
+            }
+
+            if (property.getOwner() == null || property.getOwner() != project) {
+                property.setOwner(project); //Quick fix for some unit tests and just to be sure it is set.
+            }
+            return property;
         }
     }
 }
