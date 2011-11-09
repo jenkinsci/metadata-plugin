@@ -26,6 +26,7 @@ package com.sonyericsson.hudson.plugins.metadata.cli;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
+import com.sonyericsson.hudson.plugins.metadata.model.PluginImpl;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import hudson.AbortException;
 import hudson.Extension;
@@ -92,23 +93,24 @@ public class UpdateMetadataCommand extends CLICommand {
 
     @Override
     protected int run() throws Exception {
-        MetadataContainer<MetadataValue> container = null;
-        String dataDocument = null;
+        MetadataContainer<MetadataValue> container;
+        String dataDocument;
         try {
             dataDocument = loadData();
             container = CliUtils.getContainer(node, job, build, true);
         } catch (CmdLineException e) {
             stderr.println(e.getMessage());
-            return CliUtils.ERR_BAD_CMD;
+            return CliUtils.Status.ERR_BAD_CMD.code();
         } catch (CliUtils.NoItemException e) {
             stderr.println(e.getMessage());
-            return CliUtils.ERR_NO_ITEM;
+            return CliUtils.Status.ERR_NO_ITEM.code();
         } catch (CliUtils.NoMetadataException e) {
             stderr.println(e.getMessage());
-            return CliUtils.ERR_NO_METADATA;
+            return CliUtils.Status.ERR_NO_METADATA.code();
         }
 
         if (container != null) {
+            container.getACL().checkPermission(PluginImpl.UPDATE_METADATA);
             JSON json = JSONSerializer.toJSON(dataDocument);
             try {
                 List<MetadataValue> values = JsonUtils.toValues(json);
@@ -122,15 +124,15 @@ public class UpdateMetadataCommand extends CLICommand {
                 container.save();
             } catch (JsonUtils.ParseException e) {
                 stderr.println(e.getMessage());
-                return CliUtils.ERR_BAD_DATA;
+                return CliUtils.Status.ERR_BAD_DATA.code();
             } catch (IOException ex) {
                 stderr.println("Warning Could not save the data to disk, the data is added in memory.\n"
                         + ex.getMessage());
-                return CliUtils.WARN_NO_SAVE;
+                return CliUtils.Status.WARN_NO_SAVE.code();
             }
         } else {
             stderr.println("No metadata container found.");
-            return CliUtils.ERR_BAD_CMD;
+            return CliUtils.Status.ERR_BAD_CMD.code();
         }
         return 0;
     }

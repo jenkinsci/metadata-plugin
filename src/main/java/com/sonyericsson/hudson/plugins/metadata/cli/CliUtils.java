@@ -48,31 +48,52 @@ import java.io.IOException;
 public abstract class CliUtils {
 
     /**
-     * Commandline status code indicating {@link NoItemException}. (-1)
+     * Status codes to be returned from the cli commands.
      */
-    public static final int ERR_NO_ITEM = -1;
+    public static enum Status {
+        /**
+         * Commandline status code indicating {@link NoItemException}. (-1)
+         */
+        ERR_NO_ITEM(-1),
+        /**
+         * Commandline status code indicating {@link NoMetadataException}. (-2)
+         */
+        ERR_NO_METADATA(-2),
+        /**
+         * Commandline status code indicating illegal commandline argument combinations. (1)
+         */
+        ERR_BAD_CMD(1),
+        /**
+         * Commandline status code indicating a
+         * {@link com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.ParseException}.
+         * (2)
+         */
+        ERR_BAD_DATA(2),
+        /**
+         * Commandline status indicating that the metadata could not be saved to disk.
+         */
+        WARN_NO_SAVE(10);
 
-    /**
-     * Commandline status code indicating {@link NoMetadataException}. (-2)
-     */
-    public static final int ERR_NO_METADATA = -2;
+        private final int code;
 
-    /**
-     * Commandline status code indicating illegal commandline argument combinations. (1)
-     */
-    public static final int ERR_BAD_CMD = 1;
+        /**
+         * Constructor.
+         * @param code the error code.
+         * @see #code()
+         */
+        Status(int code) {
+            this.code = code;
+        }
 
-    /**
-     * Commandline status code indicating a
-     * {@link com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.ParseException}.
-     * (2)
-     */
-    public static final int ERR_BAD_DATA = 2;
-
-    /**
-     * Commandline status indicating that the metadata could not be saved to disk.
-     */
-    public static final int WARN_NO_SAVE = 10;
+        /**
+         * The error code to return from the command.
+         *
+         * @return the error code.
+         */
+        public int code() {
+            return code;
+        }
+    }
 
     /**
      * Finds the container that has been selected on the commandline.
@@ -90,7 +111,7 @@ public abstract class CliUtils {
      * @throws java.io.IOException if a metadata container needed to be added and it failed to do so.
      */
     public static MetadataContainer<MetadataValue> getContainer(String node, String job, Integer build,
-                                                             boolean createContainer)
+                                                                boolean createContainer)
             throws CmdLineException, NoItemException, NoMetadataException, IOException {
 
         if ((node == null || node.isEmpty()) && (job == null || job.isEmpty())) {

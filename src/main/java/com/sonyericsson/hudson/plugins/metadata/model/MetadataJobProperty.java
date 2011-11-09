@@ -36,6 +36,7 @@ import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
+import hudson.security.ACL;
 import net.sf.json.JSON;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -171,6 +172,15 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
             owner.save();
         } else {
             throw new IOException("This container is not attached to any job.");
+        }
+    }
+
+    @Override
+    public ACL getACL() {
+        if (owner != null) {
+            return owner.getACL();
+        } else {
+            return Hudson.getInstance().getACL();
         }
     }
 

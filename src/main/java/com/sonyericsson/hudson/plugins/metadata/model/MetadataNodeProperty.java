@@ -33,6 +33,7 @@ import hudson.ExtensionList;
 import hudson.model.Computer;
 import hudson.model.Hudson;
 import hudson.model.Node;
+import hudson.security.ACL;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.NodePropertyDescriptor;
 import net.sf.json.JSON;
@@ -144,6 +145,15 @@ public class MetadataNodeProperty extends NodeProperty<Node> implements Metadata
     @Override
     public void save() throws IOException {
         Hudson.getInstance().save();
+    }
+
+    @Override
+    public ACL getACL() {
+        if (this.node != null) {
+            return this.node.getACL();
+        } else {
+            return Hudson.getInstance().getACL();
+        }
     }
 
     /**

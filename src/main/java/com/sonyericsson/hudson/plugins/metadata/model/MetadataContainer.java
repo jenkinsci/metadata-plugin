@@ -23,6 +23,8 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model;
 
+import hudson.security.ACL;
+
 import java.io.IOException;
 
 /**
@@ -40,4 +42,10 @@ public interface MetadataContainer<T extends Metadata> extends MetadataParent<T>
      * @throws IOException if the persistence.
      */
     void save() throws IOException;
+
+    /**
+     * Returns the {@link ACL} for the owner of the container..
+     * @return the ACL.
+     */
+    ACL getACL();
 }

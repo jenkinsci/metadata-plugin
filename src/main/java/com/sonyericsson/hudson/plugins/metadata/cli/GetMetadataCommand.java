@@ -24,6 +24,7 @@
 package com.sonyericsson.hudson.plugins.metadata.cli;
 
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
+import com.sonyericsson.hudson.plugins.metadata.model.PluginImpl;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import hudson.Extension;
 import hudson.cli.CLICommand;
@@ -72,20 +73,21 @@ public class GetMetadataCommand extends CLICommand {
             container = CliUtils.getContainer(node, job, build, false);
         } catch (CmdLineException e) {
             stderr.println(e.getMessage());
-            return CliUtils.ERR_BAD_CMD;
+            return CliUtils.Status.ERR_BAD_CMD.code();
         } catch (CliUtils.NoItemException e) {
             stderr.println(e.getMessage());
-            return CliUtils.ERR_NO_ITEM;
+            return CliUtils.Status.ERR_NO_ITEM.code();
         } catch (CliUtils.NoMetadataException e) {
             stderr.println(e.getMessage());
-            return CliUtils.ERR_NO_METADATA;
+            return CliUtils.Status.ERR_NO_METADATA.code();
         }
         if (container != null) {
+            container.getACL().checkPermission(PluginImpl.READ_METADATA);
             JSON json = container.toJson();
             stdout.println(json.toString());
         } else {
             stderr.println("No metadata container found.");
-            return CliUtils.ERR_BAD_CMD;
+            return CliUtils.Status.ERR_BAD_CMD.code();
         }
 
         return 0;

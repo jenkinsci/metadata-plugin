@@ -23,6 +23,7 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model;
 
+import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetadataDefinition;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.DateMetadataValue;
@@ -34,6 +35,8 @@ import hudson.Plugin;
 import hudson.model.Hudson;
 import hudson.model.Items;
 import hudson.model.Run;
+import hudson.security.Permission;
+import hudson.security.PermissionGroup;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +48,24 @@ import java.util.List;
  */
 @Extension
 public class PluginImpl extends Plugin {
+
+    /**
+     * Permission Groups for metadata related tasks.
+     */
+    public static final PermissionGroup PERMISSION_GROUP =
+            new PermissionGroup(PluginImpl.class, Messages._Permission_Metadata());
+
+    /**
+     * Permission to read metadata on objects. Primarily for use in CLI commands.
+     */
+    public static final Permission READ_METADATA =
+            new Permission(PERMISSION_GROUP, "Read", Messages._Permission_Read(), Hudson.READ);
+
+    /**
+     * Permission to update metadata on objects. Primarily for use in CLI commands.
+     */
+    public static final Permission UPDATE_METADATA =
+            new Permission(PERMISSION_GROUP, "Update", Messages._Permission_Update(), Hudson.READ);
 
     private List<AbstractMetadataDefinition> definitions = new LinkedList<AbstractMetadataDefinition>();
 

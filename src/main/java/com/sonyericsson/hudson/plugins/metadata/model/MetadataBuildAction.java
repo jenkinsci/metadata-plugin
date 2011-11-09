@@ -28,7 +28,9 @@ import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import hudson.model.Action;
+import hudson.model.Hudson;
 import hudson.model.Run;
+import hudson.security.ACL;
 import net.sf.json.JSON;
 
 import java.io.IOException;
@@ -146,6 +148,15 @@ public class MetadataBuildAction implements Action, MetadataContainer<MetadataVa
             this.run.save();
         } else {
             throw new IOException("This container is not attached to any build.");
+        }
+    }
+
+    @Override
+    public ACL getACL() {
+        if (run != null) {
+            return run.getACL();
+        } else {
+            return Hudson.getInstance().getACL();
         }
     }
 }
