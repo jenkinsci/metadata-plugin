@@ -173,10 +173,7 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
             ExtensionList<AbstractMetaDataDefinitionDescriptor> extensionList =
                     Hudson.getInstance().getExtensionList(AbstractMetaDataDefinitionDescriptor.class);
             for (AbstractMetaDataDefinitionDescriptor d : extensionList) {
-                //TODO fix the problem  with limitless loop, for now don't return anything nested.
-                if (!(d instanceof TreeNodeMetaDataDefinitionDescriptor)) {
-                    list.add(d);
-                }
+                list.add(d);
             }
             return list;
         }
