@@ -216,8 +216,7 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
             ExtensionList<AbstractMetaDataValueDescriptor> extensionList =
                     Hudson.getInstance().getExtensionList(AbstractMetaDataValueDescriptor.class);
             for (AbstractMetaDataValueDescriptor d : extensionList) {
-                //TODO fix the problem  with limitless loop, for now don't return anything nested.
-                if (!(d instanceof TreeNodeMetaDataValueDescriptor) && d.appliesTo(container)) {
+                if (d.appliesTo(container)) {
                     list.add(d);
                 }
             }
