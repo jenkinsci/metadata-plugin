@@ -42,14 +42,20 @@ import java.util.List;
 
 import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_METADATA_CONTAINER;
 import static com.sonyericsson.hudson.plugins.metadata.Constants.SERIALIZATION_ALIAS_TREE;
-import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.*;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.CHILDREN;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.GENERATED;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.checkRequiredJsonAttribute;
 
 /**
  * Meta data containing other meta data values. Used to create tree structures of data.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-
+@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+        value = "UG_SYNC_SET_UNSYNC_GET",
+        justification = "It is synchronized")
 @XStreamAlias(SERIALIZATION_ALIAS_TREE)
 public class TreeNodeMetadataValue extends AbstractMetadataValue implements MetadataParent<MetadataValue> {
 
@@ -91,6 +97,16 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
     }
 
     /**
+     * Standard Constructor.
+     *
+     * @param name the name.
+     */
+    public TreeNodeMetadataValue(String name) {
+        super(name);
+        this.children = new LinkedList<MetadataValue>();
+    }
+
+    /**
      * Sets {@link #children} and sets their parent to this.
      *
      * @param children the children.
@@ -102,16 +118,6 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
                 value.setParent(this);
             }
         }
-    }
-
-    /**
-     * Standard Constructor.
-     *
-     * @param name the name.
-     */
-    public TreeNodeMetadataValue(String name) {
-        super(name);
-        this.children = new LinkedList<MetadataValue>();
     }
 
     @Override
@@ -131,6 +137,16 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
     }
 
     @Override
+    public synchronized int indexOf(String name) {
+        return ParentUtil.getChildIndex(children, name);
+    }
+
+    @Override
+    public synchronized MetadataValue setChild(int index, MetadataValue value) {
+        return children.set(index, value);
+    }
+
+    @Override
     public synchronized Collection<MetadataValue> addChild(MetadataValue value) {
         return ParentUtil.addChildValue(this, children, value);
     }
@@ -146,12 +162,24 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
     }
 
     @Override
+    public synchronized void replacementOf(MetadataValue old) {
+        if (old instanceof MetadataParent) {
+            MetadataParent<MetadataValue> oldParent = (MetadataParent<MetadataValue>)old;
+            for (MetadataValue child : oldParent.getChildren()) {
+                if (getChild(child.getName()) != null) {
+                    children.add(child);
+                }
+            }
+        }
+    }
+
+    @Override
     public Descriptor<AbstractMetadataValue> getDescriptor() {
         return Hudson.getInstance().getDescriptorByType(TreeNodeMetaDataValueDescriptor.class);
     }
 
     @Override
-    public JSONObject toJson() {
+    public synchronized JSONObject toJson() {
         JSONObject obj = toAbstractJson();
         JSONArray array = new JSONArray();
         for (MetadataValue child : children) {
@@ -159,6 +187,11 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
         }
         obj.put(CHILDREN, array);
         return obj;
+    }
+
+    @Override
+    public boolean requiresReplacement() {
+        return false;
     }
 
     /**

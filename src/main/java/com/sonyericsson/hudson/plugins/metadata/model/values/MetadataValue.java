@@ -50,4 +50,13 @@ public interface MetadataValue extends Metadata {
      * @return the JSON version.
      */
     JSONObject toJson();
+
+    /**
+     * A signal sent to this object that it is the replacement of another object.
+     * The intention from the system is that the object should take this opportunity
+     * to try and salvage as much as possible from the old object.
+     *
+     * @param old the object that it is the replacement of.
+     */
+    void replacementOf(MetadataValue old);
 }

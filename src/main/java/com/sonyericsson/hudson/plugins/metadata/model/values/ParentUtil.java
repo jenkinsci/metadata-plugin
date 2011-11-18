@@ -25,11 +25,13 @@ package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.MetadataDefinition;
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.TreeNodeMetadataDefinition;
 import net.sf.json.JSON;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,6 +52,57 @@ public final class ParentUtil {
     }
 
     /**
+     * Replaces an existing value amongst the parent's children.
+     *
+     * @param parent   the parent to add/replace the child to
+     * @param <T>       the type of metadata
+     * @param value     the value to replace
+     */
+    public static <T extends MetadataValue> void replaceChild(MetadataParent<T> parent, T value) {
+        if (value == null) {
+            throw new IllegalArgumentException("The child value is null");
+        }
+        T my = parent.getChild(value.getName());
+        if (my != null) {
+            if (my instanceof MetadataParent && value instanceof MetadataParent) {
+                MetadataParent<T> myParent = (MetadataParent<T>)my;
+                MetadataParent<T> valueParent = (MetadataParent<T>)value;
+                if (myParent.requiresReplacement() || valueParent.requiresReplacement()) {
+                    parent.setChild(parent.indexOf(my.getName()), value);
+                    value.setParent(parent);
+                    value.replacementOf(my);
+                    my.setParent(null); //It should be prepared to be gc'ed
+                } else {
+                    replaceChildren(myParent, new ArrayList<T>(valueParent.getChildren()));
+                }
+            } else {
+                //it exists! then it is time to replace it.
+                parent.setChild(parent.indexOf(my.getName()), value);
+                value.setParent(parent);
+                value.replacementOf(my);
+                my.setParent(null); //It should be prepared to be gc'ed
+            }
+        } else {
+            //didn't exist lets just add it.
+            parent.getChildren().add(value);
+            value.setParent(parent);
+        }
+    }
+
+    /**
+     * Adds the children in the list to the parent, replacing any existing children already present.
+     *
+     * @param parent the parent to add to.
+     * @param children the children to add/replace
+     * @param <T> the type of metadata.
+     */
+    public static <T extends MetadataValue> void replaceChildren(MetadataParent<T> parent, List<T> children) {
+        for (T child : children) {
+            replaceChild(parent, child);
+        }
+    }
+
+    /**
      * Adds the value as a child to the parent. Help utility for those who implement {@link
      * com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#addChild(Metadata)}
      *
@@ -59,7 +112,8 @@ public final class ParentUtil {
      * @param <T>      the type for parent, children, value and the return value.
      * @return the value(s) that failed to be added.
      */
-    public static <T extends Metadata> Collection<T> addChildValue(MetadataParent<T> parent, List<T> children,
+    public static <T extends Metadata> Collection<T> addChildValue(MetadataParent<T> parent,
+                                                                   List<T> children,
                                                                    T value) {
 
         if (value == null) {
@@ -102,8 +156,8 @@ public final class ParentUtil {
     }
 
     /**
-     * Adds the values as a child to the parent. Help utility for those who implement
-     * {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#
+     * Adds the values as a child to the parent. Help utility for those who implement {@link
+     * com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#
      * addChild(com.sonyericsson.hudson.plugins.metadata.model.Metadata)}
      *
      * @param parent   the parent to add the values to
@@ -147,16 +201,33 @@ public final class ParentUtil {
     }
 
     /**
+     * Utility method for {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#indexOf(String)} }.
+     *
+     * @param children the list of children.
+     * @param name   the name to search.
+     * @param <T>    the type for values, name and the return value.
+     * @return the index of the child if found or -1 if not.
+     */
+    public static <T extends Metadata> int getChildIndex(List<T> children, String name) {
+        for (int i = 0; i < children.size(); i++) {
+            if (children.get(i).getName().equalsIgnoreCase(name)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
      * Converts the container into a JSON object. This processing is different from {@link
      * com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue#toJson()} because it will only convert the
-     * children not the entire object, since a container
-     * (like {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty})
+     * children not the entire object, since a container (like
+     * {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty})
      * in essence doesn't have a name.
      *
      * @param container the container
      * @return the JSON representation.
      */
-    public static JSON toJson(MetadataParent<MetadataValue> container) {
+    public static JSON toJson(MetadataContainer<MetadataValue> container) {
         return JsonUtils.toJson(container.getChildren());
     }
 }

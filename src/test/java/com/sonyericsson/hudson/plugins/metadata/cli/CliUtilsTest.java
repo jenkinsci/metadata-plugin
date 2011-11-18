@@ -47,7 +47,11 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.isA;
 
 //CS IGNORE MagicNumber FOR NEXT 400 LINES. REASON: TestData
 

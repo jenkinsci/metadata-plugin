@@ -27,7 +27,11 @@ import com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty;
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 /**
  * Tests for {@link TreeStructureUtil}.

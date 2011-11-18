@@ -43,6 +43,9 @@ import java.util.List;
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
+@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+        value = "UG_SYNC_SET_UNSYNC_GET",
+        justification = "It is synchronized")
 public class MetadataBuildAction implements Action, MetadataContainer<MetadataValue> {
 
     private Run run;
@@ -105,7 +108,7 @@ public class MetadataBuildAction implements Action, MetadataContainer<MetadataVa
      *
      * @see #getChildren()
      */
-    public List<MetadataValue> getValues() {
+    public synchronized List<MetadataValue> getValues() {
         if (values == null) {
             values = new LinkedList<MetadataValue>();
         }
@@ -113,22 +116,32 @@ public class MetadataBuildAction implements Action, MetadataContainer<MetadataVa
     }
 
     @Override
-    public MetadataValue getChild(String name) {
+    public synchronized MetadataValue getChild(String name) {
         return ParentUtil.getChildValue(getValues(), name);
     }
 
     @Override
-    public Collection<MetadataValue> addChild(MetadataValue value) {
+    public synchronized int indexOf(String name) {
+        return ParentUtil.getChildIndex(values, name);
+    }
+
+    @Override
+    public synchronized MetadataValue setChild(int index, MetadataValue value) {
+        return values.set(index, value);
+    }
+
+    @Override
+    public synchronized Collection<MetadataValue> addChild(MetadataValue value) {
         return ParentUtil.addChildValue(this, getValues(), value);
     }
 
     @Override
-    public Collection<MetadataValue> addChildren(Collection<MetadataValue> childValues) {
+    public synchronized Collection<MetadataValue> addChildren(Collection<MetadataValue> childValues) {
         return ParentUtil.addChildValues(this, getValues(), childValues);
     }
 
     @Override
-    public Collection<MetadataValue> getChildren() {
+    public synchronized Collection<MetadataValue> getChildren() {
         return getValues();
     }
 
@@ -138,12 +151,17 @@ public class MetadataBuildAction implements Action, MetadataContainer<MetadataVa
     }
 
     @Override
-    public JSON toJson() {
+    public synchronized JSON toJson() {
         return ParentUtil.toJson(this);
     }
 
     @Override
-    public void save() throws IOException {
+    public boolean requiresReplacement() {
+        return false;
+    }
+
+    @Override
+    public synchronized void save() throws IOException {
         if (this.run != null) {
             this.run.save();
         } else {

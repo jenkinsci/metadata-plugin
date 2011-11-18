@@ -32,7 +32,9 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.*;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 

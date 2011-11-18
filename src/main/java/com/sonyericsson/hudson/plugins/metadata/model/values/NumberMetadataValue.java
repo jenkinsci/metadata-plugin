@@ -35,7 +35,11 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 import static com.sonyericsson.hudson.plugins.metadata.Constants.SERIALIZATION_ALIAS_NUMBER;
-import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.*;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.GENERATED;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.checkRequiredJsonAttribute;
 
 /**
  * Meta data containing a non-decimal number.

@@ -40,7 +40,11 @@ import java.util.Calendar;
 import java.util.Date;
 
 import static com.sonyericsson.hudson.plugins.metadata.Constants.SERIALIZATION_ALIAS_DATE;
-import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.*;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.GENERATED;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.checkRequiredJsonAttribute;
 
 /**
  * Meta data with the value of a {@link java.util.Date}.

@@ -47,6 +47,9 @@ import java.util.List;
  *
  * @author Tomas Westling &lt;thomas.westling@sonyericsson.com&gt;
  */
+@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+        value = "UG_SYNC_SET_UNSYNC_GET",
+        justification = "It is synchronized")
 public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
         implements MetadataParent<MetadataDefinition> {
 
@@ -85,29 +88,6 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
         this.children = new LinkedList<MetadataDefinition>();
     }
 
-    @Override
-    public MetadataDefinition getChild(String name) {
-        return ParentUtil.getChildValue(children, name);
-    }
-
-    @Override
-    public Collection<MetadataDefinition> addChild(MetadataDefinition definition) {
-        return ParentUtil.addChildValue(this, children, definition);
-    }
-
-    @Override
-    public Collection<MetadataDefinition> addChildren(Collection<MetadataDefinition> definitions) {
-        return ParentUtil.addChildValues(this, children, definitions);
-    }
-
-    /**
-     *  Getter for the children of this tree node, used by stapler to create the entire tree.
-      * @return the children.
-     */
-    public synchronized Collection<MetadataDefinition> getChildren() {
-        return children;
-    }
-
     /**
      * Standard constructor.
      *
@@ -120,7 +100,40 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
     }
 
     @Override
-    public AbstractMetadataValue createValue(StaplerRequest req, JSONObject jo) {
+    public synchronized MetadataDefinition getChild(String name) {
+        return ParentUtil.getChildValue(children, name);
+    }
+
+    @Override
+    public synchronized int indexOf(String name) {
+        return ParentUtil.getChildIndex(children, name);
+    }
+
+    @Override
+    public synchronized MetadataDefinition setChild(int index, MetadataDefinition value) {
+        return children.set(index, value);
+    }
+
+    @Override
+    public synchronized Collection<MetadataDefinition> addChild(MetadataDefinition definition) {
+        return ParentUtil.addChildValue(this, children, definition);
+    }
+
+    @Override
+    public synchronized Collection<MetadataDefinition> addChildren(Collection<MetadataDefinition> definitions) {
+        return ParentUtil.addChildValues(this, children, definitions);
+    }
+
+    /**
+     *  Getter for the children of this tree node, used by stapler to create the entire tree.
+      * @return the children.
+     */
+    public synchronized Collection<MetadataDefinition> getChildren() {
+        return children;
+    }
+
+    @Override
+    public synchronized AbstractMetadataValue createValue(StaplerRequest req, JSONObject jo) {
         TreeNodeMetadataValue value = req.bindJSON(TreeNodeMetadataValue.class, jo);
         value.setDescription(getDescription());
         return value;
@@ -138,7 +151,7 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
      * @return the full name.
      */
     @Exported
-    public String getFullName() {
+    public synchronized String getFullName() {
         if (getParent() != null) {
             return getParent().getFullName() + Constants.SEPARATOR_DOT + getName();
         }
@@ -148,6 +161,11 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
     @Override
     public JSON toJson() {
         throw new UnsupportedOperationException("Not implemented!");
+    }
+
+    @Override
+    public boolean requiresReplacement() {
+        return false;
     }
 
     /**

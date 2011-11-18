@@ -33,7 +33,11 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import static com.sonyericsson.hudson.plugins.metadata.Constants.SERIALIZATION_ALIAS_STRING;
-import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.*;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.GENERATED;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.checkRequiredJsonAttribute;
 
 /**
  * A Meta Data value of the type String.

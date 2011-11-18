@@ -55,6 +55,9 @@ import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_ME
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
+@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+        value = "UG_SYNC_SET_UNSYNC_GET",
+        justification = "It is synchronized")
 @XStreamAlias("node-metadata")
 @ExportedBean
 public class MetadataNodeProperty extends NodeProperty<Node> implements MetadataContainer<MetadataValue> {
@@ -100,6 +103,16 @@ public class MetadataNodeProperty extends NodeProperty<Node> implements Metadata
     }
 
     @Override
+    public synchronized int indexOf(String name) {
+        return ParentUtil.getChildIndex(values, name);
+    }
+
+    @Override
+    public synchronized MetadataValue setChild(int index, MetadataValue value) {
+        return values.set(index, value);
+    }
+
+    @Override
     public synchronized Collection<MetadataValue> addChild(MetadataValue value) {
         return ParentUtil.addChildValue(this, values, value);
     }
@@ -121,8 +134,13 @@ public class MetadataNodeProperty extends NodeProperty<Node> implements Metadata
     }
 
     @Override
-    public JSON toJson() {
+    public synchronized JSON toJson() {
         return ParentUtil.toJson(this);
+    }
+
+    @Override
+    public boolean requiresReplacement() {
+        return false;
     }
 
     /**

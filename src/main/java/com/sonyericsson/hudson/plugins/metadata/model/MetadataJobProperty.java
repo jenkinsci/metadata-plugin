@@ -56,7 +56,9 @@ import static com.sonyericsson.hudson.plugins.metadata.Constants.REQUEST_ATTR_ME
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
-
+@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+        value = "UG_SYNC_SET_UNSYNC_GET",
+        justification = "It is synchronized")
 @XStreamAlias("job-metadata")
 @ExportedBean
 public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> implements MetadataContainer<MetadataValue> {
@@ -131,6 +133,16 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
     }
 
     @Override
+    public synchronized int indexOf(String name) {
+        return ParentUtil.getChildIndex(values, name);
+    }
+
+    @Override
+    public synchronized MetadataValue setChild(int index, MetadataValue value) {
+        return values.set(index, value);
+    }
+
+    @Override
     public synchronized Collection<MetadataValue> addChild(MetadataValue value) {
         return ParentUtil.addChildValue(this, getValues(), value);
     }
@@ -152,7 +164,7 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
      * @param request the current http request.
      * @return a list.
      */
-    public List<AbstractMetadataDefinition> getDefinitions(StaplerRequest request) {
+    public synchronized List<AbstractMetadataDefinition> getDefinitions(StaplerRequest request) {
         return PluginImpl.getInstance().getDefinitions();
     }
 
@@ -162,12 +174,17 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
     }
 
     @Override
-    public JSON toJson() {
+    public synchronized JSON toJson() {
         return ParentUtil.toJson(this);
     }
 
     @Override
-    public void save() throws IOException {
+    public boolean requiresReplacement() {
+        return false;
+    }
+
+    @Override
+    public synchronized void save() throws IOException {
         if (owner != null) {
             owner.save();
         } else {

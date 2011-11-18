@@ -34,8 +34,14 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.*;
-import static junit.framework.Assert.*;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.CHILDREN;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.METADATA_TYPE;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.fail;
 
 //CS IGNORE MagicNumber FOR NEXT 200 LINES. REASON: TestData
 

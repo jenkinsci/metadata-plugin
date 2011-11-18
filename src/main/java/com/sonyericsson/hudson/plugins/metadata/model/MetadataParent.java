@@ -30,8 +30,8 @@ import java.util.Collection;
 /**
  * The Parent node of some metadata.
  *
- * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  * @param <T> the type to work with, either MetadataValue or MetadataDefinition.
+ * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
 public interface MetadataParent<T extends Metadata> {
 
@@ -44,10 +44,9 @@ public interface MetadataParent<T extends Metadata> {
     T getChild(String name);
 
     /**
-     * Adds the child to this parent's list of children. If a child with the same name is already present, the
-     * children should try to be merged. The returned child is either the child itself if it is a leaf or a
-     * clone of itself with the children that failed to be merged if it contains children,
-     * null indicates a fully successful merge/add.
+     * Adds the child to the list of children. If a child with the same name is already present, the children
+     * should try to be merged. The returned child is either the child itself if it is a leaf or a clone of itself with
+     * the children that failed to be merged if it contains children, null indicates a fully successful merge/add.
      *
      * @param child the child to add.
      * @return null if the operation was successful.
@@ -79,7 +78,34 @@ public interface MetadataParent<T extends Metadata> {
 
     /**
      * Convert this object into a JSON object.
+     *
      * @return the JSON version.
      */
     JSON toJson();
+
+    /**
+     * If this parent type requires to be replaced or not when a replacement command is issued. I.e. If this is just a
+     * holder of children then it is not necessary, but if it contains more complex structures it might want to.
+     *
+     * @return true if it needs to be replaced by fresher instances or false if it can be reused.
+     * @see com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue#replacementOf(
+     * com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue)
+     */
+    boolean requiresReplacement();
+
+    /**
+     * The index of the child with the provided name.
+     *
+     * @param name the name of the child to find.
+     * @return the index of the child or -1 if no child with that name was found.
+     */
+    int indexOf(String name);
+
+    /**
+     * Sets the child on <code>index</code> with the provided value, replacing any object currently on that index.
+     * @param index the index to set.
+     * @param value the child to set.
+     * @return the value previous at the specified index.
+     */
+    T setChild(int index, T value);
 }

@@ -163,6 +163,11 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
         return getName();
     }
 
+    @Override
+    public void replacementOf(MetadataValue old) {
+        //Nothing needs to be done as most types should be replaced directly.
+    }
+
     /**
      * Converts this into a JSON Object <strong>without the value</strong>. Implementing classes can use this as a
      * utility method for the name, type and description. And then just add the value.

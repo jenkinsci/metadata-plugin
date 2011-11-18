@@ -36,7 +36,10 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -409,6 +412,85 @@ public class ParentUtilTest {
 
         assertEquals("something else", ((MetadataParent)child2).getChild("child21").getValue());
     }
+
+    /**
+     * Tests
+     * {@link ParentUtil#replaceChild(com.sonyericsson.hudson.plugins.metadata.model.MetadataParent, MetadataValue)}
+     * and
+     * {@link ParentUtil#replaceChildren(com.sonyericsson.hudson.plugins.metadata.model.MetadataParent, java.util.List)}.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testReplaceChildren() throws Exception {
+       /*
+            Original tree
+
+             child1
+                child12 = original
+                child13
+             child2
+             child3
+                child31
+                child32 = original
+             child4 = original
+
+             Replace tree
+
+             child1
+                child12 = replace
+                child14
+              child3
+                child32 = replace
+             child4
+                child41 = replace
+             child5
+
+             Expected result
+
+             child1
+                child12 = replace
+                child13
+                child14
+             child2
+             child3
+                child31
+                child32 = replace
+             child4
+                child41 = replace
+             child5
+         */
+
+        TreeNodeMetadataValue[] startTree = TreeStructureUtil.createTreePath("", "root", "child1");
+
+        TreeNodeMetadataValue startRoot = startTree[0];
+        TreeStructureUtil.addValue(startRoot, "original", "", "child1", "child12");
+        TreeStructureUtil.addValue(startRoot, "original", "", "child1", "child13");
+        TreeStructureUtil.addValue(startRoot, "original", "", "child2");
+
+        TreeStructureUtil.addValue(startRoot, "original", "", "child3", "child31");
+        TreeStructureUtil.addValue(startRoot, "original", "", "child3", "child32");
+
+        TreeStructureUtil.addValue(startRoot, "original", "", "child4");
+
+        TreeNodeMetadataValue[] replaceTree = TreeStructureUtil.createTreePath("", "root", "child1");
+
+        TreeNodeMetadataValue replaceRoot = replaceTree[0];
+        TreeStructureUtil.addValue(replaceRoot, "replace", "", "child1", "child12");
+        TreeStructureUtil.addValue(replaceRoot, "orig-replace", "", "child1", "child14");
+        TreeStructureUtil.addValue(replaceRoot, "replace", "", "child3", "child32");
+        TreeStructureUtil.addValue(replaceRoot, "replace", "", "child4", "child41");
+        TreeStructureUtil.addValue(replaceRoot, "orig-replace", "", "child5");
+
+        ParentUtil.replaceChildren(startRoot, replaceRoot.getValue());
+
+        assertEquals("replace", TreeStructureUtil.getPath(startRoot, "child1", "child12").getValue());
+        assertEquals("orig-replace", TreeStructureUtil.getPath(startRoot, "child1", "child14").getValue());
+        assertEquals("replace", TreeStructureUtil.getPath(startRoot, "child3", "child32").getValue());
+        assertEquals("replace", TreeStructureUtil.getPath(startRoot, "child4", "child41").getValue());
+        assertEquals("orig-replace", TreeStructureUtil.getPath(startRoot, "child5").getValue());
+    }
+
+
     /**
      * Creates a straight tree-path. The method returns an array where index 0 is the root and index 1 is the leaf.
      *
