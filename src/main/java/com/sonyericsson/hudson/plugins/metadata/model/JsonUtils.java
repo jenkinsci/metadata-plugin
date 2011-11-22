@@ -34,8 +34,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue.
+        AbstractMetaDataValueDescriptor.findForJsonType;
+
 //CS IGNORE LineLength FOR NEXT 2 LINES. REASON: import.
-import static com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue.AbstractMetaDataValueDescriptor.findForJsonType;
 
 /**
  * Constants regarding JSON conversions.
@@ -75,6 +77,12 @@ public abstract class JsonUtils {
      * of a node JSON object. Used instead of {@link #VALUE} for nodes.
      */
     public static final String CHILDREN = "children";
+
+    /**
+     * The {@link com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue#isExposedToEnvironment()}
+     * attribute of a node JSON object. Used to decide if this value should be exposed as an environment variable..
+     */
+    public static final String EXPOSED = "exposedToEnvironment";
 
     /**
      * The {@link com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue#isGenerated()} attribute of a JSON

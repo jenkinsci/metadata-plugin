@@ -23,10 +23,12 @@ public class StringMetadataDefinition extends AbstractMetadataDefinition {
      * @param name         the name.
      * @param description  the description.
      * @param defaultValue the default value for this definition
+     * @param exposedToEnvironment if this definition should be exposed to the build as an
+     *                      environment variable.
      */
     @DataBoundConstructor
-    public StringMetadataDefinition(String name, String description, String defaultValue) {
-        super(name, description);
+    public StringMetadataDefinition(String name, String description, String defaultValue, boolean exposedToEnvironment) {
+        super(name, description, exposedToEnvironment);
         this.defaultValue = defaultValue;
     }
 

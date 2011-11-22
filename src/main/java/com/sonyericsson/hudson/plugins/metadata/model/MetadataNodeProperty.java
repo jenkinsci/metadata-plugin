@@ -134,6 +134,11 @@ public class MetadataNodeProperty extends NodeProperty<Node> implements Metadata
     }
 
     @Override
+    public String getFullName(String separator) {
+        return "";
+    }
+
+    @Override
     public synchronized JSON toJson() {
         return ParentUtil.toJson(this);
     }

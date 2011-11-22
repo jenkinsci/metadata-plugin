@@ -110,9 +110,8 @@ public class HttpCliRootActionTest {
      */
     @Test
     public void testDoUpdate() throws Exception {
-
         String value = (new StringMetadataValue("owner", "bobby")).toJson().toString();
-
+        boolean exposed = true;
         JSONObject expectedJson = new JSONObject();
         expectedJson.put("type", "ok");
         expectedJson.put("errorCode", 0);
@@ -136,9 +135,10 @@ public class HttpCliRootActionTest {
      */
     @Test
     public void testDoUpdateWithReplace() throws Exception {
-
+        boolean exposed = true;
         StringMetadataValue value = new StringMetadataValue("owner", "bobby");
         String replace = (new StringMetadataValue("owner", "Tomas")).toJson().toString();
+
 
         JSONObject expectedJson = new JSONObject();
         expectedJson.put("type", "ok");

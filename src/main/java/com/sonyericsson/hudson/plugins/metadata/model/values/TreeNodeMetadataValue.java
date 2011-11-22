@@ -27,6 +27,7 @@ import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Descriptor;
@@ -46,6 +47,7 @@ import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.CHILDREN;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.GENERATED;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.EXPOSED;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.checkRequiredJsonAttribute;
 
 /**
@@ -67,10 +69,25 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
      * @param name        the name.
      * @param description the description
      * @param children    its children.
+     * @param exposedToEnvironment if this value should be exposed to the build as an
+     *                      environment variable.
      */
     @DataBoundConstructor
+    public TreeNodeMetadataValue(String name, String description, List<MetadataValue> children,
+                                 boolean exposedToEnvironment) {
+        super(name, description, exposedToEnvironment);
+        setChildren(children);
+    }
+
+    /**
+     * Standard Constructor.
+     *
+     * @param name        the name
+     * @param description the description.
+     * @param children    its children.
+     */
     public TreeNodeMetadataValue(String name, String description, List<MetadataValue> children) {
-        super(name, description);
+        super(name, description, false);
         setChildren(children);
     }
 
@@ -194,6 +211,17 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
         return false;
     }
 
+    @Override
+    public void addEnvironmentVariables(EnvVars variables, boolean exposeAll) {
+        for (MetadataValue v : getChildren()) {
+            if (isExposedToEnvironment()) {
+                v.addEnvironmentVariables(variables, true);
+            } else {
+                v.addEnvironmentVariables(variables, exposeAll);
+            }
+        }
+    }
+
     /**
      * Descriptor for {@link TreeNodeMetadataValue}s.
      */
@@ -224,6 +252,9 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
             }
             TreeNodeMetadataValue value = new TreeNodeMetadataValue(
                     json.getString(NAME), json.optString(DESCRIPTION), children);
+            if (json.has(EXPOSED)) {
+                value.setExposeToEnvironment(json.getBoolean(EXPOSED));
+            }
             if (json.has(GENERATED)) {
                 value.setGenerated(json.getBoolean(GENERATED));
             } else {

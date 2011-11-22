@@ -23,8 +23,8 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
-import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetadataDefinition;
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.MetadataDefinition;
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.StringMetadataDefinition;
@@ -79,9 +79,11 @@ public class ParentUtilTest {
     @Test
     public void testAddChildrenNonEmpty() throws Exception {
         List<MetadataValue> nonEmptyList = new LinkedList<MetadataValue>();
-        StringMetadataValue sampleValue = new StringMetadataValue("sampleName", "sampleValue", "sampleDescription");
+        StringMetadataValue sampleValue = new StringMetadataValue(
+                "sampleName", "sampleValue", "sampleDescription", false);
         nonEmptyList.add(sampleValue);
-        TreeNodeMetadataValue parent = new TreeNodeMetadataValue("parentName", "parentDescription", nonEmptyList);
+        TreeNodeMetadataValue parent = new TreeNodeMetadataValue(
+                "parentName", "parentDescription", nonEmptyList, false);
         assertNotNull(parent.getChild("sampleName"));
     }
 
@@ -93,7 +95,7 @@ public class ParentUtilTest {
     @Test
     public void testAddChildrenEmpty() throws Exception {
         List<MetadataValue> emptyList = new LinkedList<MetadataValue>();
-        TreeNodeMetadataValue parent = new TreeNodeMetadataValue("parentName", "parentDescription", emptyList);
+        TreeNodeMetadataValue parent = new TreeNodeMetadataValue("parentName", "parentDescription", emptyList, false);
         assertNull(parent.getChild("someName"));
     }
 
@@ -541,7 +543,7 @@ public class ParentUtilTest {
      * @return the tree.
      */
     public static TreeNodeMetadataDefinition createPath(String value, String description, String... path) {
-        StringMetadataDefinition str = new StringMetadataDefinition(path[path.length - 1], description, value);
+        StringMetadataDefinition str = new StringMetadataDefinition(path[path.length - 1], description, value, false);
         return createPath(str, Arrays.copyOf(path, path.length - 1));
     }
 
@@ -555,7 +557,7 @@ public class ParentUtilTest {
      * @return true if there was no merge conflicts.
      */
     public static boolean addValue(MetadataParent root, String value, String description, String... path) {
-        StringMetadataDefinition sVal = new StringMetadataDefinition(path[path.length - 1], description, value);
+        StringMetadataDefinition sVal = new StringMetadataDefinition(path[path.length - 1], description, value, false);
         return addValue(root, sVal, Arrays.copyOf(path, path.length - 1));
     }
     /**

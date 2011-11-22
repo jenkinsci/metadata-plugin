@@ -31,6 +31,16 @@
                 <td><st:nbsp/><st:nbsp/>${%Value}</td>
                 <td width="48%"><f:textbox name="value" value="${instance.value}"/></td>
             </tr>
+            <tr>
+                <td colspan="3">
+                    <f:checkbox name="exposedToEnvironment" checked="${instance.isExposedToEnvironment()}"/>
+                    ${%Expose to environment}
+                </td>
+                <td class="setting-help" align="right">
+                    <a href="#" class="help-button" helpURL="/plugin/metadata/help/environment.html"><img src="${imagesURL}/16x16/help.gif" alt="Help for feature: ${title}" /></a>
+                </td>
+            </tr>
+            <f:helpArea />
         </table>
     </f:block>
 </j:jelly>

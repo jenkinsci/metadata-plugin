@@ -39,9 +39,19 @@ public abstract class Constants {
     public static final String REQUEST_ATTR_METADATA_CONTAINER = "jenkins-metadata-container";
 
     /**
-     * The dot separator constant.
+     * The separator constant used for the display name.
      */
-    public static final String SEPARATOR_DOT = ".";
+    public static final String DISPLAY_NAME_SEPARATOR = ".";
+
+    /**
+     * The separator constant used for the environment variable name.
+     */
+    public static final String ENVIRONMENT_SEPARATOR = "_";
+
+    /**
+     * The prefix for the environment variable names..
+     */
+    public static final String METADATA_ENV_PREFIX = "MD" + ENVIRONMENT_SEPARATOR;
 
     /**
      * The URL to the actions.

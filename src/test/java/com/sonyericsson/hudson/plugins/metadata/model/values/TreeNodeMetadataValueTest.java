@@ -39,6 +39,7 @@ import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTI
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.METADATA_TYPE;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.EXPOSED;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
@@ -71,7 +72,8 @@ public class TreeNodeMetadataValueTest {
         String stringValue = "Who are you gonna call?!";
 
         TreeNodeMetadataValue metadataValue = new TreeNodeMetadataValue(name, description);
-        StringMetadataValue stringMetadataValue = new StringMetadataValue(stringName, stringDescription, stringValue);
+        StringMetadataValue stringMetadataValue = new StringMetadataValue(stringName, stringDescription,
+                stringValue, false);
         metadataValue.addChild(stringMetadataValue);
 
         JSONObject json = metadataValue.toJson();
@@ -97,11 +99,13 @@ public class TreeNodeMetadataValueTest {
         MockUtils.mockMetadataValueDescriptors(hudson);
         String name = "nameTest";
         String description = "descrText";
+        boolean exposed = true;
 
         JSONObject json = new JSONObject();
         json.put(NAME, name);
         json.put(DESCRIPTION, description);
         json.put(JsonUtils.METADATA_TYPE, "metadata-tree");
+        json.put(EXPOSED, exposed);
 
         String numberName = "numberNameTest";
         long numberValue = 5;
@@ -110,6 +114,7 @@ public class TreeNodeMetadataValueTest {
         numberJson.put(NAME, numberName);
         numberJson.put(VALUE, numberValue);
         numberJson.put(METADATA_TYPE, "metadata-number");
+        numberJson.put(EXPOSED, exposed);
 
         String stringName = "str";
         String stringValue = "me and by boys were walking on the beach.";
@@ -120,6 +125,7 @@ public class TreeNodeMetadataValueTest {
         stringJson.put(DESCRIPTION, stringDescription);
         stringJson.put(VALUE, stringValue);
         stringJson.put(METADATA_TYPE, "metadata-string");
+        stringJson.put(EXPOSED, exposed);
 
         String nodeName = "layer2";
 
@@ -129,6 +135,7 @@ public class TreeNodeMetadataValueTest {
         JSONArray nodeChildren = new JSONArray();
         nodeChildren.add(stringJson);
         nodeJson.put(CHILDREN, nodeChildren);
+        nodeJson.put(EXPOSED, exposed);
 
         JSONArray children = new JSONArray();
         children.add(numberJson);
@@ -146,22 +153,22 @@ public class TreeNodeMetadataValueTest {
             if (value instanceof NumberMetadataValue) {
                 assertEquals(numberName, value.getName());
                 assertEquals(numberValue, value.getValue());
-                assertEquals(name + Constants.SEPARATOR_DOT + numberName,
+                assertEquals(name + Constants.DISPLAY_NAME_SEPARATOR + numberName,
                         ((NumberMetadataValue)value).getFullName());
             } else if (value instanceof StringMetadataValue) {
                 assertEquals(stringName, value.getName());
                 assertEquals(stringValue, value.getValue());
                 assertEquals(stringDescription, value.getDescription());
-                assertEquals(name + Constants.SEPARATOR_DOT + stringName,
+                assertEquals(name + Constants.DISPLAY_NAME_SEPARATOR + stringName,
                         ((StringMetadataValue)value).getFullName());
             } else if (value instanceof TreeNodeMetadataValue) {
                 assertEquals(nodeName, value.getName());
-                assertEquals(name + Constants.SEPARATOR_DOT + nodeName,
+                assertEquals(name + Constants.DISPLAY_NAME_SEPARATOR + nodeName,
                         ((TreeNodeMetadataValue)value).getFullName());
                 StringMetadataValue child = (StringMetadataValue)((TreeNodeMetadataValue)value).getChild(stringName);
                 assertNotNull(child);
-                assertEquals(name + Constants.SEPARATOR_DOT + nodeName
-                        + Constants.SEPARATOR_DOT + stringName,
+                assertEquals(name + Constants.DISPLAY_NAME_SEPARATOR + nodeName
+                        + Constants.DISPLAY_NAME_SEPARATOR + stringName,
                         child.getFullName());
             } else {
                 fail("Unexpected metadata type: " + value.getClass().getName());

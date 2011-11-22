@@ -24,6 +24,7 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
+import hudson.EnvVars;
 import net.sf.json.JSONObject;
 
 /**
@@ -59,4 +60,11 @@ public interface MetadataValue extends Metadata {
      * @param old the object that it is the replacement of.
      */
     void replacementOf(MetadataValue old);
+
+    /**
+     * Adds the environment variables for this Metadata to the variables map.
+     * @param variables the map of current environment variables.
+     * @param exposeAll whether all Metadata should be added to the map. Inherited from the parent.
+     */
+    void addEnvironmentVariables(EnvVars variables, boolean exposeAll);
 }

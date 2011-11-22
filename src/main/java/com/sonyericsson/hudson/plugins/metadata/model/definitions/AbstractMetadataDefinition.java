@@ -23,6 +23,7 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 
+import com.sonyericsson.hudson.plugins.metadata.Constants;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
 import hudson.AbortException;
@@ -48,6 +49,7 @@ public abstract class AbstractMetadataDefinition implements
     private MetadataParent parent;
     private final String name;
     private final String description;
+    private boolean exposedToEnvironment;
 
     /**
      * Constructor with only a name.
@@ -55,7 +57,7 @@ public abstract class AbstractMetadataDefinition implements
      * @param name the name of the definition.
      */
     public AbstractMetadataDefinition(String name) {
-        this(name, null);
+        this(name, null, false);
     }
 
     /**
@@ -65,8 +67,20 @@ public abstract class AbstractMetadataDefinition implements
      * @param description the description of the definition.
      */
     public AbstractMetadataDefinition(String name, String description) {
+        this(name, description, false);
+    }
+
+    /**
+     * Constructor with name, description and exposedToEnvironment..
+     *
+     * @param name        the name of the definition.
+     * @param description the description of the definition.
+     * @param exposedToEnvironment If this definition should be exposed as an environment variable.
+     */
+    public AbstractMetadataDefinition(String name, String description, boolean exposedToEnvironment) {
         this.name = name;
         this.description = description;
+        this.exposedToEnvironment = exposedToEnvironment;
     }
 
     /**
@@ -95,6 +109,38 @@ public abstract class AbstractMetadataDefinition implements
     @Override
     public synchronized void setParent(MetadataParent parent) {
         this.parent = parent;
+    }
+
+    @Override
+    public boolean isExposedToEnvironment() {
+        return exposedToEnvironment;
+    }
+
+    @Override
+    public void setExposeToEnvironment(boolean expose) {
+        exposedToEnvironment = expose;
+    }
+
+    /**
+     * This function will generate the full name, using the chosen separator.
+     * @param separator the separator to use.
+     * @return the full name.
+     */
+    @Exported
+    public String getFullName(String separator) {
+        if (getParent() != null) {
+            return getParent().getFullName() + separator + getName();
+        }
+        return getName();
+    }
+
+    /**
+     * This function will generate the full name.
+     * @return the full name.
+     */
+    @Exported
+    public String getFullName() {
+        return getFullName(Constants.DISPLAY_NAME_SEPARATOR);
     }
 
     /**

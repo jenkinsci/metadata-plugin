@@ -39,6 +39,7 @@ import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.GENERATED;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.EXPOSED;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.checkRequiredJsonAttribute;
 
 /**
@@ -54,21 +55,36 @@ public class NumberMetadataValue extends AbstractMetadataValue {
     /**
      * Standard Constructor.
      *
-     * @param name        the name
+     * @param name        the name.
      * @param description the description.
-     * @param value       the value
+     * @param value       the value.
+     * @param exposedToEnvironment if this value should be exposed to the build as an
+     *                      environment variable.
      */
     @DataBoundConstructor
+    public NumberMetadataValue(String name, String description, long value, boolean exposedToEnvironment) {
+        super(name, description, exposedToEnvironment);
+        this.value = value;
+
+    }
+
+    /**
+     * Standard Constructor.
+     *
+     * @param name  the name.
+     * @param description the description.
+     * @param value the value.
+     */
     public NumberMetadataValue(String name, String description, long value) {
-        super(name, description);
+        super(name, description, false);
         this.value = value;
     }
 
     /**
      * Standard Constructor.
      *
-     * @param name  the name
-     * @param value the value
+     * @param name  the name.
+     * @param value the value.
      */
     public NumberMetadataValue(String name, long value) {
         super(name);
@@ -114,7 +130,11 @@ public class NumberMetadataValue extends AbstractMetadataValue {
             checkRequiredJsonAttribute(json, VALUE);
 
             NumberMetadataValue value = new NumberMetadataValue(
-                    json.getString(NAME), json.optString(DESCRIPTION), json.getLong(VALUE));
+                    json.getString(NAME), json.optString(DESCRIPTION),
+                    json.getLong(VALUE));
+            if (json.has(EXPOSED)) {
+                value.setExposeToEnvironment(json.getBoolean(EXPOSED));
+            }
             if (json.has(GENERATED)) {
                 value.setGenerated(json.getBoolean(GENERATED));
             } else {

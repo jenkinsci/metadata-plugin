@@ -77,6 +77,13 @@ public interface MetadataParent<T extends Metadata> {
     String getFullName();
 
     /**
+     * The full name of the element, using the chosen separator string.
+     * @param separator the separator string.
+     * @return the fullName.
+     */
+    String getFullName(String separator);
+
+    /**
      * Convert this object into a JSON object.
      *
      * @return the JSON version.

@@ -35,6 +35,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.EXPOSED;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
@@ -59,7 +60,7 @@ public class StringMetadataValueTest {
         String name = "nameTest";
         String description = "descrText";
         String value = "I am the greatest!";
-        StringMetadataValue metadataValue = new StringMetadataValue(name, description, value);
+        StringMetadataValue metadataValue = new StringMetadataValue(name, description, value, false);
         JSONObject json = metadataValue.toJson();
         assertEquals(name, json.getString(JsonUtils.NAME));
         assertEquals(description, json.getString(JsonUtils.DESCRIPTION));
@@ -78,11 +79,13 @@ public class StringMetadataValueTest {
         String name = "nameTest";
         String description = "descrText";
         String value = "Bug Busters!!";
+        boolean exposed = true;
 
         JSONObject json = new JSONObject();
         json.put(NAME, name);
         json.put(DESCRIPTION, description);
         json.put(VALUE, value);
+        json.put(EXPOSED, exposed);
         json.put(JsonUtils.METADATA_TYPE, "metadata-string");
 
         StringMetadataValue metadataValue = (StringMetadataValue)JsonUtils.toValue(json);

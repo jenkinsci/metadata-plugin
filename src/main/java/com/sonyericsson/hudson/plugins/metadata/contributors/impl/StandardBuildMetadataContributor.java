@@ -55,7 +55,7 @@ public class StandardBuildMetadataContributor extends BuildMetadataContributor {
         mdv.setGenerated(true);
         TreeStructureUtil.addValue(buildNode, mdv, "duration");
         TreeStructureUtil.addValue(buildNode, build.getBuiltOnStr(), null, "builtOn");
-        TreeStructureUtil.addValue(buildNode, build.getTime(), null, "scheduled");
+        TreeStructureUtil.addValue(buildNode, build.getTime(), null, false, "scheduled");
         List<MetadataValue> values = new LinkedList<MetadataValue>();
         values.add(buildNode);
         return values;

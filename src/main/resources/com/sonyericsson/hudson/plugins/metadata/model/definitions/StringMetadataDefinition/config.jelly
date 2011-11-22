@@ -34,4 +34,8 @@
     <f:entry title="${%Description}" help="/plugin/metadata/help/definitions/description.html">
         <f:textarea name="description" value="${instance.description}"/>
     </f:entry>
+    <f:entry title="${%Expose to environment}" help="/plugin/metadata/help/environment.html">
+        <f:checkbox name="exposedToEnvironment" checked="${instance.isExposedToEnvironment()}"/>
+    </f:entry>
+
 </j:jelly>

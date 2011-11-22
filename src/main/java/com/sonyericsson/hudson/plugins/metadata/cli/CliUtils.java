@@ -110,6 +110,7 @@ public abstract class CliUtils {
      * @throws NoMetadataException if the item doesn't contain any metadata.
      * @throws java.io.IOException if a metadata container needed to be added and it failed to do so.
      */
+    //CS IGNORE RedundantThrows FOR NEXT 3 LINES. REASON: NometadataException listed twice but it's not.
     public static MetadataContainer<MetadataValue> getContainer(String node, String job, Integer build,
                                                                 boolean createContainer)
             throws CmdLineException, NoItemException, NoMetadataException, IOException {

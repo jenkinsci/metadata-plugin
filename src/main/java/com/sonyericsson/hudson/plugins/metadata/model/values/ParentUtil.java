@@ -131,7 +131,8 @@ public final class ParentUtil {
                     Metadata treeNode = null;
                     if (value instanceof MetadataValue) {
                         LinkedList<MetadataValue> list = (LinkedList<MetadataValue>)leftOvers;
-                        treeNode = new TreeNodeMetadataValue(value.getName(), value.getDescription(), list);
+                        treeNode = new TreeNodeMetadataValue(value.getName(), value.getDescription(),
+                                list, value.isExposedToEnvironment());
                     } else if (value instanceof MetadataDefinition) {
                         LinkedList<MetadataDefinition> list = (LinkedList<MetadataDefinition>)leftOvers;
                         treeNode = new TreeNodeMetadataDefinition(value.getName(), value.getDescription(), list);

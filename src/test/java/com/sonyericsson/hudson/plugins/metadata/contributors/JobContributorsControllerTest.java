@@ -59,7 +59,7 @@ public class JobContributorsControllerTest {
         TreeStructureUtil.getPath(treePath[0], "this").setGenerated(false);
         TreeStructureUtil.addValue(treePath[1], "Bouyah", "no description", "generated");
         treePath[0].addChild(new StringMetadataValue("keep", "valid"));
-        TreeStructureUtil.addValue(treePath[0], "too", "", false, "and", "keep", "this");
+        TreeStructureUtil.addValue(treePath[0], "too", "", false, false, "and", "keep", "this");
         TreeStructureUtil.addValue(treePath[0], "yes", "no description", "remove");
         System.out.println(TreeStructureUtil.prettyPrint(treePath[0], ""));
         JobContributorsController.SaveableOperation operation = new JobContributorsController.SaveableOperation(

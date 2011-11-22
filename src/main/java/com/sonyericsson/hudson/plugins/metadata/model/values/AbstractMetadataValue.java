@@ -27,6 +27,7 @@ package com.sonyericsson.hudson.plugins.metadata.model.values;
 import com.sonyericsson.hudson.plugins.metadata.Constants;
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
+import hudson.EnvVars;
 import hudson.ExtensionList;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
@@ -49,6 +50,21 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
     private String description;
     private MetadataParent parent;
     private boolean generated = false;
+    private boolean exposedToEnvironment = false;
+
+
+/**
+     * Constructor with name, description and exposedToEnvironment.
+     *
+     * @param name        The name of the definitions.
+     * @param description The description of the definitions.
+     * @param exposedToEnvironment If this value should be exposed as an environment variable.
+     */
+    protected AbstractMetadataValue(String name, String description, boolean exposedToEnvironment) {
+        this.name = name;
+        this.description = description;
+        this.exposedToEnvironment = exposedToEnvironment;
+    }
 
     /**
      * Constructor with name and description.
@@ -57,8 +73,7 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
      * @param description The description of the definitions.
      */
     protected AbstractMetadataValue(String name, String description) {
-        this.name = name;
-        this.description = description;
+        this(name, description, false);
     }
 
     /**
@@ -67,7 +82,7 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
      * @param name The name of the definitions.
      */
     protected AbstractMetadataValue(String name) {
-        this(name, null);
+        this(name, null, false);
     }
 
     /**
@@ -151,21 +166,57 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
     }
 
     /**
+     * This function will generate the full name, using the chosen separator.
+     * @param separator the separator to use.
+     * @return the full name.
+     */
+    @Exported
+    public String getFullName(String separator) {
+        if (getParent() != null) {
+            return getParent().getFullName() + separator + getName();
+        }
+        return getName();
+    }
+
+    /**
      * This function will generate the full name.
-     *
      * @return the full name.
      */
     @Exported
     public String getFullName() {
-        if (getParent() != null) {
-            return getParent().getFullName() + Constants.SEPARATOR_DOT + getName();
-        }
-        return getName();
+        return getFullName(Constants.DISPLAY_NAME_SEPARATOR);
     }
 
     @Override
     public void replacementOf(MetadataValue old) {
         //Nothing needs to be done as most types should be replaced directly.
+    }
+
+    @Override
+    public void addEnvironmentVariables(EnvVars variables, boolean exposeAll) {
+        if (exposedToEnvironment || exposeAll) {
+            variables.put(getEnvironmentName(), getValue().toString());
+        }
+    }
+
+    /**
+     * This function will generate the full environment variable name.
+     *  The format will be MD_FULL_PATH_TO_CHILD
+     * @return the full environment variable name.
+     */
+    @Exported
+    public String getEnvironmentName() {
+        return (Constants.METADATA_ENV_PREFIX + getFullName(Constants.ENVIRONMENT_SEPARATOR)).toUpperCase();
+    }
+
+    @Override
+    public boolean isExposedToEnvironment() {
+        return exposedToEnvironment;
+    }
+
+    @Override
+    public void setExposeToEnvironment(boolean expose) {
+        exposedToEnvironment = expose;
     }
 
     /**
@@ -179,6 +230,7 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
         obj.put(JsonUtils.NAME, name);
         obj.put(JsonUtils.DESCRIPTION, description);
         obj.put(JsonUtils.GENERATED, generated);
+        obj.put(JsonUtils.EXPOSED, exposedToEnvironment);
 
         AbstractMetaDataValueDescriptor descriptor = (AbstractMetaDataValueDescriptor)getDescriptor();
         obj.put(JsonUtils.METADATA_TYPE, descriptor.getJsonType());

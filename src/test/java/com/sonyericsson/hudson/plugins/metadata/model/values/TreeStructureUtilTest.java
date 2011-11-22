@@ -23,8 +23,8 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
-import com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty;
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

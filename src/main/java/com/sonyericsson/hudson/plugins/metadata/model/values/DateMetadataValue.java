@@ -44,6 +44,7 @@ import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.GENERATED;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.EXPOSED;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.checkRequiredJsonAttribute;
 
 /**
@@ -59,11 +60,25 @@ public class DateMetadataValue extends AbstractMetadataValue {
     /**
      * Standard Constructor.
      *
-     * @param name        the name
-     * @param description the description
-     * @param value       the value
+     * @param name        the name.
+     * @param description the description.
+     * @param value       the value.
+     * @param exposedToEnvironment if this value should be exposed to the build as an
+     *                      environment variable.
      */
     @DataBoundConstructor
+    public DateMetadataValue(String name, String description, Date value, boolean exposedToEnvironment) {
+        super(name, description, exposedToEnvironment);
+        setValue(value);
+    }
+
+    /**
+     * Standard Constructor.
+     *
+     * @param name  the name.
+     * @param description the description.
+     * @param value the value.
+     */
     public DateMetadataValue(String name, String description, Date value) {
         super(name, description);
         setValue(value);
@@ -72,8 +87,8 @@ public class DateMetadataValue extends AbstractMetadataValue {
     /**
      * Standard Constructor.
      *
-     * @param name  the name
-     * @param value the value
+     * @param name  the name.
+     * @param value the value.
      */
     public DateMetadataValue(String name, Date value) {
         super(name);
@@ -131,7 +146,11 @@ public class DateMetadataValue extends AbstractMetadataValue {
 
             //TODO Deserialize timezone info?
             DateMetadataValue value = new DateMetadataValue(
-                    json.getString(NAME), json.optString(DESCRIPTION), new Date(json.getLong(VALUE)));
+                    json.getString(NAME), json.optString(DESCRIPTION),
+                    new Date(json.getLong(VALUE)));
+            if (json.has(EXPOSED)) {
+                value.setExposeToEnvironment(json.getBoolean(EXPOSED));
+            }
             if (json.has(GENERATED)) {
                 value.setGenerated(json.getBoolean(GENERATED));
             } else {

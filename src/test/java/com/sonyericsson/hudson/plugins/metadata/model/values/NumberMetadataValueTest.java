@@ -35,6 +35,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.EXPOSED;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
@@ -61,7 +62,7 @@ public class NumberMetadataValueTest {
         String name = "nameTest";
         String description = "descrText";
         long value = 5000;
-        NumberMetadataValue metadataValue = new NumberMetadataValue(name, description, value);
+        NumberMetadataValue metadataValue = new NumberMetadataValue(name, description, value, false);
         JSONObject json = metadataValue.toJson();
         assertEquals(name, json.getString(JsonUtils.NAME));
         assertEquals(description, json.getString(JsonUtils.DESCRIPTION));
@@ -80,11 +81,13 @@ public class NumberMetadataValueTest {
         String name = "nameTest";
         String description = "descrText";
         long value = 5432;
+        boolean exposed = true;
 
         JSONObject json = new JSONObject();
         json.put(NAME, name);
         json.put(DESCRIPTION, description);
         json.put(VALUE, value);
+        json.put(EXPOSED, exposed);
         json.put(JsonUtils.METADATA_TYPE, "metadata-number");
 
         NumberMetadataValue metadataValue = (NumberMetadataValue)JsonUtils.toValue(json);

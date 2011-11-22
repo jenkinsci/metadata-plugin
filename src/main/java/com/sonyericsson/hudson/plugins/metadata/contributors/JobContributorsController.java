@@ -156,7 +156,7 @@ public class JobContributorsController extends SaveableListener {
             TreeNodeMetadataValue[] tree = TreeStructureUtil.createTreePath("", "job-info", "last-saved");
             TreeNodeMetadataValue jobInfo = tree[0];
             TreeNodeMetadataValue lastSaved = tree[1];
-            TreeStructureUtil.addValue(lastSaved, new Date(), "", "time");
+            TreeStructureUtil.addValue(lastSaved, new Date(), "", false, "time");
             TreeStructureUtil.addValue(lastSaved, currentUser.getDisplayName(), "", "user", "display-name");
             TreeStructureUtil.addValue(lastSaved, currentUser.getFullName(), "", "user", "full-name");
             //TODO lower the level

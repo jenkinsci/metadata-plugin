@@ -23,56 +23,36 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model;
 
+import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
+import hudson.EnvVars;
+import hudson.Extension;
+import hudson.model.AbstractBuild;
+import hudson.model.EnvironmentContributor;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+
+import java.io.IOException;
+
 /**
- * Common interface for definitions and values.
+ * Environment contributor for the metadata values. Adds metadata values
+ * that has been flagged to be exposed as environment variables before each build step.
  *
  * @author Tomas Westling &lt;thomas.westling@sonyericsson.com&gt;
  */
-public interface Metadata {
-    /**
-     * Returns the name of this metadata.
-     *
-     * @return the name of this metadata.
-     */
-    String getName();
-
-    /**
-     * Returns the description of this metadata.
-     *
-     * @return The description of this metadata.
-     */
-    String getDescription();
-
-    /**
-     * Get the value.
-     *
-     * @return the value.
-     */
-    Object getValue();
-
-    /**
-     * The parent of this metadata.
-     *
-     * @return the parent.
-     */
-    MetadataParent getParent();
-
-    /**
-     * The parent of this metadata.
-     *
-     * @param parent the metadata.
-     */
-    void setParent(MetadataParent parent);
-
-    /**
-     * Returns whether or not this should be exposed to the environment.
-     * @return whether this should be exposed to the environment or not.
-     */
-    boolean isExposedToEnvironment();
-
-    /**
-     * Set whether this should be exposed to the environment or not.
-     * @param expose true if this should be exposed, false if not.
-     */
-    void setExposeToEnvironment(boolean expose);
+@Extension
+public class MetadataEnvironmentContributor extends EnvironmentContributor {
+    @Override
+    public void buildEnvironmentFor(Run r, EnvVars envs, TaskListener listener)
+            throws IOException, InterruptedException {
+        if (r instanceof AbstractBuild) {
+            AbstractBuild build = (AbstractBuild)r;
+            MetadataBuildAction action = build.getAction(MetadataBuildAction.class);
+            if (action == null) {
+                return;
+            }
+            for (MetadataValue child : action.getChildren()) {
+                child.addEnvironmentVariables(envs, false);
+            }
+        }
+    }
 }

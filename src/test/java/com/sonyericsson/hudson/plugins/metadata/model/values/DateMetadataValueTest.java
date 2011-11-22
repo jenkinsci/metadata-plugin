@@ -37,6 +37,7 @@ import java.util.Date;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.EXPOSED;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
@@ -61,7 +62,7 @@ public class DateMetadataValueTest {
         String name = "nameTest";
         String description = "descrText";
         Date value = new Date();
-        DateMetadataValue metadataValue = new DateMetadataValue(name, description, value);
+        DateMetadataValue metadataValue = new DateMetadataValue(name, description, value, false);
         JSONObject json = metadataValue.toJson();
         assertEquals(name, json.getString(NAME));
         assertEquals(description, json.getString(DESCRIPTION));
@@ -80,11 +81,13 @@ public class DateMetadataValueTest {
         String name = "nameTest";
         String description = "descrText";
         Date value = new Date();
+        boolean exposed = true;
 
         JSONObject json = new JSONObject();
         json.put(NAME, name);
         json.put(DESCRIPTION, description);
         json.put(VALUE, value.getTime());
+        json.put(EXPOSED, exposed);
         json.put(JsonUtils.METADATA_TYPE, "metadata-date");
 
         DateMetadataValue metadataValue = (DateMetadataValue)JsonUtils.toValue(json);
