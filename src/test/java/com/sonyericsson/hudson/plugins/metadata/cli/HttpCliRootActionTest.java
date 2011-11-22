@@ -52,10 +52,11 @@ import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link HttpCliRootAction}.
@@ -63,7 +64,7 @@ import static org.mockito.Mockito.doAnswer;
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CliUtils.class, Hudson.class, ACL.class })
+@PrepareForTest({ CliUtils.class, Hudson.class, ACL.class })
 public class HttpCliRootActionTest {
 
     private MetadataContainer<MetadataValue> container;
@@ -127,6 +128,36 @@ public class HttpCliRootActionTest {
         verify(out).print(eq(expectedJson.toString()));
     }
 
+    /**
+     * Happy tests for {@link HttpCliRootAction#doUpdate(org.kohsuke.stapler.StaplerRequest,
+     * org.kohsuke.stapler.StaplerResponse)}.
+     *
+     * @throws Exception if so.
+     */
+    @Test
+    public void testDoUpdateWithReplace() throws Exception {
+
+        StringMetadataValue value = new StringMetadataValue("owner", "bobby");
+        String replace = (new StringMetadataValue("owner", "Tomas")).toJson().toString();
+
+        JSONObject expectedJson = new JSONObject();
+        expectedJson.put("type", "ok");
+        expectedJson.put("errorCode", 0);
+        expectedJson.put("message", "OK");
+
+        when(request.getParameter(eq("job"))).thenReturn(job);
+        when(request.getParameter(eq("data"))).thenReturn(replace);
+        when(request.getParameter(eq("replace"))).thenReturn("true");
+        PowerMockito.when(CliUtils.getContainer(null, job, null, true)).thenReturn(container);
+
+        when(container.getChild(eq("owner"))).thenReturn(value);
+
+        action.doUpdate(request, response);
+
+        verify(response).setContentType(eq(HttpCliRootAction.CONTENT_TYPE));
+        verify(out).print(eq(expectedJson.toString()));
+        verify(container).setChild(anyInt(), any(MetadataValue.class));
+    }
 
     /**
      * Happy tests for {@link HttpCliRootAction#doGet(org.kohsuke.stapler.StaplerRequest,

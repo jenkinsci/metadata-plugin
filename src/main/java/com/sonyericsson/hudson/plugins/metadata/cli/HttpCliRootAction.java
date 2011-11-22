@@ -27,6 +27,7 @@ import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
 import com.sonyericsson.hudson.plugins.metadata.model.PluginImpl;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import hudson.Extension;
 import hudson.model.RootAction;
 import net.sf.json.JSON;
@@ -118,26 +119,29 @@ public class HttpCliRootAction implements RootAction {
 
         if (container != null) {
             container.getACL().checkPermission(PluginImpl.UPDATE_METADATA);
+            if (params.isReplace()) {
+                container.getACL().checkPermission(PluginImpl.REPLACE_METADATA);
+            }
             JSON json = JSONSerializer.toJSON(dataDocument);
             try {
                 List<MetadataValue> values = JsonUtils.toValues(json);
-                Collection<MetadataValue> leftOvers = container.addChildren(values);
-                response.setContentType(CONTENT_TYPE);
-                if (leftOvers != null && !leftOvers.isEmpty()) {
-                    JSONObject jsonMessage = new JSONObject();
-                    jsonMessage.put("type", "warning");
-                    jsonMessage.put("errorCode", 0);
-                    jsonMessage.put("message", "Since the engineer who implemented this command is lazy "
-                            + "there is yet a replace option, "
-                            + "the following data could not be replaced because it already existed.");
-                    jsonMessage.put("leftOvers", JsonUtils.toJson(leftOvers));
-                    response.getOutputStream().print(jsonMessage.toString());
+                if (params.isReplace()) {
+                    ParentUtil.replaceChildren(container, values);
+                    sendOk(response);
                 } else {
-                    JSONObject jsonMessage = new JSONObject();
-                    jsonMessage.put("type", "ok");
-                    jsonMessage.put("errorCode", 0);
-                    jsonMessage.put("message", "OK");
-                    response.getOutputStream().print(jsonMessage.toString());
+                    Collection<MetadataValue> leftOvers = container.addChildren(values);
+                    if (leftOvers != null && !leftOvers.isEmpty()) {
+                        response.setContentType(CONTENT_TYPE);
+                        JSONObject jsonMessage = new JSONObject();
+                        jsonMessage.put("type", "warning");
+                        jsonMessage.put("errorCode", 0);
+                        jsonMessage.put("message", "The following data could not be replaced because"
+                                + "it already existed. Use the replace parameter to try and force it in.");
+                        jsonMessage.put("leftOvers", JsonUtils.toJson(leftOvers));
+                        response.getOutputStream().print(jsonMessage.toString());
+                    } else {
+                        sendOk(response);
+                    }
                 }
                 container.save();
             } catch (JsonUtils.ParseException e) {
@@ -201,10 +205,37 @@ public class HttpCliRootAction implements RootAction {
      * @throws IOException if so.
      */
     private static void sendError(CliUtils.Status status, String message, StaplerResponse response) throws IOException {
+        sendResponse("error", status.code(), status.name(), message, response);
+    }
+
+    /**
+     * Sends an OK status message in JSON format.
+     *
+     * @param response the response handle.
+     * @throws IOException if so.
+     */
+    private static void sendOk(StaplerResponse response) throws IOException {
+        sendResponse("ok", 0, null, "OK", response);
+    }
+
+    /**
+     * Sends a status message in JSON format.
+     *
+     * @param type      the response type (ok, error, warning)
+     * @param errorCode the errorCode
+     * @param errorName the name of the error if any.
+     * @param message   the message
+     * @param response  the response handle.
+     * @throws IOException if so.
+     */
+    private static void sendResponse(String type, int errorCode, String errorName, String message,
+                                     StaplerResponse response) throws IOException {
         JSONObject json = new JSONObject();
-        json.put("type", "error");
-        json.put("errorCode", status.code());
-        json.put("errorName", status.name());
+        json.put("type", type);
+        json.put("errorCode", errorCode);
+        if (errorName != null) {
+            json.put("errorName", errorName);
+        }
         json.put("message", message);
         response.setContentType(CONTENT_TYPE);
         response.getOutputStream().print(json.toString());
@@ -220,6 +251,7 @@ public class HttpCliRootAction implements RootAction {
         private String node;
         private String job;
         private Integer build;
+        private boolean replace;
 
         /**
          * Standard constructor.
@@ -269,6 +301,15 @@ public class HttpCliRootAction implements RootAction {
         }
 
         /**
+         * The replace param.
+         *
+         * @return true if replace.
+         */
+        public boolean isReplace() {
+            return replace;
+        }
+
+        /**
          * Get the parameters.
          *
          * @return itself.
@@ -288,6 +329,12 @@ public class HttpCliRootAction implements RootAction {
                     myResult = false;
                     return this;
                 }
+            }
+            String replaceStr = request.getParameter("replace");
+            if ("on".equalsIgnoreCase(replaceStr)
+                    || "yes".equalsIgnoreCase(replaceStr)
+                    || "true".equalsIgnoreCase(replaceStr)) {
+                replace = true;
             }
             myResult = true;
             return this;

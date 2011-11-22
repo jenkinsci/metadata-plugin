@@ -65,7 +65,13 @@ public class PluginImpl extends Plugin {
      * Permission to update metadata on objects. Primarily for use in CLI commands.
      */
     public static final Permission UPDATE_METADATA =
-            new Permission(PERMISSION_GROUP, "Update", Messages._Permission_Update(), Hudson.READ);
+            new Permission(PERMISSION_GROUP, "Update", Messages._Permission_Update(), Hudson.ADMINISTER);
+
+    /**
+     * Permission to update and replace metadata on objects. Primarily for use in CLI commands.
+     */
+    public static final Permission REPLACE_METADATA =
+            new Permission(PERMISSION_GROUP, "Replace", Messages._Permission_Replace(), Hudson.ADMINISTER);
 
     private List<AbstractMetadataDefinition> definitions = new LinkedList<AbstractMetadataDefinition>();
 

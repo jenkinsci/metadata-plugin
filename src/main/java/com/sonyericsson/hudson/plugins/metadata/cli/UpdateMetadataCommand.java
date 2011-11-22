@@ -28,6 +28,7 @@ import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
 import com.sonyericsson.hudson.plugins.metadata.model.PluginImpl;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.cli.CLICommand;
@@ -55,7 +56,7 @@ import java.util.List;
 @Extension
 public class UpdateMetadataCommand extends CLICommand {
 
-    //CS IGNORE VisibilityModifier FOR NEXT 30 LINES. REASON: Standard Jenkins Args4J design pattern.
+    //CS IGNORE VisibilityModifier FOR NEXT 40 LINES. REASON: Standard Jenkins Args4J design pattern.
 
     /**
      * The job argument. The name of the job/project to add data to. If job is not provided {@link #node} must be.
@@ -74,6 +75,12 @@ public class UpdateMetadataCommand extends CLICommand {
      */
     @Option(name = "-node", usage = "The name of the node/computer to add data to.")
     public String node;
+
+    /**
+     * The replace argument. If replace should be used instead of add.
+     */
+    @Option(name = "-replace", required = false, usage = "If existing values should be replaced/merged.")
+    public boolean replace = false;
 
     /**
      * The data argument. File or URL to the document containing the data to add. If no data argument is provided it is
@@ -111,15 +118,22 @@ public class UpdateMetadataCommand extends CLICommand {
 
         if (container != null) {
             container.getACL().checkPermission(PluginImpl.UPDATE_METADATA);
+            if (replace) {
+                container.getACL().checkPermission(PluginImpl.REPLACE_METADATA);
+            }
             JSON json = JSONSerializer.toJSON(dataDocument);
             try {
                 List<MetadataValue> values = JsonUtils.toValues(json);
-                Collection<MetadataValue> leftOvers = container.addChildren(values);
-                if (leftOvers != null && !leftOvers.isEmpty()) {
-                    stderr.println("Since the engineer who implemented this command is lazy "
-                            + "there is yet a replace option, "
-                            + "the following data on stdout could not be replaced because it already existed.");
-                    stdout.println(JsonUtils.toJson(leftOvers).toString());
+                if (replace) {
+                    ParentUtil.replaceChildren(container, values);
+                } else {
+                    Collection<MetadataValue> leftOvers = container.addChildren(values);
+                    if (leftOvers != null && !leftOvers.isEmpty()) {
+                        stderr.println(
+                                "The following data on stdout could not be added because it already existed."
+                                        + " use the --replace option to try and force it in.");
+                        stdout.println(JsonUtils.toJson(leftOvers).toString());
+                    }
                 }
                 container.save();
             } catch (JsonUtils.ParseException e) {
