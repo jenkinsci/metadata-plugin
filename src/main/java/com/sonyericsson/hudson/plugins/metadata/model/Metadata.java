@@ -26,9 +26,10 @@ package com.sonyericsson.hudson.plugins.metadata.model;
 /**
  * Common interface for definitions and values.
  *
+ * @param <P> The metadata type of the parent.
  * @author Tomas Westling &lt;thomas.westling@sonyericsson.com&gt;
  */
-public interface Metadata {
+public interface Metadata<P extends Metadata> {
     /**
      * Returns the name of this metadata.
      *
@@ -55,14 +56,14 @@ public interface Metadata {
      *
      * @return the parent.
      */
-    MetadataParent getParent();
+    MetadataParent<P> getParent();
 
     /**
      * The parent of this metadata.
      *
      * @param parent the metadata.
      */
-    void setParent(MetadataParent parent);
+    void setParent(MetadataParent<P> parent);
 
     /**
      * Returns whether or not this should be exposed to the environment.

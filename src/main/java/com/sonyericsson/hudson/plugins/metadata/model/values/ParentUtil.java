@@ -55,25 +55,24 @@ public final class ParentUtil {
      * Replaces an existing value amongst the parent's children.
      *
      * @param parent   the parent to add/replace the child to
-     * @param <T>       the type of metadata
      * @param value     the value to replace
      */
-    public static <T extends MetadataValue> void replaceChild(MetadataParent<T> parent, T value) {
+    public static void replaceChild(MetadataParent<MetadataValue> parent, MetadataValue value) {
         if (value == null) {
             throw new IllegalArgumentException("The child value is null");
         }
-        T my = parent.getChild(value.getName());
+        MetadataValue my = parent.getChild(value.getName());
         if (my != null) {
             if (my instanceof MetadataParent && value instanceof MetadataParent) {
-                MetadataParent<T> myParent = (MetadataParent<T>)my;
-                MetadataParent<T> valueParent = (MetadataParent<T>)value;
+                MetadataParent<MetadataValue> myParent = (MetadataParent<MetadataValue>)my;
+                MetadataParent<MetadataValue> valueParent = (MetadataParent<MetadataValue>)value;
                 if (myParent.requiresReplacement() || valueParent.requiresReplacement()) {
                     parent.setChild(parent.indexOf(my.getName()), value);
                     value.setParent(parent);
                     value.replacementOf(my);
                     my.setParent(null); //It should be prepared to be gc'ed
                 } else {
-                    replaceChildren(myParent, new ArrayList<T>(valueParent.getChildren()));
+                    replaceChildren(myParent, new ArrayList<MetadataValue>(valueParent.getChildren()));
                 }
             } else {
                 //it exists! then it is time to replace it.
@@ -94,10 +93,9 @@ public final class ParentUtil {
      *
      * @param parent the parent to add to.
      * @param children the children to add/replace
-     * @param <T> the type of metadata.
      */
-    public static <T extends MetadataValue> void replaceChildren(MetadataParent<T> parent, List<T> children) {
-        for (T child : children) {
+    public static void replaceChildren(MetadataParent<MetadataValue> parent, List<MetadataValue> children) {
+        for (MetadataValue child : children) {
             replaceChild(parent, child);
         }
     }

@@ -156,7 +156,12 @@ public class MetadataBuildAction implements Action, MetadataContainer<MetadataVa
     }
 
     @Override
-    public JSON toJson() {
+    public String getFullNameFrom(MetadataParent base) {
+        return "";
+    }
+
+    @Override
+    public synchronized JSON toJson() {
         return ParentUtil.toJson(this);
     }
 

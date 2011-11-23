@@ -22,8 +22,8 @@
   ~ THE SOFTWARE.
   -->
 <?jelly escape-by-default='true'?>
-    <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-        <j:forEach var="child" items="${it.children}">
-            <st:include it="${child}" page="display.jelly" />
-        </j:forEach>
-    </j:jelly>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
+    <j:forEach var="child" items="${it.children}">
+        <st:include it="${child}" page="display.jelly"/>
+    </j:forEach>
+</j:jelly>

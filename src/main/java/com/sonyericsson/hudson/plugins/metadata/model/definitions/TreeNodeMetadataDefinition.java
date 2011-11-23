@@ -152,10 +152,21 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
      */
     @Exported
     public synchronized String getFullName() {
-        if (getParent() != null) {
-            return getParent().getFullName() + Constants.DISPLAY_NAME_SEPARATOR + getName();
+        MetadataParent parent = getParent();
+        if (parent != null) {
+            return parent.getFullName() + Constants.DISPLAY_NAME_SEPARATOR + getName();
         }
         return getName();
+    }
+
+    @Override
+    public String getFullNameFrom(MetadataParent<MetadataDefinition> base) {
+        MetadataParent parent = getParent();
+        if (parent == null || parent == base) {
+            return getName();
+        } else {
+            return parent.getFullNameFrom(base) + Constants.DISPLAY_NAME_SEPARATOR + getName();
+        }
     }
 
     @Override

@@ -24,13 +24,14 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import hudson.EnvVars;
 import net.sf.json.JSONObject;
 
 /**
  * A metadata value interface.
  */
-public interface MetadataValue extends Metadata {
+public interface MetadataValue extends Metadata<MetadataValue> {
 
     /**
      * If this value is generated or user created.
@@ -67,4 +68,12 @@ public interface MetadataValue extends Metadata {
      * @param exposeAll whether all Metadata should be added to the map. Inherited from the parent.
      */
     void addEnvironmentVariables(EnvVars variables, boolean exposeAll);
+
+    /**
+     * Gives the full name from the given parent.
+     *
+     * @param base the parent to base the tree structure from.
+     * @return a dot separated path from the base up to this item.
+     */
+    String getFullNameFrom(MetadataParent<MetadataValue> base);
 }

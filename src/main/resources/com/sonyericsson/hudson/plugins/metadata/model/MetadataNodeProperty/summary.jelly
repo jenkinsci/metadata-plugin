@@ -21,18 +21,17 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
-         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
     <j:if test="${it.shouldDisplaySummary(request)}">
-    <h2>${%Metadata}</h2>
-    <table id="nodeMetadata" class="bigtable">
-        <tr>
-            <th>${%Name}</th>
-            <th>${%Value}</th>
-        </tr>
-        <j:forEach var="child" items="${it.children}">
-            <st:include it="${child}" page="display.jelly"/>
-        </j:forEach>
-    </table>
+        <h2>${%Metadata}</h2>
+        <table id="nodeMetadata" class="pane">
+            <tr>
+                <td class="pane-header" width="25%">${%Name}</td>
+                <td class="pane-header">${%Value}</td>
+            </tr>
+            <j:forEach var="child" items="${it.children}">
+                <st:include it="${child}" page="display.jelly"/>
+            </j:forEach>
+        </table>
     </j:if>
 </j:jelly>

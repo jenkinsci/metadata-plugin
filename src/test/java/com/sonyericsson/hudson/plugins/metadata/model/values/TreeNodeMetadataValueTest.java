@@ -26,6 +26,7 @@ package com.sonyericsson.hudson.plugins.metadata.model.values;
 import com.sonyericsson.hudson.plugins.metadata.Constants;
 import com.sonyericsson.hudson.plugins.metadata.MockUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import hudson.model.Hudson;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -174,5 +175,20 @@ public class TreeNodeMetadataValueTest {
                 fail("Unexpected metadata type: " + value.getClass().getName());
             }
         }
+    }
+
+    /**
+     *  Tests
+     *  {@link TreeNodeMetadataValue#getFullNameFrom(com.sonyericsson.hudson.plugins.metadata.model.MetadataParent)}.
+     */
+    @Test
+    public void testGetFullNameFrom() {
+        final String expected = "3.4";
+
+        TreeNodeMetadataValue[] path = TreeStructureUtil.createTreePath("Test", "root", "1", "2", "3", "4");
+        MetadataParent<MetadataValue> path1 =
+                (MetadataParent<MetadataValue>)TreeStructureUtil.getPath(path[0], "1", "2");
+
+        assertEquals(expected, path[1].getFullNameFrom(path1));
     }
 }

@@ -22,9 +22,20 @@
   ~ THE SOFTWARE.
   -->
 <?jelly escape-by-default='true'?>
-    <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-        <tr>
-            <th align="left">${it.fullName}</th>
-            <td><i:formatDate value="${it.value}" type="both" dateStyle="medium" timeStyle="medium"/></td>
-        </tr>
-    </j:jelly>
+<j:jelly xmlns:j="jelly:core" xmlns:i="jelly:fmt">
+    <tr>
+        <th align="left">
+            <j:choose>
+                <j:when test="${fullNameFrom != null}">
+                    ${it.getFullNameFrom(fullNameFrom)}
+                </j:when>
+                <j:otherwise>
+                    ${it.fullName}
+                </j:otherwise>
+            </j:choose>
+        </th>
+        <td>
+            <i:formatDate value="${it.value}" type="both" dateStyle="medium" timeStyle="medium"/>
+        </td>
+    </tr>
+</j:jelly>

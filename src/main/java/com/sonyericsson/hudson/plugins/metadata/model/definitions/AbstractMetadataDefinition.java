@@ -128,8 +128,9 @@ public abstract class AbstractMetadataDefinition implements
      */
     @Exported
     public String getFullName(String separator) {
-        if (getParent() != null) {
-            return getParent().getFullName() + separator + getName();
+        MetadataParent myParent = getParent();
+        if (myParent != null) {
+            return myParent.getFullName() + separator + getName();
         }
         return getName();
     }

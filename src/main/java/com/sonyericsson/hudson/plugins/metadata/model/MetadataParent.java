@@ -84,6 +84,14 @@ public interface MetadataParent<T extends Metadata> {
     String getFullName(String separator);
 
     /**
+     * Gives the full name from the given parent.
+     *
+     * @param base the parent to base the tree structure from.
+     * @return a dot separated path from the base up to this item.
+     */
+    String getFullNameFrom(MetadataParent<T> base);
+
+    /**
      * Convert this object into a JSON object.
      *
      * @return the JSON version.

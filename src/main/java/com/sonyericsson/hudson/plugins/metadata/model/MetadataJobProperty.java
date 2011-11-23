@@ -179,6 +179,11 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
     }
 
     @Override
+    public String getFullNameFrom(MetadataParent base) {
+        return "";
+    }
+
+    @Override
     public synchronized JSON toJson() {
         return ParentUtil.toJson(this);
     }

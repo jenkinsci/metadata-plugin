@@ -22,15 +22,15 @@
   ~ THE SOFTWARE.
   -->
 <?jelly escape-by-default='true'?>
-    <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+    <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
         <l:layout title="Metadata">
             <st:include it="${it.project}" page="sidepanel.jelly" />
             <l:main-panel>
                 <h1>${%Metadata about the Job}</h1>
-                <table id="usrMetadata" class="pane bigtable" style="margin-top:0; border-top:none">
-                    <tr style="border-top:none">
-                        <th>Name</th>
-                        <th>Value</th>
+                <table id="usrMetadata" class="pane">
+                    <tr>
+                        <td class="pane-header" width="25%">Name</td>
+                        <td class="pane-header">Value</td>
                     </tr>
                     <j:forEach var="child" items="${it.jobProperty.children}">
                         <st:include it="${child}" page="display.jelly" />

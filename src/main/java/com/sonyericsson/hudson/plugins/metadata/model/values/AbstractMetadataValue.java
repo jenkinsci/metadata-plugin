@@ -48,7 +48,7 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
      */
     protected final String name;
     private String description;
-    private MetadataParent parent;
+    private MetadataParent<MetadataValue> parent;
     private boolean generated = false;
     private boolean exposedToEnvironment = false;
 
@@ -132,7 +132,8 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
      *
      * @return the parent.
      */
-    public synchronized MetadataParent getParent() {
+    @Override
+    public MetadataParent<MetadataValue> getParent() {
         return parent;
     }
 
@@ -141,7 +142,8 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
      *
      * @param parent the parent.
      */
-    public synchronized void setParent(MetadataParent parent) {
+    @Override
+    public void setParent(MetadataParent<MetadataValue> parent) {
         this.parent = parent;
     }
 
@@ -151,7 +153,7 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
      * @return true if generated.
      */
     @Override
-    public synchronized boolean isGenerated() {
+    public boolean isGenerated() {
         return generated;
     }
 
@@ -172,8 +174,9 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
      */
     @Exported
     public String getFullName(String separator) {
-        if (getParent() != null) {
-            return getParent().getFullName() + separator + getName();
+        MetadataParent<MetadataValue> myParent = getParent();
+        if (myParent != null) {
+            return myParent.getFullName() + separator + getName();
         }
         return getName();
     }
@@ -185,6 +188,16 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
     @Exported
     public String getFullName() {
         return getFullName(Constants.DISPLAY_NAME_SEPARATOR);
+    }
+
+    @Override
+    public synchronized String getFullNameFrom(MetadataParent<MetadataValue> base) {
+        MetadataParent<MetadataValue> myParent = getParent();
+        if (myParent == base || myParent == null) {
+            return name;
+        } else {
+            return myParent.getFullNameFrom(base) + Constants.DISPLAY_NAME_SEPARATOR + getName();
+        }
     }
 
     @Override
