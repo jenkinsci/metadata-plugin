@@ -24,7 +24,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
     <j:if test="${it.shouldDisplaySummary(request)}">
         <h2>${%Metadata}</h2>
-        <table id="nodeMetadata" class="pane">
+        <table id="nodeMetadata" class="pane" style="width: 0;">
             <tr>
                 <td class="pane-header" width="25%">${%Name}</td>
                 <td class="pane-header">${%Value}</td>
