@@ -43,7 +43,10 @@ import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.EXPOSED;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNotSame;
+import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.fail;
+
 
 //CS IGNORE MagicNumber FOR NEXT 200 LINES. REASON: TestData
 
@@ -190,5 +193,25 @@ public class TreeNodeMetadataValueTest {
                 (MetadataParent<MetadataValue>)TreeStructureUtil.getPath(path[0], "1", "2");
 
         assertEquals(expected, path[1].getFullNameFrom(path1));
+    }
+
+    /**
+     * Tests the cloning functionality of a TreeNodeMetaDataValue.
+     * Makes sure that no shallow copying occurs.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testClone() throws Exception {
+        TreeNodeMetadataValue originalTreeValue = new TreeNodeMetadataValue("TreeOne", "");
+        originalTreeValue.addChild(new StringMetadataValue("StringOne", "", "StringValueOne"));
+        TreeNodeMetadataValue clonedTreeValue = originalTreeValue.clone();
+        StringMetadataValue originalStringValue = (StringMetadataValue)originalTreeValue.getChild("StringOne");
+        StringMetadataValue clonedStringValue = (StringMetadataValue)clonedTreeValue.getChild("StringOne");
+
+        assertNotSame(originalTreeValue, clonedTreeValue);
+        assertNotSame(originalStringValue, clonedStringValue);
+        assertEquals(originalStringValue.getValue(), clonedStringValue.getValue());
+        assertSame(originalStringValue.getParent(), originalTreeValue);
+        assertSame(clonedStringValue.getParent(), clonedTreeValue);
     }
 }

@@ -59,7 +59,7 @@ import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.checkRequ
         value = "UG_SYNC_SET_UNSYNC_GET",
         justification = "It is synchronized")
 @XStreamAlias(SERIALIZATION_ALIAS_TREE)
-public class TreeNodeMetadataValue extends AbstractMetadataValue implements MetadataParent<MetadataValue> {
+public class TreeNodeMetadataValue extends AbstractMetadataValue implements MetadataParent<MetadataValue>, Cloneable {
 
     private List<MetadataValue> children;
 
@@ -221,6 +221,20 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
             }
         }
     }
+
+    @Override
+        public TreeNodeMetadataValue clone() throws CloneNotSupportedException {
+            TreeNodeMetadataValue tree = (TreeNodeMetadataValue)super.clone();
+            List<MetadataValue> clonedChildren = new LinkedList<MetadataValue>();
+            for (MetadataValue child : children) {
+                MetadataValue clonedChild = child.clone();
+                clonedChild.setParent(tree);
+                clonedChildren.add(clonedChild);
+            }
+
+            tree.setChildren(clonedChildren);
+            return tree;
+        }
 
     /**
      * Descriptor for {@link TreeNodeMetadataValue}s.

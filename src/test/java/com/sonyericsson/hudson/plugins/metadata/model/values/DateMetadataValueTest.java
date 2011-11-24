@@ -29,9 +29,11 @@ import hudson.model.Hudson;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
@@ -40,6 +42,7 @@ import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTI
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.EXPOSED;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNotSame;
 
 /**
  * Tests for {@link DateMetadataValue}.
@@ -95,6 +98,23 @@ public class DateMetadataValueTest {
         assertEquals(name, metadataValue.getName());
         assertEquals(description, metadataValue.getDescription());
         assertEquals(value, metadataValue.getValue());
+    }
+
+    /**
+     * Tests the cloning functionality of a DateMetaDataValue.
+     * Makes sure that no shallow copying occurs.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testClone() throws Exception {
+        Date value = new Date();
+        DateMetadataValue originalValue = new DateMetadataValue("name", "description", value, false);
+        DateMetadataValue clonedValue = originalValue.clone();
+        assertEquals(originalValue.getValue(), clonedValue.getValue());
+
+        Calendar originalCalendar = (Calendar)Whitebox.getInternalState(originalValue, "value");
+        Calendar clonedCalendar = (Calendar)Whitebox.getInternalState(clonedValue, "value");
+        assertNotSame(originalCalendar, clonedCalendar);
     }
 
 }

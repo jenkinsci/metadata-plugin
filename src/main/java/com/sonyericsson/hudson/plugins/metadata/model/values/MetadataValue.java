@@ -31,7 +31,7 @@ import net.sf.json.JSONObject;
 /**
  * A metadata value interface.
  */
-public interface MetadataValue extends Metadata<MetadataValue> {
+public interface MetadataValue extends Metadata<MetadataValue>, Cloneable {
 
     /**
      * If this value is generated or user created.
@@ -76,4 +76,11 @@ public interface MetadataValue extends Metadata<MetadataValue> {
      * @return a dot separated path from the base up to this item.
      */
     String getFullNameFrom(MetadataParent<MetadataValue> base);
+
+    /**
+     * Clones this MetadataValue.
+     * @return a clone of this MetadataValue.
+     * @throws CloneNotSupportedException if it cannot be cloned.
+     */
+    MetadataValue clone() throws CloneNotSupportedException;
 }
