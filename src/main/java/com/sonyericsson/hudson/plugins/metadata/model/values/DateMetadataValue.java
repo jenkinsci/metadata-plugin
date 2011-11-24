@@ -115,12 +115,29 @@ public class DateMetadataValue extends AbstractMetadataValue {
         this.value.setTime(dateValue);
     }
 
+    /**
+     * Sets the internal Calendar value.
+     *
+     * @param calendar the value.
+     */
+    private synchronized void setCalendar(Calendar calendar) {
+        this.value = calendar;
+    }
+
     @Override
     public synchronized JSONObject toJson() {
         JSONObject obj = toAbstractJson();
         //TODO Serialize timezone info?
         obj.put(VALUE, value.getTimeInMillis());
         return obj;
+    }
+
+    @Override
+    public DateMetadataValue clone() throws CloneNotSupportedException {
+        DateMetadataValue date = (DateMetadataValue)super.clone();
+        Calendar calendar = (Calendar)value.clone();
+        date.setCalendar(calendar);
+        return date;
     }
 
     /**

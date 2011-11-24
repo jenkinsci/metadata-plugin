@@ -42,7 +42,8 @@ import java.io.Serializable;
  * A metadata value to be set in a job or node.
  */
 @ExportedBean
-public abstract class AbstractMetadataValue implements Serializable, Describable<AbstractMetadataValue>, MetadataValue {
+public abstract class AbstractMetadataValue implements
+        Serializable, Describable<AbstractMetadataValue>, MetadataValue {
     /**
      * The name of this metadata value.
      */
@@ -248,6 +249,11 @@ public abstract class AbstractMetadataValue implements Serializable, Describable
         AbstractMetaDataValueDescriptor descriptor = (AbstractMetaDataValueDescriptor)getDescriptor();
         obj.put(JsonUtils.METADATA_TYPE, descriptor.getJsonType());
         return obj;
+    }
+
+    @Override
+    public AbstractMetadataValue clone() throws CloneNotSupportedException {
+        return (AbstractMetadataValue)super.clone();
     }
 
     /**
