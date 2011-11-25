@@ -26,6 +26,7 @@ package com.sonyericsson.hudson.plugins.metadata.model.values;
 import com.sonyericsson.hudson.plugins.metadata.Constants;
 import com.sonyericsson.hudson.plugins.metadata.MockUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import hudson.model.Hudson;
 import net.sf.json.JSONArray;
@@ -46,6 +47,7 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 
 //CS IGNORE MagicNumber FOR NEXT 200 LINES. REASON: TestData
@@ -148,7 +150,8 @@ public class TreeNodeMetadataValueTest {
 
         json.put(CHILDREN, children);
 
-        TreeNodeMetadataValue metadataValue = (TreeNodeMetadataValue)JsonUtils.toValue(json);
+        TreeNodeMetadataValue metadataValue = (TreeNodeMetadataValue)JsonUtils.toValue(json,
+                mock(MetadataContainer.class));
         assertNotNull(metadataValue);
         assertEquals(name, metadataValue.getName());
         assertEquals(description, metadataValue.getDescription());

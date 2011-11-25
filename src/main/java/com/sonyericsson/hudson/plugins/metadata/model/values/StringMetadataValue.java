@@ -25,6 +25,7 @@ package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.model.Descriptor;
@@ -122,7 +123,8 @@ public class StringMetadataValue extends AbstractMetadataValue {
         }
 
         @Override
-        public MetadataValue fromJson(JSONObject json) throws JsonUtils.ParseException {
+        public MetadataValue fromJson(JSONObject json, MetadataContainer<MetadataValue> container)
+                throws JsonUtils.ParseException {
             JsonUtils.checkRequiredJsonAttribute(json, NAME);
             checkRequiredJsonAttribute(json, VALUE);
 

@@ -123,7 +123,7 @@ public class UpdateMetadataCommand extends CLICommand {
             }
             JSON json = JSONSerializer.toJSON(dataDocument);
             try {
-                List<MetadataValue> values = JsonUtils.toValues(json);
+                List<MetadataValue> values = JsonUtils.toValues(json, container);
                 if (replace) {
                     ParentUtil.replaceChildren(container, values);
                 } else {

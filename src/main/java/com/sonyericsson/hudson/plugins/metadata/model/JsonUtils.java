@@ -102,17 +102,20 @@ public abstract class JsonUtils {
      * of them all else it will be a list of one items.
      *
      * @param json the JSON data to convert.
+     * @param container the container that the value is later supposed to go into.
+     *                              Can be used to check for validity of attributes.
      * @return a list of converted values.
      *
      * @throws ParseException if for example mandatory fields are missing in the data. The exception will contain the
      *                        JSONObject that was the offending one.
-     * @see #toValues(net.sf.json.JSONArray)
+     * @see #toValues(net.sf.json.JSONArray, MetadataContainer)
      */
-    public static List<MetadataValue> toValues(JSON json) throws ParseException {
+    public static List<MetadataValue> toValues(JSON json, MetadataContainer<MetadataValue> container)
+            throws ParseException {
         if (json.isArray()) {
-            return toValues((JSONArray)json);
+            return toValues((JSONArray)json, container);
         } else {
-            return Collections.singletonList(toValue((JSONObject)json));
+            return Collections.singletonList(toValue((JSONObject)json, container));
         }
     }
 
@@ -120,17 +123,20 @@ public abstract class JsonUtils {
      * Converts the given JSON array to {@link MetadataValue}s.
      *
      * @param json the JSON array to convert.
+     * @param container the container that the value is later supposed to go into.
+     *                              Can be used to check for validity of attributes.
      * @return a list of converted values.
      *
      * @throws ParseException if for example mandatory fields are missing in the data. The exception will contain the
      *                        JSONObject that was the offending one.
-     * @see #toValue(net.sf.json.JSONObject)
+     * @see #toValue(net.sf.json.JSONObject, MetadataContainer)
      */
-    public static List<MetadataValue> toValues(JSONArray json) throws ParseException {
+    public static List<MetadataValue> toValues(JSONArray json, MetadataContainer<MetadataValue> container)
+            throws ParseException {
         List<MetadataValue> list = new LinkedList<MetadataValue>();
         for (int i = 0; i < json.size(); i++) {
             JSONObject object = json.getJSONObject(i);
-            list.add(toValue(object));
+            list.add(toValue(object, container));
         }
         return list;
     }
@@ -139,19 +145,22 @@ public abstract class JsonUtils {
      * Converts the given JSON object to {@link MetadataValue}.
      *
      * @param json the JSON data to convert.
+     * @param container the container that the value is later supposed to go into.
+     *                              Can be used to check for validity of attributes.
      * @return the converted value.
      *
      * @throws ParseException if for example mandatory fields are missing in the data. The exception will contain the
      *                        JSONObject that was the offending one, it could be something further down the hierarchy
      *                        than the object provided..
-     * @see #toValues(net.sf.json.JSONArray)
+     * @see #toValues(net.sf.json.JSONArray, MetadataContainer)
      */
-    public static MetadataValue toValue(JSONObject json) throws ParseException {
+    public static MetadataValue toValue(JSONObject json, MetadataContainer<MetadataValue> container)
+            throws ParseException {
         String type = json.optString(METADATA_TYPE);
         if (type != null && !type.isEmpty()) {
             AbstractMetadataValue.AbstractMetaDataValueDescriptor descriptor = findForJsonType(type);
             if (descriptor != null) {
-                return descriptor.fromJson(json);
+                return descriptor.fromJson(json, container);
             } else {
                 throw new ParseException("Not a valid metadata type", json);
             }

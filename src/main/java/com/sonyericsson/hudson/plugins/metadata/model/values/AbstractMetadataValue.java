@@ -26,6 +26,7 @@ package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.Constants;
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import hudson.EnvVars;
 import hudson.ExtensionList;
@@ -307,11 +308,14 @@ public abstract class AbstractMetadataValue implements
          * Converts a JSON object into a MetadataValue of this descriptors describable.
          *
          * @param json the json data to use.
+         * @param container The container that the created object is intended to go into.
+         *                              Can be used to check for validity of attributes.
          * @return the converted value.
          *
          * @throws JsonUtils.ParseException if something is for example missing.
          */
-        public abstract MetadataValue fromJson(JSONObject json) throws JsonUtils.ParseException;
+        public abstract MetadataValue fromJson(JSONObject json, MetadataContainer<MetadataValue> container)
+                throws JsonUtils.ParseException;
     }
 }
 

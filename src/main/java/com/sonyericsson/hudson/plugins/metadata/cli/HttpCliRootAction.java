@@ -41,11 +41,20 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import static com.sonyericsson.hudson.plugins.metadata.cli.CliResponse.Type;
+import static com.sonyericsson.hudson.plugins.metadata.cli.CliResponse.sendError;
+import static com.sonyericsson.hudson.plugins.metadata.cli.CliResponse.sendOk;
+import static com.sonyericsson.hudson.plugins.metadata.cli.CliResponse.createResponse;
+import static com.sonyericsson.hudson.plugins.metadata.cli.CliResponse.CONTENT_TYPE;
+import static com.sonyericsson.hudson.plugins.metadata.cli.CliResponse.sendResponse;
+import static java.net.HttpURLConnection.HTTP_OK;
+
 /**
  * Http interface for the CLI commands.
  * <p/>
- * As some systems prefer to have a bit more intimate call API towards other systems than what {@link
- * hudson.cli.CLICommand}s provide. This action exposes {@link GetMetadataCommand} and {@link UpdateMetadataCommand} to
+ * As some systems prefer to have a bit more intimate call API towards other systems than what
+ * {@link hudson.cli.CLICommand}s provide.
+ * This action exposes {@link GetMetadataCommand} and {@link UpdateMetadataCommand} to
  * a standard HTTP post or GET.
  *
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
@@ -58,11 +67,6 @@ public class HttpCliRootAction implements RootAction {
      * The URL to this action.
      */
     protected static final String URL = "metadata-httpcli";
-
-    /**
-     * The JSON content type to use when writing responses.
-     */
-    protected static final String CONTENT_TYPE = "application/json";
 
     @Override
     public String getIconFileName() {
@@ -124,21 +128,18 @@ public class HttpCliRootAction implements RootAction {
             }
             JSON json = JSONSerializer.toJSON(dataDocument);
             try {
-                List<MetadataValue> values = JsonUtils.toValues(json);
+                List<MetadataValue> values = JsonUtils.toValues(json, container);
                 if (params.isReplace()) {
                     ParentUtil.replaceChildren(container, values);
                     sendOk(response);
                 } else {
                     Collection<MetadataValue> leftOvers = container.addChildren(values);
                     if (leftOvers != null && !leftOvers.isEmpty()) {
-                        response.setContentType(CONTENT_TYPE);
-                        JSONObject jsonMessage = new JSONObject();
-                        jsonMessage.put("type", "warning");
-                        jsonMessage.put("errorCode", 0);
-                        jsonMessage.put("message", "The following data could not be replaced because"
+                        JSONObject jsonMessage = createResponse(Type.warning, 0, "Warning",
+                                "The following data could not be replaced because"
                                 + "it already existed. Use the replace parameter to try and force it in.");
                         jsonMessage.put("leftOvers", JsonUtils.toJson(leftOvers));
-                        response.getOutputStream().print(jsonMessage.toString());
+                        sendResponse(response, jsonMessage, HTTP_OK);
                     } else {
                         sendOk(response);
                     }
@@ -193,52 +194,6 @@ public class HttpCliRootAction implements RootAction {
         } else {
             sendError(CliUtils.Status.ERR_BAD_CMD, "No metadata container found.", response);
         }
-    }
-
-    /**
-     * Sends an error message in json format on the response object. The http response will still be 200 OK since the
-     * J2EE API doesn't allow content for the other status codes.
-     *
-     * @param status   the status code.
-     * @param message  the human readable message.
-     * @param response the response object to send to.
-     * @throws IOException if so.
-     */
-    private static void sendError(CliUtils.Status status, String message, StaplerResponse response) throws IOException {
-        sendResponse("error", status.code(), status.name(), message, response);
-    }
-
-    /**
-     * Sends an OK status message in JSON format.
-     *
-     * @param response the response handle.
-     * @throws IOException if so.
-     */
-    private static void sendOk(StaplerResponse response) throws IOException {
-        sendResponse("ok", 0, null, "OK", response);
-    }
-
-    /**
-     * Sends a status message in JSON format.
-     *
-     * @param type      the response type (ok, error, warning)
-     * @param errorCode the errorCode
-     * @param errorName the name of the error if any.
-     * @param message   the message
-     * @param response  the response handle.
-     * @throws IOException if so.
-     */
-    private static void sendResponse(String type, int errorCode, String errorName, String message,
-                                     StaplerResponse response) throws IOException {
-        JSONObject json = new JSONObject();
-        json.put("type", type);
-        json.put("errorCode", errorCode);
-        if (errorName != null) {
-            json.put("errorName", errorName);
-        }
-        json.put("message", message);
-        response.setContentType(CONTENT_TYPE);
-        response.getOutputStream().print(json.toString());
     }
 
     /**

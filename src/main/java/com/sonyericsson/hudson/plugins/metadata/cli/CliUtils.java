@@ -40,6 +40,10 @@ import org.kohsuke.args4j.CmdLineException;
 
 import java.io.IOException;
 
+import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static java.net.HttpURLConnection.HTTP_OK;
+
 /**
  * Common utility functions for the CLI commands.
  *
@@ -54,35 +58,39 @@ public abstract class CliUtils {
         /**
          * Commandline status code indicating {@link NoItemException}. (-1)
          */
-        ERR_NO_ITEM(-1),
+        ERR_NO_ITEM(-1, HTTP_NOT_FOUND),
         /**
          * Commandline status code indicating {@link NoMetadataException}. (-2)
          */
-        ERR_NO_METADATA(-2),
+        ERR_NO_METADATA(-2, HTTP_NOT_FOUND),
         /**
          * Commandline status code indicating illegal commandline argument combinations. (1)
          */
-        ERR_BAD_CMD(1),
+        ERR_BAD_CMD(1, HTTP_BAD_REQUEST),
         /**
          * Commandline status code indicating a
          * {@link com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.ParseException}.
          * (2)
          */
-        ERR_BAD_DATA(2),
+        ERR_BAD_DATA(2, HTTP_BAD_REQUEST),
         /**
          * Commandline status indicating that the metadata could not be saved to disk.
          */
-        WARN_NO_SAVE(10);
+        WARN_NO_SAVE(10, HTTP_OK);
 
         private final int code;
+        private final int httpStatus;
 
         /**
          * Constructor.
+         *
          * @param code the error code.
+         * @param httpStatus the HTTP status to set in the response.
          * @see #code()
          */
-        Status(int code) {
+        Status(int code, int httpStatus) {
             this.code = code;
+            this.httpStatus = httpStatus;
         }
 
         /**
@@ -92,6 +100,14 @@ public abstract class CliUtils {
          */
         public int code() {
             return code;
+        }
+
+        /**
+         * The HTTP status that should be set in the HTTP response if any.
+         * @return the status code.
+         */
+        public int httpStatus() {
+            return httpStatus;
         }
     }
 

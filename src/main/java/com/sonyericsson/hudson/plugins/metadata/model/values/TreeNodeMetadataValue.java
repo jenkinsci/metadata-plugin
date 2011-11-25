@@ -25,6 +25,7 @@ package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.EnvVars;
@@ -254,14 +255,15 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
         }
 
         @Override
-        public MetadataValue fromJson(JSONObject json) throws JsonUtils.ParseException {
+        public MetadataValue fromJson(JSONObject json, MetadataContainer<MetadataValue> container)
+                throws JsonUtils.ParseException {
             checkRequiredJsonAttribute(json, NAME);
             List<MetadataValue> children = new LinkedList<MetadataValue>();
             if (json.has(CHILDREN)) {
                 JSONArray array = json.getJSONArray(CHILDREN);
                 for (int i = 0; i < array.size(); i++) {
                     JSONObject obj = array.getJSONObject(i);
-                    children.add(JsonUtils.toValue(obj));
+                    children.add(JsonUtils.toValue(obj, container));
                 }
             }
             TreeNodeMetadataValue value = new TreeNodeMetadataValue(

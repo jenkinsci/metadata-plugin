@@ -25,6 +25,7 @@ package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.MockUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
 import hudson.model.Hudson;
 import net.sf.json.JSONObject;
 import org.junit.Test;
@@ -43,6 +44,7 @@ import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.EXPOSED;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNotSame;
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests for {@link DateMetadataValue}.
@@ -93,7 +95,7 @@ public class DateMetadataValueTest {
         json.put(EXPOSED, exposed);
         json.put(JsonUtils.METADATA_TYPE, "metadata-date");
 
-        DateMetadataValue metadataValue = (DateMetadataValue)JsonUtils.toValue(json);
+        DateMetadataValue metadataValue = (DateMetadataValue)JsonUtils.toValue(json, mock(MetadataContainer.class));
         assertNotNull(metadataValue);
         assertEquals(name, metadataValue.getName());
         assertEquals(description, metadataValue.getDescription());

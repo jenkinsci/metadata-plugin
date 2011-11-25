@@ -48,6 +48,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import javax.servlet.ServletOutputStream;
 import java.util.Collections;
 
+import static com.sonyericsson.hudson.plugins.metadata.cli.CliResponse.CONTENT_TYPE;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.contains;
@@ -64,7 +65,7 @@ import static org.mockito.Mockito.when;
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ CliUtils.class, Hudson.class, ACL.class })
+@PrepareForTest({CliUtils.class, Hudson.class, ACL.class })
 public class HttpCliRootActionTest {
 
     private MetadataContainer<MetadataValue> container;
@@ -123,7 +124,7 @@ public class HttpCliRootActionTest {
 
         action.doUpdate(request, response);
 
-        verify(response).setContentType(eq(HttpCliRootAction.CONTENT_TYPE));
+        verify(response).setContentType(eq(CONTENT_TYPE));
         verify(out).print(eq(expectedJson.toString()));
     }
 
@@ -154,7 +155,7 @@ public class HttpCliRootActionTest {
 
         action.doUpdate(request, response);
 
-        verify(response).setContentType(eq(HttpCliRootAction.CONTENT_TYPE));
+        verify(response).setContentType(eq(CONTENT_TYPE));
         verify(out).print(eq(expectedJson.toString()));
         verify(container).setChild(anyInt(), any(MetadataValue.class));
     }
@@ -181,7 +182,7 @@ public class HttpCliRootActionTest {
 
         action.doGet(request, response);
 
-        verify(response).setContentType(eq(HttpCliRootAction.CONTENT_TYPE));
+        verify(response).setContentType(eq(CONTENT_TYPE));
         verify(out).print(eq(jsonObject.toString()));
     }
 
@@ -208,7 +209,7 @@ public class HttpCliRootActionTest {
 
         action.doGet(request, response);
 
-        verify(response).setContentType(eq(HttpCliRootAction.CONTENT_TYPE));
+        verify(response).setContentType(eq(CONTENT_TYPE));
         verify(out).print(contains(message));
 
         JSONObject obj = (JSONObject)JSONSerializer.toJSON(printed);
@@ -241,7 +242,7 @@ public class HttpCliRootActionTest {
 
         action.doGet(request, response);
 
-        verify(response).setContentType(eq(HttpCliRootAction.CONTENT_TYPE));
+        verify(response).setContentType(eq(CONTENT_TYPE));
 
         JSONObject obj = (JSONObject)JSONSerializer.toJSON(printed);
         assertEquals("error", obj.getString("type"));
@@ -273,7 +274,7 @@ public class HttpCliRootActionTest {
 
         action.doGet(request, response);
 
-        verify(response).setContentType(eq(HttpCliRootAction.CONTENT_TYPE));
+        verify(response).setContentType(eq(CONTENT_TYPE));
 
         JSONObject obj = (JSONObject)JSONSerializer.toJSON(printed);
         assertEquals("error", obj.getString("type"));
