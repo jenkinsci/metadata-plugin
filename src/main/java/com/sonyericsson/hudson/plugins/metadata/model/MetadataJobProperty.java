@@ -73,6 +73,9 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
      */
     @DataBoundConstructor
     public MetadataJobProperty(List<MetadataValue> values) {
+        for (MetadataValue value : values) {
+            value.setParent(this);
+        }
         this.values = values;
     }
 

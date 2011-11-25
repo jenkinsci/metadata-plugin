@@ -176,8 +176,12 @@ public abstract class AbstractMetadataValue implements
     @Exported
     public String getFullName(String separator) {
         MetadataParent<MetadataValue> myParent = getParent();
-        if (myParent != null) {
-            return myParent.getFullName() + separator + getName();
+        if (myParent == null) {
+            return getName();
+        }
+        String fullName = myParent.getFullName();
+        if (fullName != null && !"".equals(fullName)) {
+            return fullName + separator + getName();
         }
         return getName();
     }
@@ -196,9 +200,12 @@ public abstract class AbstractMetadataValue implements
         MetadataParent<MetadataValue> myParent = getParent();
         if (myParent == base || myParent == null) {
             return name;
-        } else {
-            return myParent.getFullNameFrom(base) + Constants.DISPLAY_NAME_SEPARATOR + getName();
         }
+        String fullNameFrom = myParent.getFullNameFrom(base);
+        if (fullNameFrom != null && !"".equals(fullNameFrom)) {
+            return fullNameFrom + Constants.DISPLAY_NAME_SEPARATOR + getName();
+        }
+        return name;
     }
 
     @Override
