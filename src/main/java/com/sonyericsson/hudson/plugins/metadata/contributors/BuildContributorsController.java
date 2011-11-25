@@ -25,11 +25,14 @@ package com.sonyericsson.hudson.plugins.metadata.contributors;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataBuildAction;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.JobProperty;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
 
@@ -70,5 +73,39 @@ public class BuildContributorsController extends RunListener<AbstractBuild> {
         }
         listener.getLogger().println(Messages.BuildContributorsController_LogMessage_Done());
         logger.finest("Done collecting.");
+    }
+
+    /**
+     * Adds all the job metadata as build metadata.
+     * @param build the build to work with.
+     * @param listener the listener for this build. This can be used to produce log messages, for example,
+     *      which becomes a part of the "console output" of this build.
+     */
+    @Override
+    public void onStarted(AbstractBuild build, TaskListener listener) {
+        logger.entering(BuildContributorsController.class.getName(), "onStarted({0})", build);
+        AbstractProject project = build.getProject();
+        JobProperty property = project.getProperty(MetadataJobProperty.class);
+        if (property == null) {
+            return;
+        }
+        MetadataBuildAction action = build.getAction(MetadataBuildAction.class);
+        if (action == null) {
+            action = new MetadataBuildAction(build);
+            build.addAction(action);
+        }
+
+        MetadataJobProperty metadataJobProperty = (MetadataJobProperty)property;
+        logger.finest("Starting job to build metadata conversion.");
+        for (MetadataValue value : metadataJobProperty.getChildren()) {
+            try {
+                action.addChild(value.clone());
+            } catch (CloneNotSupportedException e) {
+                listener.getLogger().println(
+                        Messages.BuildContributorsController_LogMessage_CopyFailure(e.getMessage()));
+                logger.warning("Could not copy the job metadata: " + e.getMessage());
+            }
+        }
+        logger.finest("Done converting.");
     }
 }

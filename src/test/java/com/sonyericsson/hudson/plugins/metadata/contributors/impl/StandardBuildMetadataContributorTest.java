@@ -24,12 +24,16 @@
 package com.sonyericsson.hudson.plugins.metadata.contributors.impl;
 
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataBuildAction;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty;
 import com.sonyericsson.hudson.plugins.metadata.model.values.NumberMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
+import hudson.model.JobProperty;
 import hudson.model.Result;
+import hudson.tasks.Shell;
 import org.junit.Assert;
 import org.jvnet.hudson.test.HudsonTestCase;
 import org.jvnet.hudson.test.SleepBuilder;
@@ -68,5 +72,34 @@ public class StandardBuildMetadataContributorTest extends HudsonTestCase {
         assertNotNull(longValue);
         Assert.assertThat(longValue.getValue(), greaterThanOrEqualTo(1000L));
         assertNotNull(TreeStructureUtil.getPath(action, "build", "builtOn"));
+    }
+
+    /**
+     * Tests that job metadata gets converted to build metadata correctly.
+     * @throws Exception if so.
+     */
+    public void testJobToBuildMetadataConversion() throws Exception {
+        FreeStyleProject project = createFreeStyleProject("test1");
+        project.getBuildersList().add(new Shell("echo hej"));
+        JobProperty property = project.getProperty(MetadataJobProperty.class);
+        TreeNodeMetadataValue tree =
+                TreeStructureUtil.createPath("value", "description", false, false, "tree", "string");
+
+        if (property == null) {
+            property = new MetadataJobProperty();
+            project.addProperty(property);
+        }
+        MetadataJobProperty metadataJobProperty = (MetadataJobProperty)property;
+        metadataJobProperty.addChild(tree);
+
+        FreeStyleBuild build = buildAndAssertSuccess(project);
+        MetadataBuildAction action = build.getAction(MetadataBuildAction.class);
+        assertNotNull(action);
+
+        StringMetadataValue buildValue = (StringMetadataValue)TreeStructureUtil.getPath(action, "tree", "string");
+        StringMetadataValue jobValue = (StringMetadataValue)TreeStructureUtil.
+                getPath(metadataJobProperty, "tree", "string");
+        assertNotNull(buildValue);
+        assertEquals(buildValue.getValue(), jobValue.getValue());
     }
 }
