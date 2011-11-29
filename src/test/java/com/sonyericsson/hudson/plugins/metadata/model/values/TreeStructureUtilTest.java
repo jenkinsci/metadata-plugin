@@ -121,4 +121,15 @@ public class TreeStructureUtilTest {
     public void testCreatePathNoParent() {
         TreeStructureUtil.createPath("value", "description", "one");
     }
+
+    /**
+     * Test {@link TreeStructureUtil#getLeaf(com.sonyericsson.hudson.plugins.metadata.model.MetadataParent, String...)}.
+     */
+    @Test
+    public void testGetLeaf() {
+        TreeNodeMetadataValue root = TreeStructureUtil.createPath("value", "description", "one", "two", "three");
+        assertNull(TreeStructureUtil.getLeaf(root, "two"));
+        assertNotNull(TreeStructureUtil.getPath(root, "two"));
+        assertEquals("value", ((StringMetadataValue)TreeStructureUtil.getLeaf(root, "two", "three")).getValue());
+    }
 }

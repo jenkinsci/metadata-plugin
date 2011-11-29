@@ -280,6 +280,26 @@ public abstract class TreeStructureUtil {
     }
 
     /**
+     * Returns the leaf with the given path.
+     *
+     * @param root the root to start from.
+     * @param path the path to get.
+     * @param <T>  The type of metadata.
+     * @return the leaf or null if it wasn't found or if the path doesn't represent a leaf.
+     */
+    public static <T extends Metadata> T getLeaf(MetadataParent<T> root, String... path) {
+        T value = getPath(root, path);
+        if (value == null) {
+            return null;
+        } else if (value instanceof MetadataParent) {
+            return null;
+        } else {
+            return value;
+        }
+    }
+
+
+    /**
      * Prints the value and it's child if any into a structured string.
      *
      * @param value the value to print
