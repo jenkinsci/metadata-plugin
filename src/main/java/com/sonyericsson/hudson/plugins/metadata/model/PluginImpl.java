@@ -73,6 +73,13 @@ public class PluginImpl extends Plugin {
     public static final Permission REPLACE_METADATA =
             new Permission(PERMISSION_GROUP, "Replace", Messages._Permission_Replace(), Hudson.ADMINISTER);
 
+    /**
+     * Permission to configure metadata definitions, i.e. use the Metadata configuration page.
+     */
+    public static final Permission CONFIGURE_DEFINITIONS =
+            new Permission(PERMISSION_GROUP, "Configure", Messages._Permission_Configure_definitions(),
+                    Hudson.ADMINISTER);
+
     private List<AbstractMetadataDefinition> definitions = new LinkedList<AbstractMetadataDefinition>();
 
     @Override

@@ -30,6 +30,7 @@ import hudson.ExtensionList;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.model.RootAction;
+import hudson.security.Permission;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -68,17 +69,36 @@ public class MetadataConfigurationPage implements RootAction {
 
     @Override
     public String getIconFileName() {
-        return "clock.png";
+        if (Hudson.getInstance().hasPermission(PluginImpl.CONFIGURE_DEFINITIONS)) {
+            return "clock.png";
+        } else {
+            return null;
+        }
     }
 
     @Override
     public String getDisplayName() {
-        return Messages.ConfigurationPage_DisplayName();
+        if (Hudson.getInstance().hasPermission(PluginImpl.CONFIGURE_DEFINITIONS)) {
+            return Messages.ConfigurationPage_DisplayName();
+        } else {
+            return null;
+        }
     }
 
     @Override
     public String getUrlName() {
         return URL_NAME;
+    }
+
+    /**
+     * Serves the permission required to perform this action.
+     * Used by index.jelly
+     *
+     * @return the permission.
+     */
+    @SuppressWarnings("unused")
+    public Permission getRequiredPermission() {
+        return PluginImpl.CONFIGURE_DEFINITIONS;
     }
 
     /**
