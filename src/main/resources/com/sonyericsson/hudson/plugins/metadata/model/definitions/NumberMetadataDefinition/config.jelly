@@ -26,11 +26,12 @@
          xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
          xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
     <f:entry title="${%Name}">
-        <f:textbox name="name" value="${instance.name}"/>
+        <f:textbox name="name" value="${instance.name}"
+        checkUrl="'/MetadataChecks/checkName?value='+escape(this.value)"/>
     </f:entry>
     <f:entry title="${%Default Value}" help="/plugin/metadata/help/definitions/defaultvalue.html">
         <f:textbox name="defaultValue" value="${instance.defaultValue}"
-                   checkUrl="'/descriptorByName/com.sonyericsson.hudson.plugins.metadata.model.definitions.NumberMetaDataDefinition/checkNumberValue?value='+escape(this.value)"/>
+                   checkUrl="'/MetadataChecks/checkNumberValue?value='+escape(this.value)"/>
     </f:entry>
     <f:entry title="${%Description}" help="/plugin/metadata/help/definitions/description.html">
         <f:textarea name="description" value="${instance.description}"/>

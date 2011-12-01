@@ -26,21 +26,20 @@ package com.sonyericsson.hudson.plugins.metadata.model.values;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
+import com.sonyericsson.hudson.plugins.metadata.model.TimeDetails;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
-import hudson.util.FormValidation;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
-
-import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import static com.sonyericsson.hudson.plugins.metadata.Constants.DEFAULT_MONTH_ADJUSTMENT;
 import static com.sonyericsson.hudson.plugins.metadata.Constants.SERIALIZATION_ALIAS_DATE;
+import static com.sonyericsson.hudson.plugins.metadata.Constants.DEFAULT_TIME_DETAILS;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
@@ -57,6 +56,100 @@ import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.checkRequ
 public class DateMetadataValue extends AbstractMetadataValue {
 
     private Calendar value;
+    private boolean checked = false;
+    /**
+     * Getter for the defaultYear.
+     *
+     * @return the default year.
+     */
+    public int getYear() {
+        return value.get(Calendar.YEAR);
+    }
+
+    /**
+     * Getter for the defaultMonth.
+     *
+     * @return the default month of the year.
+     */
+    public int getMonth() {
+        return value.get(Calendar.MONTH) + DEFAULT_MONTH_ADJUSTMENT;
+    }
+
+    /**
+     * Getter for the defaultDay.
+     *
+     * @return the default day of the month.
+     */
+    public int getDay() {
+        return value.get(Calendar.DAY_OF_MONTH);
+    }
+
+    /**
+     * Getter for the default hour.
+     *
+     * @return the default hour of the day..
+     */
+    public int getHour() {
+        return value.get(Calendar.HOUR_OF_DAY);
+    }
+
+    /**
+     * Getter for the default minute.
+     *
+     * @return the default minute of the hour.
+     */
+    public int getMinute() {
+        return value.get(Calendar.MINUTE);
+    }
+
+    /**
+     * Getter for the default second.
+     *
+     * @return the default second.
+     */
+    public int getSecond() {
+        return value.get(Calendar.SECOND);
+    }
+
+    /**
+     * Returns the checked value, used to decide if the time details should be visible.
+     *
+     * @return the checked value.
+     */
+    public boolean isChecked() {
+        return checked;
+    }
+
+/**
+     * Standard Constructor.
+     *
+     * @param name         the name
+     * @param year  the default year.
+     * @param month the default month of the year.
+     * @param day   the default day of the month.
+     * @param description  the description.
+     * @param details      the optional time details, hour/minute/second.
+     * @param exposedToEnvironment if this value should be exposed to the build as an
+//     *                      environment variable.
+     */
+    @DataBoundConstructor
+    public DateMetadataValue(String name, String description, int year,
+                                  int month, int day, TimeDetails details, boolean exposedToEnvironment) {
+        super(name, description, exposedToEnvironment);
+        value = Calendar.getInstance();
+
+
+        if (details != null) {
+            value.set(year, month - DEFAULT_MONTH_ADJUSTMENT, day,
+                    details.getHour(), details.getMinute(), details.getSecond());
+            checked = details.isChecked();
+        } else {
+            value.set(year, month - DEFAULT_MONTH_ADJUSTMENT, day,
+                    DEFAULT_TIME_DETAILS, DEFAULT_TIME_DETAILS, DEFAULT_TIME_DETAILS);
+        }
+    }
+
+
 
     /**
      * Standard Constructor.
@@ -67,7 +160,6 @@ public class DateMetadataValue extends AbstractMetadataValue {
      * @param exposedToEnvironment if this value should be exposed to the build as an
      *                      environment variable.
      */
-    @DataBoundConstructor
     public DateMetadataValue(String name, String description, Date value, boolean exposedToEnvironment) {
         super(name, description, exposedToEnvironment);
         setValue(value);
@@ -177,28 +269,6 @@ public class DateMetadataValue extends AbstractMetadataValue {
                 value.setGenerated(true);
             }
             return value;
-        }
-
-        /**
-         * Form validation for the value. It will try to parse the date according to the user's locale.
-         *
-         * @param value   the value.
-         * @param request the http request.
-         * @return {@link hudson.util.FormValidation#ok()} if the value can be parsed to a date.
-         */
-        public FormValidation doCheckValue(@QueryParameter String value, StaplerRequest request) {
-            DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
-                    DateFormat.MEDIUM,
-                    request.getLocale());
-            try {
-                if (format.parse(value) != null) {
-                    return FormValidation.ok();
-                } else {
-                    return FormValidation.error(Messages.DateMetadataValue_BadDate());
-                }
-            } catch (java.text.ParseException e) {
-                return FormValidation.error(e.getMessage());
-            }
         }
     }
 }

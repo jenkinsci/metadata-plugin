@@ -23,24 +23,16 @@
   -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <f:block>
-        <table cellpadding="0" cellspacing="2" border="0" width="100%">
-            <tr>
-                <td>${%Name}</td>
-                <td width="48%"><f:textbox name="name" value="${instance.name}"/></td>
-                <td><st:nbsp/><st:nbsp/>${%Value}</td>
-                <td width="48%"><f:textbox name="value" value="${instance.value}"/></td>
-            </tr>
-            <tr>
-                <td colspan="3">
-                    <f:checkbox name="exposedToEnvironment" checked="${instance.isExposedToEnvironment()}"/>
-                    ${%Expose to environment}
-                </td>
-                <td class="setting-help" align="right">
-                    <a href="#" class="help-button" helpURL="/plugin/metadata/help/environment.html"><img src="${imagesURL}/16x16/help.gif" alt="Help for feature: ${title}" /></a>
-                </td>
-            </tr>
-            <f:helpArea />
-        </table>
-    </f:block>
+    <!--TODO could not get this page to work like string value, with name and value on same line, due to the checkurl-->
+    <f:entry title="${%Name}">
+        <f:textbox name="name" value="${instance.name}"
+                   checkUrl="'/MetadataChecks/checkName?value='+escape(this.value)"/>
+    </f:entry>
+    <f:entry title="${%Value}">
+        <f:textbox name="value" value="${instance.value}"
+                   checkUrl="'/MetadataChecks/checkNumberValue?value='+escape(this.value)"/>
+    </f:entry>
+    <f:entry title="${%Expose to environment}" help="/plugin/metadata/help/environment.html">
+        <f:checkbox name="exposedToEnvironment" checked="${instance.isExposedToEnvironment()}"/>
+    </f:entry>
 </j:jelly>

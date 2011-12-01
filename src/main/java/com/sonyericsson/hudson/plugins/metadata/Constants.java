@@ -59,6 +59,11 @@ public abstract class Constants {
     public static final String COMMON_URL_NAME = "metadata";
 
     /**
+     * The URL to the Metadata checks.
+     */
+    public static final String METADATA_CHECKS_URL_NAME = "MetadataChecks";
+
+    /**
      * The icon to display for the actions.
      */
     public static final String COMMON_ICON = "clipboard.png";
@@ -87,6 +92,15 @@ public abstract class Constants {
      */
     public static final String SERIALIZATION_ALIAS_TREE = "metadata-tree";
 
+    /**
+     * Default hour,minute,second if no defaults are added.
+     */
+    public static final int DEFAULT_TIME_DETAILS = 0;
+
+    /**
+     * Subtracted from month value since it starts on 1 instead of 0.
+     */
+    public static final int DEFAULT_MONTH_ADJUSTMENT = 1;
 
     /**
      * Empty utility constructor.

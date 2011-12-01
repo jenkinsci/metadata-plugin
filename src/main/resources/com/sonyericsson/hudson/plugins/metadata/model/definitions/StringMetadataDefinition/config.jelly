@@ -26,7 +26,8 @@
          xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
          xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
     <f:entry title="${%Name}">
-        <f:textbox name="name" value="${instance.name}"/>
+        <f:textbox name="name" value="${instance.name}"
+                   checkUrl="'/MetadataChecks/checkName?value='+escape(this.value)"/>
     </f:entry>
     <f:entry title="${%Default Value}" help="/plugin/metadata/help/definitions/defaultvalue.html">
         <f:textbox name="defaultValue" value="${instance.defaultValue}"/>
@@ -37,5 +38,4 @@
     <f:entry title="${%Expose to environment}" help="/plugin/metadata/help/environment.html">
         <f:checkbox name="exposedToEnvironment" checked="${instance.isExposedToEnvironment()}"/>
     </f:entry>
-
 </j:jelly>

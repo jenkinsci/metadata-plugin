@@ -25,21 +25,27 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
          xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
          xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
-    <f:entry>
+    <f:block>
         <table cellpadding="0" cellspacing="2" border="0">
             <tr>
                 <td>${%Name}</td>
                 <td colspan="5">
-                    <f:textbox name="name" value="${instance.name}"/>
+                    <f:textbox name="name" value="${instance.name}"
+                               checkUrl="'/MetadataChecks/checkName?value='+escape(this.value)"/>
                 </td>
             </tr>
+            <!--used to display the form validation error -->
+            <tr class="validation-error-area"><td/><td colspan="5" /></tr>
             <tr>
                 <td>
                     <st:nbsp/>
                     <st:nbsp/>${%Default year}
                 </td>
                 <td width="50">
-                    <f:textbox name="defaultYear" value="${instance.defaultYear}"/>
+                    <f:textbox name="defaultYear" value="${instance.defaultYear}"
+                               checkUrl="'/MetadataChecks/checkDateValue?yearValue='+escape(Form.findMatchingInput(this,'defaultYear').value)
+                               +'&amp;monthValue='+escape(Form.findMatchingInput(this,'defaultMonth').value)
+                               +'&amp;dayValue='+escape(Form.findMatchingInput(this,'defaultDay').value)"/>
                 </td>
 
                 <td>
@@ -47,49 +53,68 @@
                     <st:nbsp/>${%Default month}
                 </td>
                 <td width="50">
-                    <f:textbox name="defaultMonth" value="${instance.defaultMonth}"/>
+                    <f:textbox name="defaultMonth" value="${instance.defaultMonth}"
+                               checkUrl="'/MetadataChecks/checkDateValue?yearValue='+escape(Form.findMatchingInput(this,'defaultYear').value)
+                               +'&amp;monthValue='+escape(Form.findMatchingInput(this,'defaultMonth').value)
+                               +'&amp;dayValue='+escape(Form.findMatchingInput(this,'defaultDay').value)"/>
                 </td>
                 <td>
                     <st:nbsp/>
                     <st:nbsp/>${%Default day}
                 </td>
                 <td width="50">
-                    <f:textbox name="defaultDay" value="${instance.defaultDay}"/>
+                    <f:textbox name="defaultDay" value="${instance.defaultDay}"
+                               checkUrl="'/MetadataChecks/checkDateValue?yearValue='+escape(Form.findMatchingInput(this,'defaultYear').value)
+                               +'&amp;monthValue='+escape(Form.findMatchingInput(this,'defaultMonth').value)
+                               +'&amp;dayValue='+escape(Form.findMatchingInput(this,'defaultDay').value)"/>
                 </td>
             </tr>
+            <!--used to display the form validation error -->
+            <tr class="validation-error-area"><td/><td colspan="5" /></tr>
         </table>
-        <f:optionalBlock name="details" title="Time details" checked="${instance.isChecked()}">
-            <f:entry>
-                <table cellpadding="0" cellspacing="2" border="0">
-                    <tr>
-                        <td>
-                            <st:nbsp/>
-                            <st:nbsp/>${%Default hour}
-                        </td>
-                        <td width="50">
-                            <f:textbox name="hour" value="${instance.defaultHour}"/>
+        </f:block>
 
-                        </td>
+    <f:optionalBlock name="details" title="Time details" checked="${instance.isChecked()}">
 
-                        <td>
-                            <st:nbsp/>
-                            <st:nbsp/>${%Default minute}
-                        </td>
-                        <td width="50">
-                            <f:textbox name="minute" value="${instance.defaultMinute}"/>
-                        </td>
-                        <td>
-                            <st:nbsp/>
-                            <st:nbsp/>${%Default second}
-                        </td>
-                        <td width="50">
-                            <f:textbox name="second" value="${instance.defaultSecond}"/>
-                        </td>
-                    </tr>
-                </table>
-            </f:entry>
-        </f:optionalBlock>
-    </f:entry>
+        <f:block>
+            <table cellpadding="0" cellspacing="2" border="0">
+                <tr>
+                    <td>
+                        <st:nbsp/>
+                        <st:nbsp/>${%Default hour}
+                    </td>
+                    <td width="50">
+                        <f:textbox name="defaultHour" value="${instance.defaultHour}"
+                                   checkUrl="'/MetadataChecks/checkTimeValue?hourValue='+escape(Form.findMatchingInput(this,'defaultHour').value)
+                                       +'&amp;minuteValue='+escape(Form.findMatchingInput(this,'defaultMinute').value)
+                                       +'&amp;secondValue='+escape(Form.findMatchingInput(this,'defaultSecond').value)"/>
+                    </td>
+                    <td>
+                        <st:nbsp/>
+                        <st:nbsp/>${%Default minute}
+                    </td>
+                    <td width="50">
+                        <f:textbox name="defaultMinute" value="${instance.defaultMinute}"
+                                   checkUrl="'/MetadataChecks/checkTimeValue?hourValue='+escape(Form.findMatchingInput(this,'defaultHour').value)
+                                       +'&amp;minuteValue='+escape(Form.findMatchingInput(this,'defaultMinute').value)
+                                       +'&amp;secondValue='+escape(Form.findMatchingInput(this,'defaultSecond').value)"/>
+                    </td>
+                    <td>
+                        <st:nbsp/>
+                        <st:nbsp/>${%Default second}
+                    </td>
+                    <td width="50">
+                        <f:textbox name="defaultSecond" value="${instance.defaultSecond}"
+                                   checkUrl="'/MetadataChecks/checkTimeValue?hourValue='+escape(Form.findMatchingInput(this,'defaultHour').value)
+                                       +'&amp;minuteValue='+escape(Form.findMatchingInput(this,'defaultMinute').value)
+                                       +'&amp;secondValue='+escape(Form.findMatchingInput(this,'defaultSecond').value)"/>
+                    </td>
+                </tr>
+                <!--used to display the form validation error -->
+                <tr class="validation-error-area"><td/><td colspan="1" /></tr>
+            </table>
+        </f:block>
+    </f:optionalBlock>
     <f:entry>
         <st:nbsp/>
         <st:nbsp/>${%Description}

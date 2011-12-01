@@ -26,7 +26,7 @@
     <l:layout title="${%Metadata Configuration}" norefresh="true">
         <l:main-panel>
             <f:form action="configureSubmit" method="post" name="configForm">
-
+                <!--title="${%Definitions}"-->
                 <f:section title="${%Metadata}">
                     <f:entry title="${%Definitions}">
                         <f:hetero-list name="definitions"

@@ -28,14 +28,15 @@ import com.sonyericsson.hudson.plugins.metadata.model.TimeDetails;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.DateMetadataValue;
 import hudson.Extension;
-import hudson.util.FormValidation;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.util.Calendar;
 import java.util.Date;
+
+import static com.sonyericsson.hudson.plugins.metadata.Constants.DEFAULT_MONTH_ADJUSTMENT;
+import static com.sonyericsson.hudson.plugins.metadata.Constants.DEFAULT_TIME_DETAILS;
 
 /**
  * Meta data with the value of a {@link java.util.Date}.
@@ -45,16 +46,6 @@ import java.util.Date;
 public class DateMetadataDefinition extends AbstractMetadataDefinition {
 
     private Calendar defaultCal;
-    //Default hour,minute,second if no defaults are added.
-    private static final int DEFAULT_TIME_DETAILS = 0;
-    //Subtracted from month value since it starts on 1 instead of 0.
-    private static final int DEFAULT_MONTH_ADJUSTMENT = 1;
-    //Min and max values for the date details.
-    private static final int MIN_TIME_DETAILS_VALUE = 0;
-    private static final int MAX_TIME_DETAILS_MONTH_VALUE = 12;
-    private static final int MAX_TIME_DETAILS_DAY_VALUE = 31;
-    private static final int MAX_TIME_DETAILS_HOUR_VALUE = 23;
-    private static final int MAX_TIME_DETAILS_MINUTE_SECOND_VALUE = 59;
     private boolean checked = false;
 
     /**
@@ -175,115 +166,6 @@ public class DateMetadataDefinition extends AbstractMetadataDefinition {
         @Override
         public String getDisplayName() {
             return Messages.DateMetadataDefinition_DisplayName();
-        }
-
-        //TODO The below checkers are not in use since I could not get them to work with
-        //TODO the current layout of the table. Add support for the checkers.
-
-        /**
-         * Form validation for the month value..
-         * The check fails if the number can't be parsed or is not between 1 and 12.
-         *
-         * @param value   the value.
-         * @param request the http request.
-         * @return {@link hudson.util.FormValidation#ok()} if the value is a number between 1 and 12.
-         */
-        public FormValidation doCheckMonthValue(@QueryParameter String value, StaplerRequest request) {
-            try {
-                long longValue = Long.parseLong(value);
-                if (longValue <= MIN_TIME_DETAILS_VALUE || longValue > MAX_TIME_DETAILS_MONTH_VALUE) {
-                    return FormValidation.error(Messages.DateMetadataDefinition_BadMonth());
-                } else {
-                    return FormValidation.ok();
-                }
-            } catch (NumberFormatException e) {
-                return FormValidation.error(hudson.model.Messages.Hudson_NotANumber());
-            }
-        }
-
-        /**
-         * Form validation for the day value..
-         * The check fails if the number can't be parsed or is not between 1 and 31.
-         *
-         * @param value   the value.
-         * @param request the http request.
-         * @return {@link hudson.util.FormValidation#ok()} if the value is a number between 1 and 31.
-         */
-        public FormValidation doCheckDayValue(@QueryParameter String value, StaplerRequest request) {
-            try {
-                long longValue = Long.parseLong(value);
-                if (longValue <= MIN_TIME_DETAILS_VALUE || longValue > MAX_TIME_DETAILS_DAY_VALUE) {
-                    return FormValidation.error(Messages.DateMetadataDefinition_BadDay());
-                } else {
-                    return FormValidation.ok();
-                }
-            } catch (NumberFormatException e) {
-                return FormValidation.error(hudson.model.Messages.Hudson_NotANumber());
-            }
-        }
-
-        /**
-         * Form validation for the hour value..
-         * The check fails if the number can't be parsed or is not between 0 and 23.
-         *
-         * @param value   the value.
-         * @param request the http request.
-         * @return {@link hudson.util.FormValidation#ok()} if the value is a number between 0 and 23.
-         */
-        public FormValidation doCheckHourValue(@QueryParameter String value, StaplerRequest request) {
-            try {
-                long longValue = Long.parseLong(value);
-                if (longValue < MIN_TIME_DETAILS_VALUE || longValue > MAX_TIME_DETAILS_HOUR_VALUE) {
-                    return FormValidation.error(Messages.DateMetadataDefinition_BadHour());
-                } else {
-                    return FormValidation.ok();
-                }
-            } catch (NumberFormatException e) {
-                return FormValidation.error(hudson.model.Messages.Hudson_NotANumber());
-            }
-        }
-
-
-        /**
-         * Form validation for the minute value..
-         * The check fails if the number can't be parsed or is not between 0 and 59.
-         *
-         * @param value   the value.
-         * @param request the http request.
-         * @return {@link hudson.util.FormValidation#ok()} if the value is a number between 0 and 59.
-         */
-        public FormValidation doCheckMinuteValue(@QueryParameter String value, StaplerRequest request) {
-            try {
-                long longValue = Long.parseLong(value);
-                if (longValue < MIN_TIME_DETAILS_VALUE || longValue > MAX_TIME_DETAILS_MINUTE_SECOND_VALUE) {
-                    return FormValidation.error(Messages.DateMetadataDefinition_BadMinute());
-                } else {
-                    return FormValidation.ok();
-                }
-            } catch (NumberFormatException e) {
-                return FormValidation.error(hudson.model.Messages.Hudson_NotANumber());
-            }
-        }
-
-        /**
-         * Form validation for the second value..
-         * The check fails if the number can't be parsed or is not between 0 and 59.
-         *
-         * @param value   the value.
-         * @param request the http request.
-         * @return {@link hudson.util.FormValidation#ok()} if the value is a number between 0 and 59.
-         */
-        public FormValidation doCheckSecondValue(@QueryParameter String value, StaplerRequest request) {
-            try {
-                long longValue = Long.parseLong(value);
-                if (longValue < MIN_TIME_DETAILS_VALUE || longValue > MAX_TIME_DETAILS_MINUTE_SECOND_VALUE) {
-                    return FormValidation.error(Messages.DateMetadataDefinition_BadSecond());
-                } else {
-                    return FormValidation.ok();
-                }
-            } catch (NumberFormatException e) {
-                return FormValidation.error(hudson.model.Messages.Hudson_NotANumber());
-            }
         }
     }
 }

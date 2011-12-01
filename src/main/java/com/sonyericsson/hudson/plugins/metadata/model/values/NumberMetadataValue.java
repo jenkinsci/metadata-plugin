@@ -30,10 +30,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
-import hudson.util.FormValidation;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 
 import static com.sonyericsson.hudson.plugins.metadata.Constants.SERIALIZATION_ALIAS_NUMBER;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
@@ -144,21 +142,6 @@ public class NumberMetadataValue extends AbstractMetadataValue {
                 value.setGenerated(true);
             }
             return value;
-        }
-
-        /**
-         * Form validation for the value. It will try to parse the value to a long.
-         *
-         * @param value the value.
-         * @return {@link hudson.util.FormValidation#ok()} if the value can be parsed to a long.
-         */
-        public FormValidation doCheckValue(@QueryParameter("value") final String value) {
-            try {
-                Long.parseLong(value);
-                return FormValidation.ok();
-            } catch (NumberFormatException e) {
-                return FormValidation.error(hudson.model.Messages.Hudson_NotANumber());
-            }
         }
     }
 }
