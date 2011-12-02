@@ -135,11 +135,16 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
             for (MetadataValue value : this.children) {
                 value.setParent(this);
             }
+        } else {
+            this.children = new LinkedList<MetadataValue>();
         }
     }
 
     @Override
     public synchronized List<MetadataValue> getValue() {
+        if (children == null) {
+            children = new LinkedList<MetadataValue>();
+        }
         return children;
     }
 
@@ -176,7 +181,7 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
 
     @Override
     public synchronized Collection<MetadataValue> getChildren() {
-        return children;
+        return getValue();
     }
 
     @Override
