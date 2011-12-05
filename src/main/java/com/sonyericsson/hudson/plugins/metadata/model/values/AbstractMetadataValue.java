@@ -48,7 +48,7 @@ public abstract class AbstractMetadataValue implements
     /**
      * The name of this metadata value.
      */
-    protected final String name;
+    protected String name;
     private String description;
     private MetadataParent<MetadataValue> parent;
     private boolean generated = false;
@@ -116,6 +116,14 @@ public abstract class AbstractMetadataValue implements
     @Exported
     public final synchronized String getName() {
         return name;
+    }
+
+    /**
+     * Set the name of this value.
+     * @param name the name.
+     */
+    protected synchronized void setName(String name) {
+        this.name = name;
     }
 
     /**
