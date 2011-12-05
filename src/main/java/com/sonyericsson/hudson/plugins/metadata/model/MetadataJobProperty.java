@@ -137,7 +137,7 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
 
     @Override
     public synchronized int indexOf(String name) {
-        return ParentUtil.getChildIndex(values, name);
+        return ParentUtil.getChildIndex(getValues(), name);
     }
 
     @Override
@@ -157,8 +157,8 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
 
     @Override
     @Exported
-    public Collection<MetadataValue> getChildren() {
-        return values;
+    public synchronized Collection<MetadataValue> getChildren() {
+        return getValues();
     }
 
     /**
