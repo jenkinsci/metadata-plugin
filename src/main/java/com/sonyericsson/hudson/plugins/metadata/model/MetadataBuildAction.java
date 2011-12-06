@@ -59,6 +59,9 @@ public class MetadataBuildAction implements Action, MetadataContainer<MetadataVa
      */
     public MetadataBuildAction(Run run, List<MetadataValue> values) {
         this.run = run;
+        if (values == null) {
+            values = new LinkedList<MetadataValue>();
+        }
         this.values = values;
     }
 
@@ -68,13 +71,14 @@ public class MetadataBuildAction implements Action, MetadataContainer<MetadataVa
      * @param run The run that this action is added to.
      */
     public MetadataBuildAction(Run run) {
-        this.run = run;
+        this(run, null);
     }
 
     /**
      * Default constructor.
      */
     public MetadataBuildAction() {
+        this.values = new LinkedList<MetadataValue>();
     }
 
     @Override
@@ -127,6 +131,7 @@ public class MetadataBuildAction implements Action, MetadataContainer<MetadataVa
 
     @Override
     public synchronized MetadataValue setChild(int index, MetadataValue value) {
+        value.setParent(this);
         return values.set(index, value);
     }
 

@@ -73,6 +73,9 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
      */
     @DataBoundConstructor
     public MetadataJobProperty(List<MetadataValue> values) {
+        if (values == null) {
+            values = new LinkedList<MetadataValue>();
+        }
         for (MetadataValue value : values) {
             value.setParent(this);
         }
@@ -83,6 +86,7 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
      * Default constructor. <strong>Do not use unless you are a serializer.</strong>
      */
     public MetadataJobProperty() {
+        this.values = new LinkedList<MetadataValue>();
     }
 
     /**
@@ -142,6 +146,7 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
 
     @Override
     public synchronized MetadataValue setChild(int index, MetadataValue value) {
+        value.setParent(this);
         return values.set(index, value);
     }
 

@@ -71,6 +71,9 @@ public class MetadataNodeProperty extends NodeProperty<Node> implements Metadata
      */
     @DataBoundConstructor
     public MetadataNodeProperty(List<MetadataValue> values) {
+        if (values == null) {
+            values = new LinkedList<MetadataValue>();
+        }
         this.values = values;
         for (MetadataValue value : this.values) {
             value.setParent(this);
@@ -81,6 +84,7 @@ public class MetadataNodeProperty extends NodeProperty<Node> implements Metadata
      * Default constructor. <strong>Do not use this unless you are a serializer.</strong>
      */
     public MetadataNodeProperty() {
+        this.values = new LinkedList<MetadataValue>();
     }
 
     /**
@@ -109,6 +113,7 @@ public class MetadataNodeProperty extends NodeProperty<Node> implements Metadata
 
     @Override
     public synchronized MetadataValue setChild(int index, MetadataValue value) {
+        value.setParent(this);
         return values.set(index, value);
     }
 
