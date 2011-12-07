@@ -188,7 +188,7 @@ public abstract class AbstractMetadataValue implements
         if (myParent == null) {
             return getName();
         }
-        String fullName = myParent.getFullName();
+        String fullName = myParent.getFullName(separator);
         if (fullName != null && !"".equals(fullName)) {
             return fullName + separator + getName();
         }
@@ -232,11 +232,14 @@ public abstract class AbstractMetadataValue implements
     /**
      * This function will generate the full environment variable name.
      *  The format will be MD_FULL_PATH_TO_CHILD
+     *
      * @return the full environment variable name.
      */
     @Exported
     public String getEnvironmentName() {
-        return (Constants.METADATA_ENV_PREFIX + getFullName(Constants.ENVIRONMENT_SEPARATOR)).toUpperCase();
+        String envName = (Constants.METADATA_ENV_PREFIX + getFullName(Constants.ENVIRONMENT_SEPARATOR));
+        envName = envName.toUpperCase();
+        return envName.replaceAll(Constants.METADATA_ENV_SPECIALS_REGEXP, Constants.ENVIRONMENT_SEPARATOR);
     }
 
     @Override

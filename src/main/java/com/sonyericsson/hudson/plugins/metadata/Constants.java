@@ -54,6 +54,11 @@ public abstract class Constants {
     public static final String METADATA_ENV_PREFIX = "MD" + ENVIRONMENT_SEPARATOR;
 
     /**
+     * A regular expression to find any special chars in the name that should be converted to "_".
+     */
+    public static final String METADATA_ENV_SPECIALS_REGEXP = "\\W";
+
+    /**
      * The URL to the actions.
      */
     public static final String COMMON_URL_NAME = "metadata";

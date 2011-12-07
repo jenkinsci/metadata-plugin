@@ -130,7 +130,7 @@ public abstract class AbstractMetadataDefinition implements
     public String getFullName(String separator) {
         MetadataParent myParent = getParent();
         if (myParent != null) {
-            return myParent.getFullName() + separator + getName();
+            return myParent.getFullName(separator) + separator + getName();
         }
         return getName();
     }
