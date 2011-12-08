@@ -25,9 +25,11 @@ package com.sonyericsson.hudson.plugins.metadata.cli;
 
 import com.sonyericsson.hudson.plugins.metadata.MockUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 import hudson.model.Hudson;
 import hudson.security.ACL;
 import net.sf.json.JSONObject;
@@ -54,8 +56,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,6 +79,7 @@ public class HttpCliRootActionTest {
     private HttpCliRootAction action;
     private final String job = "testJob1";
     private String printed;
+    private ACL acl;
 
     /**
      * Do some mocking for all tests.
@@ -87,7 +92,7 @@ public class HttpCliRootActionTest {
         MockUtils.mockMetadataValueDescriptors(hudson);
 
         container = mock(MetadataContainer.class);
-        ACL acl = PowerMockito.mock(ACL.class);
+        acl = PowerMockito.mock(ACL.class);
         when(container.getACL()).thenReturn(acl);
 
         PowerMockito.mockStatic(CliUtils.class);
@@ -136,7 +141,6 @@ public class HttpCliRootActionTest {
      */
     @Test
     public void testDoUpdateWithReplace() throws Exception {
-        boolean exposed = true;
         StringMetadataValue value = new StringMetadataValue("owner", "bobby");
         String replace = (new StringMetadataValue("owner", "Tomas")).toJson().toString();
 
@@ -158,6 +162,44 @@ public class HttpCliRootActionTest {
         verify(response).setContentType(eq(CONTENT_TYPE));
         verify(out).print(eq(expectedJson.toString()));
         verify(container).setChild(anyInt(), any(MetadataValue.class));
+    }
+
+    /**
+     * Double update test for {@link HttpCliRootAction#doUpdate(org.kohsuke.stapler.StaplerRequest,
+     * org.kohsuke.stapler.StaplerResponse)}.
+     * With a tree structure.
+     *
+     * @throws Exception if so.
+     */
+    @Test
+    public void testDoUpdateTreeWithReplace() throws Exception {
+        TreeNodeMetadataValue path = TreeStructureUtil.createPath("Bobby", "description", "owner", "name");
+        TreeStructureUtil.addValue(path, "Admin", "What is the owner", "type");
+        MetadataJobProperty myContainer = spy(new MetadataJobProperty());
+        when(myContainer.getACL()).thenReturn(acl);
+        myContainer.addChild(path);
+
+        String replace = TreeStructureUtil.createPath("Tomas", "description", "owner", "name").toJson().toString();
+
+
+        JSONObject expectedJson = new JSONObject();
+        expectedJson.put("type", "ok");
+        expectedJson.put("errorCode", 0);
+        expectedJson.put("message", "OK");
+
+        when(request.getParameter(eq("job"))).thenReturn(job);
+        when(request.getParameter(eq("data"))).thenReturn(replace);
+        when(request.getParameter(eq("replace"))).thenReturn("true");
+        PowerMockito.when(CliUtils.getContainer(null, job, null, true)).thenReturn(myContainer);
+
+        action.doUpdate(request, response);
+
+        verify(response, atLeastOnce()).setContentType(eq(CONTENT_TYPE));
+        verify(out).print(eq(expectedJson.toString()));
+
+        assertEquals(1, myContainer.getChildren().size());
+        assertEquals(2, ((TreeNodeMetadataValue)myContainer.getChild("owner")).getChildren().size());
+        assertEquals("Tomas", TreeStructureUtil.getPath(myContainer, "owner", "name").getValue());
     }
 
     /**

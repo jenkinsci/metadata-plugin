@@ -189,8 +189,8 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
         if (old instanceof MetadataParent) {
             MetadataParent<MetadataValue> oldParent = (MetadataParent<MetadataValue>)old;
             for (MetadataValue child : oldParent.getChildren()) {
-                if (getChild(child.getName()) != null) {
-                    children.add(child);
+                if (getChild(child.getName()) == null) {
+                    addChild(child);
                 }
             }
         }
