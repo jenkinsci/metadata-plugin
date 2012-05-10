@@ -190,6 +190,11 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
     }
 
     @Override
+    public Collection<String> getChildNames() {
+        return ParentUtil.getChildNames(this);
+    }
+
+    @Override
     public synchronized void replacementOf(MetadataValue old) {
         if (old instanceof MetadataParent) {
             MetadataParent<MetadataValue> oldParent = (MetadataParent<MetadataValue>)old;

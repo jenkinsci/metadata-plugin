@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +25,7 @@
 package com.sonyericsson.hudson.plugins.metadata.model;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
+import com.sonyericsson.hudson.plugins.metadata.MetadataUpdateListener;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
@@ -37,6 +39,7 @@ import hudson.security.ACL;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.NodePropertyDescriptor;
 import net.sf.json.JSON;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.Ancestor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -131,6 +134,11 @@ public class MetadataNodeProperty extends NodeProperty<Node> implements Metadata
     @Exported
     public synchronized Collection<MetadataValue> getChildren() {
         return getValues();
+    }
+
+    @Override
+    public Collection<String> getChildNames() {
+        return ParentUtil.getChildNames(this);
     }
 
     @Override
@@ -237,6 +245,13 @@ public class MetadataNodeProperty extends NodeProperty<Node> implements Metadata
                 node.getNodeProperties().add(property);
                 return property;
             }
+        }
+
+        @Override
+        public MetadataNodeProperty newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+            MetadataNodeProperty metadataNodeProperty = (MetadataNodeProperty)super.newInstance(req, formData);
+            MetadataUpdateListener.notifyMetadaNodePropertyChanged(metadataNodeProperty);
+            return metadataNodeProperty;
         }
     }
 }

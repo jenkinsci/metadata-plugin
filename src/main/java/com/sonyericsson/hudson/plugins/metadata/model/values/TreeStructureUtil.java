@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +25,7 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 
 import java.util.Arrays;
@@ -329,5 +331,22 @@ public abstract class TreeStructureUtil {
             str.append(prettyPrint(subValue, tabs));
         }
         return str.toString();
+    }
+
+    /**
+     * Find the first MetadataContainer that is an ancestor to the given Metadata.
+     * @param metadata the Metadata to find a MetadataContainer for.
+     * @return the first MetadataContainer ancestor.
+     */
+    public static MetadataContainer getContainer(Metadata metadata) {
+        MetadataParent currentParent = metadata.getParent();
+        while (!(currentParent instanceof MetadataContainer)) {
+            if (currentParent instanceof Metadata) {
+                currentParent = ((Metadata)currentParent).getParent();
+            } else {
+                return null;
+            }
+        }
+        return (MetadataContainer)currentParent;
     }
 }

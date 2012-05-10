@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -54,8 +55,8 @@ public final class ParentUtil {
     /**
      * Replaces an existing value amongst the parent's children.
      *
-     * @param parent   the parent to add/replace the child to
-     * @param value     the value to replace
+     * @param parent the parent to add/replace the child to
+     * @param value  the value to replace
      */
     public static void replaceChild(MetadataParent<MetadataValue> parent, MetadataValue value) {
         if (value == null) {
@@ -91,7 +92,7 @@ public final class ParentUtil {
     /**
      * Adds the children in the list to the parent, replacing any existing children already present.
      *
-     * @param parent the parent to add to.
+     * @param parent   the parent to add to.
      * @param children the children to add/replace
      */
     public static void replaceChildren(MetadataParent<MetadataValue> parent, List<MetadataValue> children) {
@@ -203,8 +204,8 @@ public final class ParentUtil {
      * Utility method for {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#indexOf(String)} }.
      *
      * @param children the list of children.
-     * @param name   the name to search.
-     * @param <T>    the type for values, name and the return value.
+     * @param name     the name to search.
+     * @param <T>      the type for values, name and the return value.
      * @return the index of the child if found or -1 if not.
      */
     public static <T extends Metadata> int getChildIndex(List<T> children, String name) {
@@ -228,5 +229,21 @@ public final class ParentUtil {
      */
     public static JSON toJson(MetadataContainer<MetadataValue> container) {
         return JsonUtils.toJson(container.getChildren());
+    }
+
+    /**
+     * Gets the child names of the given parent.
+     * @param parent the parent to get the child names from.
+     * @return the child names.
+     */
+    public static Collection<String> getChildNames(MetadataParent<MetadataValue> parent) {
+        Collection<String> childNames = new LinkedList<String>();
+        Collection<MetadataValue> children = parent.getChildren();
+        if (children != null) {
+            for (MetadataValue value : children) {
+                childNames.add(value.getName());
+            }
+        }
+        return childNames;
     }
 }
