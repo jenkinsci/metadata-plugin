@@ -1,0 +1,74 @@
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+    <l:layout title="${%Metadata Search Page}" norefresh="true" permission="${it.requiredPermission}">
+        <l:header>
+            <style type="text/css">
+                tr.disablehover:hover {
+                background-color: white;
+                }
+            </style>
+        </l:header>
+        <l:side-panel>
+            <l:tasks>
+                <l:task icon="images/24x24/up.gif" href="${rootURL}/" title="${%Back to Dashboard}"/>
+            </l:tasks>
+        </l:side-panel>
+        <l:main-panel>
+            <j:choose>
+                <j:when test="${!it.isEnabled()}">
+                    <p class="error">
+                        ${%Error Search Disabled}
+                    </p>
+                </j:when>
+                <j:otherwise>
+                    <h1>${%Query and search metadata}</h1>
+                    <f:form method="post" action="searchMetadata" name="theSearch">
+                        <f:section title="${%Search}">
+                            <f:entry title="${%Query String}"
+                                     help=""> <!-- help will add later -->
+                                <f:textbox name="metadata.search.queryString"
+                                           value="${request.session.getAttribute('metadata.search.queryString')}"
+                                           default="${request.session.getAttribute('metadata.search.queryString')}">
+                                </f:textbox>
+                            </f:entry>
+                            <f:block>
+                                <f:submit value="${%Search}"/>
+                            </f:block>
+                        </f:section>
+                    </f:form>
+                    <j:if test="${it.getMatchedProjects().size()==0}">
+                        <f:form method="post" action="build" name="theBuild">
+                            <f:section title="${%Search Result}">
+                                <f:description>
+                                     ${%No jobs found  }
+                                </f:description>
+                            </f:section>
+                        </f:form>
+                    </j:if>
+                    <j:if test="${it.getMatchedProjects().size()>=1}">
+                        <f:form method="post" action="build" name="theBuild">
+                            <f:section title="${%Search Result}">
+                                <f:description>
+                                     ${%Number of jobs found : } ${it.getMatchedProjects().size()}
+                                </f:description>
+                                <table width="100%" border="1" cellpadding="2" cellspacing="0"
+                                           class="pane bigtable"
+                                           style="margin-top: 0">
+                                    <tr>
+                                        <td class="pane-header">${%Project URL}</td>
+                                    </tr>
+                                    <j:forEach var="project" items="${it.getMatchedProjects()}">
+                                        <tr>
+                                            <td class="pane-header">${project}</td>
+                                        </tr>
+                                    </j:forEach>
+                                </table>
+                            </f:section>
+                        </f:form>
+                    </j:if>
+                </j:otherwise>
+            </j:choose>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>

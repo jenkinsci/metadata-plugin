@@ -1,0 +1,5 @@
+<FindBugsFilter>
+    <Match>
+        <Package name = "com.sonyericsson.hudson.plugins.metadata.search.antlr"/>
+    </Match>
+</FindBugsFilter>
