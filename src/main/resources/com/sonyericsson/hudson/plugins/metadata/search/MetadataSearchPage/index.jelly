@@ -37,7 +37,7 @@
                             </f:block>
                         </f:section>
                     </f:form>
-                    <j:if test="${it.getMatchedProjects().size()==0}">
+                    <j:if test="${request.session.getAttribute('metadata.search.result').size()==0}">
                         <f:form method="post" action="build" name="theBuild">
                             <f:section title="${%Search Result}">
                                 <f:description>
@@ -46,11 +46,11 @@
                             </f:section>
                         </f:form>
                     </j:if>
-                    <j:if test="${it.getMatchedProjects().size()>=1}">
+                    <j:if test="${request.session.getAttribute('metadata.search.result').size()>=1}">
                         <f:form method="post" action="build" name="theBuild">
                             <f:section title="${%Search Result}">
                                 <f:description>
-                                     ${%Number of jobs found : } ${it.getMatchedProjects().size()}
+                                     ${%Number of jobs found : } ${request.session.getAttribute('metadata.search.result').size()}
                                 </f:description>
                                 <table width="100%" border="1" cellpadding="2" cellspacing="0"
                                            class="pane bigtable"
@@ -58,9 +58,9 @@
                                     <tr>
                                         <td class="pane-header">${%Project URL}</td>
                                     </tr>
-                                    <j:forEach var="project" items="${it.getMatchedProjects()}">
+                                    <j:forEach var="project" items="${request.session.getAttribute('metadata.search.result')}">
                                         <tr>
-                                            <td class="pane-header">${project}</td>
+                                            <td class="pane-header">${project.getAbsoluteUrl()}</td>
                                         </tr>
                                     </j:forEach>
                                 </table>

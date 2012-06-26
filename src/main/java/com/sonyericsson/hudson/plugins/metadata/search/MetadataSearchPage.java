@@ -44,9 +44,9 @@ import org.kohsuke.stapler.QueryParameter;
 @Extension
 public class MetadataSearchPage implements RootAction {
 
-    private static final String URL_NAME = "MetaDataSearch";
+    private static final String URL_NAME = "metadata-search";
 
-   /**
+    /**
      * Default constructor.
      */
     public MetadataSearchPage() {
@@ -106,19 +106,13 @@ public class MetadataSearchPage implements RootAction {
      * @param response the response from this operation.
      * @throws Exception if an error occur.
      */
-    public void doSearchMetadata(@QueryParameter("metadata.search.queryString") final String queryString,
-            StaplerRequest request, StaplerResponse response)
+    public void doSearchMetadata(@QueryParameter("metadata.search.queryString")
+            final String queryString, StaplerRequest request, StaplerResponse response)
             throws Exception {
-        MetadataQueryParser parser = new MetadataQueryParser();
-        parser.parseQuery(queryString);
+        MetadataQuerySearch metadataQuerySearch = MetadataQuerySearch.parseQuery(queryString);
+        request.getSession(true).setAttribute("metadata.search.result",
+                metadataQuerySearch.searchQuery(Hudson.getInstance().getProjects()));
         request.getSession(true).setAttribute("metadata.search.queryString", queryString);
         response.sendRedirect2(".");
-    }
-
-    /**
-     * Search and find the matched project using
-     * Metadata query walker.
-     */
-    public void searchMatchedProjects() {
     }
 }

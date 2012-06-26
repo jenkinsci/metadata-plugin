@@ -31,7 +31,7 @@ import net.sf.json.JSONObject;
 /**
  * A metadata value interface.
  */
-public interface MetadataValue extends Metadata<MetadataValue>, Cloneable {
+public interface MetadataValue extends Metadata<MetadataValue>, Cloneable, Comparable<Object> {
 
     /**
      * If this value is generated or user created.
