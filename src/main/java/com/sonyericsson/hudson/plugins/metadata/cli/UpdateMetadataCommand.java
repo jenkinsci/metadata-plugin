@@ -32,6 +32,7 @@ import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.cli.CLICommand;
+import hudson.model.Queue;
 import hudson.remoting.Callable;
 import hudson.util.IOUtils;
 import net.sf.json.JSON;
@@ -148,6 +149,7 @@ public class UpdateMetadataCommand extends CLICommand {
             stderr.println("No metadata container found.");
             return CliUtils.Status.ERR_BAD_CMD.code();
         }
+        Queue.getInstance().scheduleMaintenance();
         return 0;
     }
 

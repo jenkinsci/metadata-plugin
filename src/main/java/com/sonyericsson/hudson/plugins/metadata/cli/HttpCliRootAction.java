@@ -29,6 +29,7 @@ import com.sonyericsson.hudson.plugins.metadata.model.PluginImpl;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import hudson.Extension;
+import hudson.model.Queue;
 import hudson.model.RootAction;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
@@ -145,6 +146,7 @@ public class HttpCliRootAction implements RootAction {
                     }
                 }
                 container.save();
+                Queue.getInstance().scheduleMaintenance();
             } catch (JsonUtils.ParseException e) {
                 sendError(CliUtils.Status.ERR_BAD_DATA, e.getMessage(), response);
             } catch (IOException ex) {

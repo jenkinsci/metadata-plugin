@@ -31,6 +31,7 @@ import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetadataValue
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 import hudson.model.Hudson;
+import hudson.model.Queue;
 import hudson.security.ACL;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -69,7 +70,7 @@ import static org.mockito.Mockito.when;
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CliUtils.class, Hudson.class, ACL.class })
+@PrepareForTest({CliUtils.class, Hudson.class, ACL.class, Queue.class })
 public class HttpCliRootActionTest {
 
     private MetadataContainer<MetadataValue> container;
@@ -80,6 +81,7 @@ public class HttpCliRootActionTest {
     private final String job = "testJob1";
     private String printed;
     private ACL acl;
+    private Queue queue;
 
     /**
      * Do some mocking for all tests.
@@ -94,6 +96,9 @@ public class HttpCliRootActionTest {
         container = mock(MetadataContainer.class);
         acl = PowerMockito.mock(ACL.class);
         when(container.getACL()).thenReturn(acl);
+        PowerMockito.mockStatic(Queue.class);
+        queue = PowerMockito.mock(Queue.class);
+        PowerMockito.when(Queue.getInstance()).thenReturn(queue);
 
         PowerMockito.mockStatic(CliUtils.class);
 
