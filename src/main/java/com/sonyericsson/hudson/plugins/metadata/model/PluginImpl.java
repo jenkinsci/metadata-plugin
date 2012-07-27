@@ -84,6 +84,8 @@ public class PluginImpl extends Plugin {
 
     @Override
     public void start() throws Exception {
+        super.start();
+        load();
         performXStreamRegistrations();
     }
 
