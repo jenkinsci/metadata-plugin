@@ -20,7 +20,10 @@
         <license>
             <name>MIT</name>
             <url>http://www.opensource.org/licenses/mit-license.php</url>
-            <comments>Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.</comments>
+            <comments>
+                Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+                Copyright 2012 Sony Mobile Communications AB. All rights reserved.
+            </comments>
         </license>
     </licenses>
 
@@ -31,8 +34,8 @@
 
     <repositories>
         <repository>
-            <id>maven.jenkins-ci.org</id>
-            <url>http://maven.jenkins-ci.org/content/repositories/releases/</url>
+            <id>repo.jenkins-ci.org</id>
+            <url>http://repo.jenkins-ci.org/public</url>
         </repository>
         <repository>
             <id>powermock-repo</id>
@@ -92,8 +95,8 @@
 
     <pluginRepositories>
         <pluginRepository>
-            <id>maven.jenkins-ci.org</id>
-            <url>http://maven.jenkins-ci.org/content/repositories/releases</url>
+            <id>repo.jenkins-ci.org</id>
+            <url>http://repo.jenkins-ci.org/public</url>
         </pluginRepository>
     </pluginRepositories>
     <build>
@@ -153,7 +156,7 @@
                             <nfa>false</nfa>
                             <libDirectory>src/main/antlr3/imports</libDirectory>
                             <messageFormat>antlr</messageFormat>
-                            <outputDirectory>src/main/generated-sources/antlr</outputDirectory>
+                            <outputDirectory>target/generated-sources/antlr</outputDirectory>
                             <printGrammar>false</printGrammar>
                             <profile>false</profile>
                             <report>false</report>
