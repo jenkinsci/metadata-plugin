@@ -96,7 +96,7 @@ public class MetadataQuerySearch {
         QueryLexer exprLexer = new QueryLexer(charStream);
         TokenStream tokenStream = new CommonTokenStream(exprLexer);
         QueryParser parser = new QueryParser(tokenStream);
-        QueryParser.query_return tree = parser.query();
+        QueryParser.expression_return tree = parser.expression();
         return new MetadataQuerySearch((CommonTree)tree.getTree());
     }
 }

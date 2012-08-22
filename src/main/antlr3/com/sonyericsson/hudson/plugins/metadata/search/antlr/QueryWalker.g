@@ -34,15 +34,51 @@ ASTLabelType=CommonTree;
 package com.sonyericsson.hudson.plugins.metadata.search.antlr;
 
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
-import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 }
 
 @members{
+        enum Operators {
+        AND("&&") {
+            @Override
+            public boolean evaluateValues(boolean op1, boolean op2) {
+                return op1 && op2;
+            }
+        },
+        OR("||") {
+            @Override
+            public boolean evaluateValues(boolean op1, boolean op2) {
+                return op1 || op2;
+            }
+        };
+        private String operator;
+
+        private Operators(String operator) {
+            this.operator = operator;
+        }
+        private static final Map<String, Operators> operatorLookup = new HashMap<String, Operators>();
+
+        public String getOperator() {
+            return operator;
+        }
+
+        static {
+            for (Operators operator : EnumSet.allOf(Operators.class)) {
+                operatorLookup.put(operator.getOperator(), operator);
+            }
+        }
+
+        public static Operators find(String operString) {
+            return operatorLookup.get(operString);
+        }
+
+        public abstract boolean evaluateValues(boolean op1, boolean op2);
+    }
     public boolean checkMatch(String sleftVal, String srightVal,
             MetadataContainer mDataProperty) {
         MetadataValue lvalue = (MetadataValue) TreeStructureUtil.getPath(mDataProperty,
@@ -72,8 +108,13 @@ import org.antlr.runtime.tree.*;
 
 evaluate[MetadataContainer<MetadataValue> metaDataProperty] returns [boolean result]
     :
-    ^(op=(OPERATOR) left=NAME right=NAME)
+    ^(operator=(AND|OR) lefteval=evaluate[metaDataProperty] righteval=evaluate[metaDataProperty])
+    {
+    result = Operators.find(operator.getText()).evaluateValues(lefteval, righteval);
+    }
+    |
+    ^(operator=(EQLS) left=NAME right=NAME)
     {
     result = checkMatch(left.getText(),right.getText(),metaDataProperty);
     }
-    ;
+   ;

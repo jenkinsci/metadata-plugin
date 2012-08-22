@@ -36,27 +36,29 @@ options {
   package com.sonyericsson.hudson.plugins.metadata.search.antlr;
 }
 
-query
-    :
-     NAME(OPERATOR^)NAME
-    ;
+expression : andexpression;
+
+andexpression : orexpression (AND^ orexpression)*;
+
+orexpression : query (OR^ query)*;
+
+basicexpr : (NAME EQLS^ NAME);
+
+query : basicexpr
+    | '('!andexpression')'!;
 
 // START:tokens
 
 NONWORD
     :
      ( 
-      '!'
-     | '#'
-     | '$'
-     | '%'
-     | '&'
-     | '(' | ')'
-     | ';'
-     | '?'
+      '#'
+     |'$'
+     |'%'
+     |';'
+     |'?'
      |'-'
      |'.'
-     |' '
      |':'
      )
     ;
@@ -64,8 +66,8 @@ NAME
     :
    ('a'..'z'|'A'..'Z'|'0'..'9'|NONWORD)+
     ;
-OPERATOR
-    :
-    '='
-    ;
+AND : '&&';
+OR : '||';
+EQLS : '=';
+WS : ( ' ' | '\t' | '\r' | '\n' )+ { $channel = HIDDEN; };
 
