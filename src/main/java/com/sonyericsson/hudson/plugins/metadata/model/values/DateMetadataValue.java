@@ -28,24 +28,30 @@ import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
 import com.sonyericsson.hudson.plugins.metadata.model.TimeDetails;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import static com.sonyericsson.hudson.plugins.metadata.Constants.DEFAULT_MONTH_ADJUSTMENT;
-import static com.sonyericsson.hudson.plugins.metadata.Constants.SERIALIZATION_ALIAS_DATE;
 import static com.sonyericsson.hudson.plugins.metadata.Constants.DEFAULT_TIME_DETAILS;
-import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
+import static com.sonyericsson.hudson.plugins.metadata.Constants.SERIALIZATION_ALIAS_DATE;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.DESCRIPTION;
-import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
-import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.GENERATED;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.EXPOSED;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.GENERATED;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
+import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.checkRequiredJsonAttribute;
 
 /**
@@ -55,12 +61,13 @@ import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.checkRequ
  */
 @XStreamAlias(SERIALIZATION_ALIAS_DATE)
 public class DateMetadataValue extends AbstractMetadataValue {
-     /**
+    /**
      * Constant for hashcode.
      */
     private static final int HASH_CONST = 93;
     private Calendar value;
     private boolean checked = false;
+
     /**
      * Getter for the defaultYear.
      *
@@ -124,21 +131,21 @@ public class DateMetadataValue extends AbstractMetadataValue {
         return checked;
     }
 
-/**
+    /**
      * Standard Constructor.
      *
-     * @param name         the name
-     * @param year  the default year.
-     * @param month the default month of the year.
-     * @param day   the default day of the month.
-     * @param description  the description.
-     * @param details      the optional time details, hour/minute/second.
+     * @param name                 the name
+     * @param year                 the default year.
+     * @param month                the default month of the year.
+     * @param day                  the default day of the month.
+     * @param description          the description.
+     * @param details              the optional time details, hour/minute/second.
      * @param exposedToEnvironment if this value should be exposed to the build as an
-//     *                      environment variable.
+     *                             environment variable.
      */
     @DataBoundConstructor
     public DateMetadataValue(String name, String description, int year,
-                                  int month, int day, TimeDetails details, boolean exposedToEnvironment) {
+                             int month, int day, TimeDetails details, boolean exposedToEnvironment) {
         super(name, description, exposedToEnvironment);
         value = Calendar.getInstance();
 
@@ -154,15 +161,14 @@ public class DateMetadataValue extends AbstractMetadataValue {
     }
 
 
-
     /**
      * Standard Constructor.
      *
-     * @param name        the name.
-     * @param description the description.
-     * @param value       the value.
+     * @param name                 the name.
+     * @param description          the description.
+     * @param value                the value.
      * @param exposedToEnvironment if this value should be exposed to the build as an
-     *                      environment variable.
+     *                             environment variable.
      */
     public DateMetadataValue(String name, String description, Date value, boolean exposedToEnvironment) {
         super(name, description, exposedToEnvironment);
@@ -172,9 +178,9 @@ public class DateMetadataValue extends AbstractMetadataValue {
     /**
      * Standard Constructor.
      *
-     * @param name  the name.
+     * @param name        the name.
      * @param description the description.
-     * @param value the value.
+     * @param value       the value.
      */
     public DateMetadataValue(String name, String description, Date value) {
         super(name, description);
@@ -262,10 +268,116 @@ public class DateMetadataValue extends AbstractMetadataValue {
         return hash;
     }
 
+    //CS IGNORE EmptyBlock FOR NEXT 50 LINES. REASON: Trying different inputs and moving on if Exceptions are found.
     @Override
     public int compareTo(Object userValue) {
-        //implementation pending
+        if (userValue == null) {
+            return -1;
+        }
+        Date date = value.getTime();
+        //if it is being compared to a DateMetadataValue, just compare the values.
+        if (userValue instanceof DateMetadataValue) {
+            DateMetadataValue dateMetadataValue = (DateMetadataValue)userValue;
+            Date userDate = dateMetadataValue.getValue();
+            return date.compareTo(userDate);
+        }
+        try {
+            return compareAsStandardDateTime(userValue.toString());
+        } catch (ParseException e) {
+            //didn't work, move on
+        }
+        try {
+            return compareAsStandardDate(userValue.toString());
+        } catch (ParseException e) {
+            //didn't work, move on
+        }
+        Locale locale;
+        StaplerRequest currentRequest = Stapler.getCurrentRequest();
+        if (currentRequest != null) {
+            locale = currentRequest.getLocale();
+        //If no locale could be found, try to use the System locale.
+        } else {
+            String property = System.getProperty("user.language");
+            locale = new Locale(property);
+        }
+
+        try {
+            return compareAsLocalDateTime(locale, userValue.toString());
+        } catch (ParseException e) {
+            //didn't work, move on
+        }
+        try {
+            return compareAsLocalDate(locale, userValue.toString());
+        } catch (ParseException e) {
+            //didn't work, move on
+        }
         return -1;
+    }
+
+    /**
+     * Tries to compare the value as the ISO-8601 standard for only date.
+     * @param userValue the String to compare.
+     * @return 0 if userValue is equal, -1 if value less than userValue, 1 if larger.
+     * @throws ParseException if userValue can't be parsed
+     */
+    private int compareAsStandardDate(String userValue) throws ParseException {
+        Calendar clonedValue = (Calendar)value.clone();
+        DateFormat dateInstance = new SimpleDateFormat("yyyy-MM-dd");
+        Date parse = dateInstance.parse(userValue);
+        clonedValue.set(Calendar.HOUR_OF_DAY, 0);
+        clonedValue.set(Calendar.MINUTE, 0);
+        clonedValue.set(Calendar.SECOND, 0);
+        clonedValue.set(Calendar.MILLISECOND, 0);
+        Date clonedDate = clonedValue.getTime();
+        return clonedDate.compareTo(parse);
+    }
+
+    /**
+     * Tries to compare the value as the ISO-8601 standard for date and time.
+     * @param userValue the String to compare.
+     * @return 0 if userValue is equal, -1 if value less than userValue, 1 if larger.
+     * @throws ParseException if userValue can't be parsed
+     */
+    private int compareAsStandardDateTime(String userValue) throws ParseException {
+        Calendar clonedValue = (Calendar)value.clone();
+        DateFormat dateInstance = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+        Date parse = dateInstance.parse(userValue);
+        clonedValue.set(Calendar.MILLISECOND, 0);
+        Date clonedDate = clonedValue.getTime();
+        return clonedDate.compareTo(parse);
+    }
+
+    /**
+     * Tries to compare the userValue using the locale, parsing only the date.
+     * @param locale the locale to use for parsing the date String.
+     * @param userValue the String to compare.
+     * @return 0 if userValue is equal, -1 if value less than userValue, 1 if larger.
+     * @throws ParseException if userValue can't be parsed
+     */
+    private int compareAsLocalDate(Locale locale, String userValue) throws ParseException {
+        Calendar clonedValue = (Calendar)value.clone();
+        DateFormat dateInstance = DateFormat.getDateInstance(DateFormat.MEDIUM, locale);
+        Date parse = dateInstance.parse(userValue);
+        clonedValue.set(Calendar.HOUR_OF_DAY, 0);
+        clonedValue.set(Calendar.MINUTE, 0);
+        clonedValue.set(Calendar.SECOND, 0);
+        clonedValue.set(Calendar.MILLISECOND, 0);
+        return clonedValue.getTime().compareTo(parse);
+    }
+
+     /**
+     * Tries to compare the userValue using the locale, parsing the date and time.
+     * @param locale the locale to use for parsing the date String.
+     * @param userValue the String to compare.
+     * @return 0 if userValue is equal, -1 if value less than userValue, 1 if larger.
+     * @throws ParseException if userValue can't be parsed
+     */
+    private int compareAsLocalDateTime(Locale locale, String userValue) throws ParseException {
+        Calendar clonedValue = (Calendar)value.clone();
+        DateFormat dateInstance = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, locale);
+        Date parse = dateInstance.parse(userValue);
+        clonedValue.set(Calendar.MILLISECOND, 0);
+        return clonedValue.getTime().compareTo(parse);
     }
 
     /**

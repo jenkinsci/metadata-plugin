@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -97,5 +98,28 @@ public class NumberMetadataValueTest {
         assertEquals(name, metadataValue.getName());
         assertEquals(description, metadataValue.getDescription());
         assertEquals(value, metadataValue.getValue().longValue());
+    }
+
+    /**
+     * Tests that the compareTo method works as it should.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testCompare() throws Exception {
+        NumberMetadataValue number = new NumberMetadataValue("name", "description", 5, false);
+        NumberMetadataValue sameNumber = new NumberMetadataValue("name", "description", 5, false);
+        assertEquals(0, number.compareTo(sameNumber));
+        NumberMetadataValue lowerNumber = new NumberMetadataValue("name", "description", 4, false);
+        assertEquals(1, number.compareTo(lowerNumber));
+        NumberMetadataValue higherNumber = new NumberMetadataValue("name", "description", 6, false);
+        assertEquals(-1, number.compareTo(higherNumber));
+        NumberMetadataValue otherNameButSameNumber = new NumberMetadataValue("othername", "description", 5, false);
+        assertEquals(0, number.compareTo(otherNameButSameNumber));
+        String numberAsString = "5";
+        assertEquals(0, number.compareTo(numberAsString));
+        String lowerNumberAsString = "4";
+        assertEquals(1, number.compareTo(lowerNumberAsString));
+        String higherNumberAsString = "6";
+        assertEquals(-1, number.compareTo(higherNumberAsString));
     }
 }

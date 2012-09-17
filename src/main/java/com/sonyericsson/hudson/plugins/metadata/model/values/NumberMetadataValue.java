@@ -135,9 +135,20 @@ public class NumberMetadataValue extends AbstractMetadataValue {
     }
 
     @Override
-    public int compareTo(Object t) {
-        //implementation pending
-        return -1;
+    public int compareTo(Object userValue) {
+        if (userValue == null) {
+            return -1;
+        }
+        Long longValue = value;
+        if (userValue instanceof NumberMetadataValue) {
+            NumberMetadataValue metaDataUserValue = (NumberMetadataValue)userValue;
+            return longValue.compareTo(metaDataUserValue.getValue());
+        }
+        try {
+            return longValue.compareTo(Long.parseLong(userValue.toString()));
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     /**

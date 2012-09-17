@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +34,7 @@ import org.junit.runner.RunWith;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import com.sonyericsson.hudson.plugins.metadata.model.TimeDetails;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -119,4 +121,32 @@ public class DateMetadataValueTest {
         assertNotSame(originalCalendar, clonedCalendar);
     }
 
+
+    //CS IGNORE MagicNumber FOR NEXT 40 LINES. REASON: TestData
+    /**
+     * Tests that the compareTo method of DateMetadataValue works as it should.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testCompare() throws Exception {
+        TimeDetails details = new TimeDetails(05, 06, 07);
+        DateMetadataValue value = new DateMetadataValue("name", "description",
+                2012, 11, 11, details, false);
+        DateMetadataValue sameValue = value.clone();
+        assertEquals(0, value.compareTo(sameValue));
+        DateMetadataValue largerValue = new DateMetadataValue("name", "description",
+                2013, 10, 05, details, false);
+        assertEquals(-1, value.compareTo(largerValue));
+        DateMetadataValue smallerValue = new DateMetadataValue("name", "description",
+                2012, 10, 11, details, false);
+        assertEquals(1, value.compareTo(smallerValue));
+        String dateStringWithoutDetails = "2012-11-11";
+        assertEquals(0, value.compareTo(dateStringWithoutDetails));
+        String dateStringWithDetails = "2012-11-11-05:06:07";
+        assertEquals(0, value.compareTo(dateStringWithDetails));
+        String dateStringLargerThan = "2013-10-05-03:53:53";
+        assertEquals(-1, value.compareTo(dateStringLargerThan));
+        String dateStringLessThan = "2012-10-05-03:53:53";
+        assertEquals(1, value.compareTo(dateStringLessThan));
+    }
 }

@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -137,6 +138,7 @@ public class DateMetadataDefinition extends AbstractMetadataDefinition {
             defaultCal.set(defaultYear, defaultMonth - DEFAULT_MONTH_ADJUSTMENT, defaultDay,
                     DEFAULT_TIME_DETAILS, DEFAULT_TIME_DETAILS, DEFAULT_TIME_DETAILS);
         }
+        defaultCal.set(Calendar.MILLISECOND, 0);
     }
 
     @Override
