@@ -30,11 +30,11 @@ import com.sonyericsson.hudson.plugins.metadata.search.antlr.QueryWalker;
 import com.sonyericsson.hudson.plugins.metadata.search.antlr.QueryParser;
 import com.sonyericsson.hudson.plugins.metadata.search.antlr.QueryLexer;
 
-import hudson.model.Project;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import hudson.model.TopLevelItem;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -62,25 +62,28 @@ public class MetadataQuerySearch {
      * Method will perform the search using
      * QueryWalker and returns the list of matched projects.
      * @param all List.
-     * @return ArrayList of matched projects.
+     * @return ArrayList of matched TopLevelItems.
      * @throws Exception exception.
      */
-    public List<AbstractProject> searchQuery(List<Project> all) throws Exception {
-        List<AbstractProject> matchedProjects = new LinkedList<AbstractProject>();
-        Iterator<Project> projects = all.iterator();
-        while (projects.hasNext()) {
-            Project<?, ?> project = projects.next();
-            MetadataJobProperty property = (MetadataJobProperty)project.getProperty(MetadataJobProperty.class);
-            if (property != null) {
-                CommonTreeNodeStream nodes = new CommonTreeNodeStream(queryTree);
-                QueryWalker walker = new QueryWalker(nodes);
-                boolean matchStatus = walker.evaluate(property);
-                if (matchStatus) {
-                    matchedProjects.add(project);
+    public List<TopLevelItem> searchQuery(List<TopLevelItem> all) throws Exception {
+        List<TopLevelItem> matchedItems = new LinkedList<TopLevelItem>();
+        Iterator<TopLevelItem> itemIterator = all.iterator();
+        while (itemIterator.hasNext()) {
+            TopLevelItem item = itemIterator.next();
+            if (item instanceof AbstractProject) {
+                MetadataJobProperty property =
+                        (MetadataJobProperty)((AbstractProject)item).getProperty(MetadataJobProperty.class);
+                if (property != null) {
+                    CommonTreeNodeStream nodes = new CommonTreeNodeStream(queryTree);
+                    QueryWalker walker = new QueryWalker(nodes);
+                    boolean matchStatus = walker.evaluate(property);
+                    if (matchStatus) {
+                        matchedItems.add(item);
+                    }
                 }
             }
         }
-        return matchedProjects;
+        return matchedItems;
     }
 
     /**

@@ -111,7 +111,7 @@ public class MetadataSearchPage implements RootAction {
             throws Exception {
         MetadataQuerySearch metadataQuerySearch = MetadataQuerySearch.parseQuery(queryString);
         request.getSession(true).setAttribute("metadata.search.result",
-                metadataQuerySearch.searchQuery(Hudson.getInstance().getProjects()));
+                metadataQuerySearch.searchQuery(Hudson.getInstance().getItems()));
         request.getSession(true).setAttribute("metadata.search.queryString", queryString);
         response.sendRedirect2(".");
     }

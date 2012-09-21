@@ -48,7 +48,7 @@
                     <f:form method="post" action="searchMetadata" name="theSearch">
                         <f:section title="${%Search}">
                             <f:entry title="${%Query String}"
-                                     help=""> <!-- help will add later -->
+                                     help="/plugin/metadata/help/search/searchquery.html">
                                 <f:textbox name="metadata.search.queryString"
                                            value="${request.session.getAttribute('metadata.search.queryString')}"
                                            default="${request.session.getAttribute('metadata.search.queryString')}">
