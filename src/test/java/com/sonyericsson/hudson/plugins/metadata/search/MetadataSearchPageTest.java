@@ -23,58 +23,34 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.search;
 
-import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlTable;
 import com.sonyericsson.hudson.plugins.metadata.TestACL;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataJobProperty;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetadataValue;
 import hudson.model.FreeStyleProject;
-import hudson.model.Hudson;
-import hudson.model.ListView;
-import hudson.model.TopLevelItem;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 import org.jvnet.hudson.test.HudsonTestCase;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Tests for the filter.
+ * Tests for {@link MetadataSearchPage}.
  *
- * @author Tomas Westling&lt;tomas.westling@sonymobile.com&gt;
+ * @author Robert Sandell &lt;robert.sandell@sonymobile.com&gt;
  */
-public class MetadataViewJobFilterTest extends HudsonTestCase {
-    /**
-     * Tests that the Filter can properly filter out the correct projects.
-     *
-     * @throws IOException if so.
-     */
-    public void testFilter() throws IOException {
-        FreeStyleProject project = createFreeStyleProject();
-        FreeStyleProject project2 = createFreeStyleProject();
-        List<MetadataValue> list = new LinkedList<MetadataValue>();
-        StringMetadataValue value = new StringMetadataValue("name", "description", "value");
-        list.add(value);
-        MetadataJobProperty property = new MetadataJobProperty(list);
-        project.addProperty(property);
-        MetadataViewJobFilter filter = new MetadataViewJobFilter("name=value");
-        List<TopLevelItem> items = Hudson.getInstance().getItems();
-        List<TopLevelItem> filter1 = filter.filter(null, items, Hudson.getInstance().getPrimaryView());
-        assertEquals(2, items.size());
-        assertEquals(1, filter1.size());
-    }
+public class MetadataSearchPageTest extends HudsonTestCase {
 
     /**
-     * Tests that the Filter can properly filter out the correct projects. Were one project is not readable by the
-     * current user. This should work by default in a view; Jenkins seems to filter based on ACL before sending it to
-     * the filter.
+     * Tests a search with ACL settings.
      *
      * @throws Exception if so.
      */
-    public void testFilterACL() throws Exception {
+    public void testSearchACL() throws Exception {
         FreeStyleProject project = createFreeStyleProject("open");
         FreeStyleProject project2 = createFreeStyleProject("secure");
         List<MetadataValue> list = new LinkedList<MetadataValue>();
@@ -87,32 +63,33 @@ public class MetadataViewJobFilterTest extends HudsonTestCase {
         list.add(value);
         project2.addProperty(new MetadataJobProperty(list));
 
-        MetadataViewJobFilter filter = new MetadataViewJobFilter("name=value");
-
-        ListView view = new ListView("Test", hudson);
-        view.getJobFilters().add(filter);
-        hudson.addView(view);
-
+        //First search without ACL
         WebClient web = createWebClient();
-        Page page = web.goTo("/view/Test/api/json", "application/javascript");
-        JSONObject json = (JSONObject)JSONSerializer.toJSON(page.getWebResponse().getContentAsString());
-        //Just to test that we can find both in an open installation.
-        assertTrue(json.has("jobs"));
-        JSONArray jobs = (JSONArray)json.get("jobs");
-        assertEquals(2, jobs.size());
+        doTestSearch(web, "name=value", 2);
 
-        //Lets secure Jenkins
+        //Setup ACL
         hudson.setSecurityRealm(createDummySecurityRealm());
         hudson.setAuthorizationStrategy(new TestACL());
 
+        //Do the test with ACL
         web = createWebClient();
         web = web.login("testuser");
+        doTestSearch(web, "name=value", 1);
+    }
 
-        page = web.goTo("/view/Test/api/json", "application/javascript");
-        json = (JSONObject)JSONSerializer.toJSON(page.getWebResponse().getContentAsString());
-        //Does it still applies to secured projects?
-        assertTrue(json.has("jobs"));
-        jobs = (JSONArray)json.get("jobs");
-        assertEquals(1, jobs.size());
+    /**
+     * Opens the search page and performs a search.
+     *
+     * @param web           the client to connect with.
+     * @param searchString  the search expression
+     * @param expectedCount the expected number of jobs to be displayed.
+     * @throws IOException  if so.
+     * @throws SAXException if so.
+     */
+    private void doTestSearch(WebClient web, String searchString, int expectedCount) throws IOException, SAXException {
+        HtmlPage htmlPage = web.goTo("/metadata-search/searchMetadata?metadata.search.queryString=" + searchString);
+        HtmlElement documentElement = htmlPage.getDocumentElement();
+        HtmlTable element = (HtmlTable)documentElement.getElementById("projectstatus");
+        assertEquals(expectedCount + 1, element.getRowCount()); //One extra for the table header.
     }
 }
