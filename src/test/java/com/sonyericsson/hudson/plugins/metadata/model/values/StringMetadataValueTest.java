@@ -27,6 +27,7 @@ package com.sonyericsson.hudson.plugins.metadata.model.values;
 import com.sonyericsson.hudson.plugins.metadata.MockUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
+import com.sonyericsson.hudson.plugins.metadata.util.ExtensionUtils;
 import hudson.model.Hudson;
 import net.sf.json.JSONObject;
 import org.junit.Test;
@@ -48,7 +49,7 @@ import static org.mockito.Mockito.mock;
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Hudson.class)
+@PrepareForTest({Hudson.class, ExtensionUtils.class })
 public class StringMetadataValueTest {
 
     /**

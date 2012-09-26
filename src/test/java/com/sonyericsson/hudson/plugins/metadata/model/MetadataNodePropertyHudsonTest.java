@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -58,15 +59,5 @@ public class MetadataNodePropertyHudsonTest extends HudsonTestCase {
         Metadata value = TreeStructureUtil.getPath(property, "some", "kind", "of", "path");
         assertNotNull(value);
         assertEquals("test", value.getValue());
-    }
-
-    /**
-     * Submits the configuration page for a Node.
-     *
-     * @param node the node
-     * @throws Exception if so.
-     */
-    private void configRoundtrip(Node node) throws Exception {
-        submit(createWebClient().goTo("computer/" + node.getNodeName() + "/configure").getFormByName("config"));
     }
 }

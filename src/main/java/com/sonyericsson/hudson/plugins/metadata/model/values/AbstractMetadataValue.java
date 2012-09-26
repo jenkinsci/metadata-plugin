@@ -29,16 +29,16 @@ import com.sonyericsson.hudson.plugins.metadata.Constants;
 import com.sonyericsson.hudson.plugins.metadata.model.JsonUtils;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
+import com.sonyericsson.hudson.plugins.metadata.util.ExtensionUtils;
 import hudson.EnvVars;
-import hudson.ExtensionList;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
-import hudson.model.Hudson;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * A metadata value to be set in a job or node.
@@ -299,8 +299,7 @@ public abstract class AbstractMetadataValue implements
          * @return the Descriptor or null if non is found.
          */
         public static AbstractMetaDataValueDescriptor findForJsonType(String type) {
-            ExtensionList<AbstractMetaDataValueDescriptor> extensionList =
-                    Hudson.getInstance().getExtensionList(AbstractMetadataValue.AbstractMetaDataValueDescriptor.class);
+            List<AbstractMetaDataValueDescriptor> extensionList = ExtensionUtils.getMetadataValueDescriptors();
             for (AbstractMetadataValue.AbstractMetaDataValueDescriptor d : extensionList) {
                 if (d.getJsonType().equals(type)) {
                     return d;

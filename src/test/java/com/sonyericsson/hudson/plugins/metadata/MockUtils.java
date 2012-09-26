@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -28,10 +29,13 @@ import com.sonyericsson.hudson.plugins.metadata.model.values.DateMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.NumberMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue;
-import hudson.ExtensionList;
+import com.sonyericsson.hudson.plugins.metadata.util.ExtensionUtils;
 import hudson.init.InitMilestone;
 import hudson.model.Hudson;
 import org.powermock.api.mockito.PowerMockito;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.mockito.Mockito.when;
 
@@ -65,7 +69,7 @@ public final class MockUtils {
      * @param list   the list of all descriptors - used by {@link #mockMetadataValueDescriptors(hudson.model.Hudson)}
      */
     public static void mockTreeNodeMetadataValueDescriptor(Hudson hudson,
-                           ExtensionList<AbstractMetadataValue.AbstractMetaDataValueDescriptor> list) {
+                           List<AbstractMetadataValue.AbstractMetaDataValueDescriptor> list) {
         TreeNodeMetadataValue.TreeNodeMetaDataValueDescriptor descriptor =
                 new TreeNodeMetadataValue.TreeNodeMetaDataValueDescriptor();
         when(hudson.getDescriptorByType(TreeNodeMetadataValue.TreeNodeMetaDataValueDescriptor.class)).
@@ -95,7 +99,7 @@ public final class MockUtils {
      * @param list   the list of all descriptors - used by {@link #mockMetadataValueDescriptors(hudson.model.Hudson)}
      */
     public static void mockStringMetadataValueDescriptor(Hudson hudson,
-                           ExtensionList<AbstractMetadataValue.AbstractMetaDataValueDescriptor> list) {
+                           List<AbstractMetadataValue.AbstractMetaDataValueDescriptor> list) {
         StringMetadataValue.StringMetaDataValueDescriptor stringDescriptor =
                 new StringMetadataValue.StringMetaDataValueDescriptor();
         when(hudson.getDescriptorByType(StringMetadataValue.StringMetaDataValueDescriptor.class)).
@@ -125,7 +129,7 @@ public final class MockUtils {
      * @param list   the list of all descriptors - used by {@link #mockMetadataValueDescriptors(hudson.model.Hudson)}
      */
     public static void mockDateMetadataValueDescriptor(Hudson hudson,
-                           ExtensionList<AbstractMetadataValue.AbstractMetaDataValueDescriptor> list) {
+                           List<AbstractMetadataValue.AbstractMetaDataValueDescriptor> list) {
         DateMetadataValue.DateMetaDataValueDescriptor descriptor =
                 new DateMetadataValue.DateMetaDataValueDescriptor();
         when(hudson.getDescriptorByType(DateMetadataValue.DateMetaDataValueDescriptor.class)).
@@ -155,7 +159,7 @@ public final class MockUtils {
      * @param list   the list of all descriptors - used by {@link #mockMetadataValueDescriptors(hudson.model.Hudson)}
      */
     public static void mockNumberMetadataValueDescriptor(Hudson hudson,
-                           ExtensionList<AbstractMetadataValue.AbstractMetaDataValueDescriptor> list) {
+                           List<AbstractMetadataValue.AbstractMetaDataValueDescriptor> list) {
         NumberMetadataValue.NumberMetaDataValueDescriptor descriptor =
                 new NumberMetadataValue.NumberMetaDataValueDescriptor();
         when(hudson.getDescriptorByType(NumberMetadataValue.NumberMetaDataValueDescriptor.class)).
@@ -173,17 +177,17 @@ public final class MockUtils {
      * @see #mockDateMetadataValueDescriptor(hudson.model.Hudson)
      * @see #mockNumberMetadataValueDescriptor(hudson.model.Hudson)
      * @see #mockStringMetadataValueDescriptor(hudson.model.Hudson)
-     * @see #mockTreeNodeMetadataValueDescriptor(hudson.model.Hudson, hudson.ExtensionList)
+     * @see #mockTreeNodeMetadataValueDescriptor(hudson.model.Hudson, List)
      */
     public static void mockMetadataValueDescriptors(Hudson hudson) {
-        ExtensionList<AbstractMetadataValue.AbstractMetaDataValueDescriptor> list =
-                ExtensionList.create(hudson, AbstractMetadataValue.AbstractMetaDataValueDescriptor.class);
+        List<AbstractMetadataValue.AbstractMetaDataValueDescriptor> list =
+                new LinkedList<AbstractMetadataValue.AbstractMetaDataValueDescriptor>();
         mockTreeNodeMetadataValueDescriptor(hudson, list);
         mockStringMetadataValueDescriptor(hudson, list);
         mockDateMetadataValueDescriptor(hudson, list);
         mockNumberMetadataValueDescriptor(hudson, list);
-
-        when(hudson.getExtensionList(AbstractMetadataValue.AbstractMetaDataValueDescriptor.class)).thenReturn(list);
+        PowerMockito.mockStatic(ExtensionUtils.class);
+        PowerMockito.when(ExtensionUtils.getMetadataValueDescriptors()).thenReturn(list);
     }
 
     /**

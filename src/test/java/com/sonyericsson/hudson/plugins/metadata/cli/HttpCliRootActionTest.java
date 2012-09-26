@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +31,7 @@ import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
+import com.sonyericsson.hudson.plugins.metadata.util.ExtensionUtils;
 import hudson.model.Hudson;
 import hudson.model.Queue;
 import hudson.security.ACL;
@@ -70,7 +72,7 @@ import static org.mockito.Mockito.when;
  * @author Robert Sandell &lt;robert.sandell@sonyericsson.com&gt;
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CliUtils.class, Hudson.class, ACL.class, Queue.class })
+@PrepareForTest({CliUtils.class, Hudson.class, ACL.class, Queue.class, ExtensionUtils.class })
 public class HttpCliRootActionTest {
 
     private MetadataContainer<MetadataValue> container;
