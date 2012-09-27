@@ -254,14 +254,26 @@ public class TreeNodeMetadataValue extends AbstractMetadataValue implements Meta
 
     @Override
     public boolean equals(Object obj) {
-        //implementation pending
         if (obj == null) {
             return false;
         }
         if (getClass() != obj.getClass()) {
             return false;
         }
-       return true;
+        final TreeNodeMetadataValue other = (TreeNodeMetadataValue)obj;
+        Collection<MetadataValue> otherChildren = other.getChildren();
+        if (children.size() != otherChildren.size()) {
+            return false;
+        }
+        for (MetadataValue child : getChildren()) {
+            MetadataValue otherChild = other.getChild(child.getName());
+            if (otherChild == null) {
+                return false;
+            } else if (!child.equals(otherChild)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

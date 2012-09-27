@@ -49,6 +49,9 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.fail;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 
 
@@ -218,5 +221,42 @@ public class TreeNodeMetadataValueTest {
         assertEquals(originalStringValue.getValue(), clonedStringValue.getValue());
         assertSame(originalStringValue.getParent(), originalTreeValue);
         assertSame(clonedStringValue.getParent(), clonedTreeValue);
+    }
+
+    /**
+     * Tests that the equals method works in the intended way.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testEquals() throws Exception {
+        TreeNodeMetadataValue first = new TreeNodeMetadataValue("TreeOne", "");
+        TreeStructureUtil.addValue(first, "subvalue", "subdescription", "subtree", "subname");
+
+        TreeNodeMetadataValue clone = first.clone();
+        assertThat(first, equalTo(clone));
+
+        StringMetadataValue stringMetadataValue = new StringMetadataValue("thatname", "thisdescription", "thevalue");
+        first.addChild(stringMetadataValue);
+        clone.addChild(stringMetadataValue);
+        assertThat(first, equalTo(clone));
+
+        clone.addChild(new StringMetadataValue("othername", "otherdescr", "othervalue"));
+        assertThat(first, not(clone));
+
+        first.addChild(new StringMetadataValue("yetanothername", "anddescription", "evenvalue"));
+        assertThat(first, not(clone));
+    }
+
+    /**
+     * Tests that the equals method works in the intended way.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testEqualsSameNameDifferentValue() throws Exception {
+        TreeNodeMetadataValue first = new TreeNodeMetadataValue("TreeOne", "");
+        TreeNodeMetadataValue clone = first.clone();
+        first.addChild(new StringMetadataValue("somename", "somedescr", "somevalue"));
+        clone.addChild(new NumberMetadataValue("somename", "somedescr", 0));
+        assertThat(first, not(clone));
     }
 }
