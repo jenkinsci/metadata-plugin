@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +32,9 @@ import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.XmlFile;
+import hudson.matrix.Combination;
+import hudson.matrix.MatrixConfiguration;
+import hudson.matrix.MatrixProject;
 import hudson.model.AbstractProject;
 import hudson.model.Saveable;
 import hudson.model.User;
@@ -41,8 +45,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -88,6 +94,7 @@ public class JobContributorsController extends SaveableListener {
 
     /**
      * Set by the thread to indicate what project is currently being handled.
+     *
      * @param project the project.
      */
     synchronized void setCurrentProject(AbstractProject project) {
@@ -96,6 +103,7 @@ public class JobContributorsController extends SaveableListener {
 
     /**
      * If the provided project is the current project being handled by the thread.
+     *
      * @param project the project to check.
      * @return true if so.
      */
@@ -134,33 +142,40 @@ public class JobContributorsController extends SaveableListener {
             try {
                 /*TODO investigate why there is a concurrency issue.
                                         It seems like the project is serialized while this is called or something else.
-                            */
+                */
                 Thread.sleep(SECOND);
             } catch (InterruptedException e) {
                 logger.finest("interrupted");
             }
-            MetadataJobProperty property = (MetadataJobProperty)project.getProperty(MetadataJobProperty.class);
+            MetadataJobProperty property = getOrCreateProperty();
             if (property == null) {
-                property = new MetadataJobProperty();
-                try {
-                    project.addProperty(property);
-                } catch (IOException e) {
-                    logger.severe("Failed to add the MetadataJobProperty to the project " + project);
-                    return;
-                }
+                return;
             }
 
             cleanGeneratedValues(property);
 
-            //TODO add a translatable description
             TreeNodeMetadataValue[] tree = TreeStructureUtil.createTreePath("", "job-info", "last-saved");
             TreeNodeMetadataValue jobInfo = tree[0];
             TreeNodeMetadataValue lastSaved = tree[1];
             TreeStructureUtil.addValue(lastSaved, new Date(), "", false, "time");
             TreeStructureUtil.addValue(lastSaved, currentUser.getDisplayName(), "", "user", "display-name");
             TreeStructureUtil.addValue(lastSaved, currentUser.getFullName(), "", "user", "full-name");
-            //TODO lower the level
-            logger.info("Adding standard generated metadata");
+            if (project instanceof MatrixConfiguration) {
+                logger.log(Level.FINER, "Adding matrix combination data for {0}", project);
+                MatrixConfiguration configuration = (MatrixConfiguration)project;
+                TreeNodeMetadataValue[] path = TreeStructureUtil.createTreePath("", "matrix", "combination");
+                TreeNodeMetadataValue matrixNode = path[0];
+                TreeNodeMetadataValue combinationNode = path[1];
+                Combination combination = configuration.getCombination();
+                //ToString version of the combination in job-info.matrix.combination.value
+                TreeStructureUtil.addValue(combinationNode, combination.toString(',', ':'), "", "value");
+                //Each axis in job-info.matrix.combination.[name]=[value]
+                for (Map.Entry<String, String> axis : combination.entrySet()) {
+                    TreeStructureUtil.addValue(combinationNode, axis.getValue(), "", "axis", axis.getKey());
+                }
+                jobInfo.addChild(matrixNode);
+            }
+            logger.finer("Adding standard generated metadata");
             property.addChild(jobInfo);
 
             ExtensionList<JobMetadataContributor> contributors = JobMetadataContributor.all();
@@ -180,14 +195,76 @@ public class JobContributorsController extends SaveableListener {
             } catch (IOException e) {
                 logger.severe("Failed to save the project: " + project);
             } finally {
+                if (project instanceof MatrixProject) {
+                    MatrixProject matrix = (MatrixProject)project;
+                    for (MatrixConfiguration mc : matrix.getActiveConfigurations()) {
+                        try {
+                            mc.save();
+                        } catch (IOException e) {
+                            logger.log(Level.SEVERE, "Failed to save MatrixConfiguration " + mc, e);
+                        }
+                    }
+                }
                 controller.setCurrentProject(null);
             }
+
         }
 
         /**
-         * Removes all generated values from the property so that it can be refilled.
-         * This method is recursive. It also has the assumption that
-         * {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#getChildren()}
+         * Finds the metadata property for the current project. If none is found a new gets created.
+         *
+         * @return the property for the current project.
+         */
+        private MetadataJobProperty getOrCreateProperty() {
+            MetadataJobProperty property = (MetadataJobProperty)project.getProperty(MetadataJobProperty.class);
+            if (property == null) {
+                if (project.getParent() instanceof AbstractProject) {
+                    property = createPropertyFromParent((AbstractProject)project.getParent());
+                } else {
+                    property = new MetadataJobProperty();
+                }
+                try {
+                    project.addProperty(property);
+                } catch (IOException e) {
+                    logger.log(Level.SEVERE, "Failed to add the MetadataJobProperty to the project " + project, e);
+                    return null;
+                }
+            } else if (project.getParent() instanceof AbstractProject) {
+                try {
+                    project.removeProperty(MetadataJobProperty.class);
+                    property = createPropertyFromParent((AbstractProject)project.getParent());
+                    project.addProperty(property);
+                } catch (IOException e) {
+                    logger.log(Level.SEVERE, "Failed to replace the MetadataJobProperty to the project " + project, e);
+                    return null;
+                }
+            }
+            return property;
+        }
+
+        /**
+         * Creates a new metadata property based on the parent of the one that should have it now.
+         *
+         * @param parent the parent containing metadata to inherit.
+         * @return the property filled with goodies.
+         */
+        private MetadataJobProperty createPropertyFromParent(AbstractProject parent) {
+            MetadataJobProperty property = new MetadataJobProperty();
+            MetadataJobProperty parentProps = (MetadataJobProperty)parent.getProperty(MetadataJobProperty.class);
+            if (parentProps != null) {
+                if (logger.isLoggable(Level.FINER)) {
+                    logger.log(Level.FINER, "Parent is a project with metadata, copy all user values"
+                            + " from [{0}] to [{1}]",
+                            new Object[]{project.getParent(), project});
+                }
+                property.addChildren(parentProps.getUserValues());
+            }
+            return property;
+        }
+
+        /**
+         * Removes all generated values from the property so that it can be refilled. This method is recursive. It also
+         * has the assumption that {@link com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#getChildren()}
          * returns a direct reference to the internal collection of children and not a clone.
          *
          * @param parent the parent to clean.
