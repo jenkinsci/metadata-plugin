@@ -34,6 +34,7 @@ import net.sf.json.JSON;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,34 +54,98 @@ public final class ParentUtil {
     }
 
     /**
+     * Removes a child from a parent.
+     *
+     * @param parent the parent.
+     * @param child the child to remove.
+     */
+    public static void removeChild(MetadataParent parent, Metadata child) {
+        if (child == null) {
+            throw new IllegalArgumentException("The child value is null");
+        }
+        Metadata metadata = parent.getChild(child.getName());
+        if (metadata != null) {
+            parent.getChildren().remove(metadata);
+            metadata.setParent(null);
+        }
+    }
+
+    /**
+     * Removes a child from a list of children.
+     *
+     * @param list the list.
+     * @param value the child to remove.
+     */
+    public static void removeChild(Collection<? extends Metadata> list, Metadata value) {
+        if (value == null) {
+            throw new IllegalArgumentException("The child value is null");
+        }
+        Metadata metadata = TreeStructureUtil.getLeaf(list, value.getFullPath());
+        if (metadata != null) {
+            list.remove(metadata);
+            metadata.setParent(null);
+        }
+    }
+
+    /**
+     * Removes all tree nodes without children from the parent.
+     *
+     * @param parent the parent to start with.
+     */
+    public static void removeEmptyBranches(MetadataParent parent) {
+        Collection<Metadata> children = parent.getChildren();
+        removeEmptyBranches(children);
+    }
+
+    /**
+     * Removes all tree nodes without children from the collection.
+     *
+     * @param collection the collection to remove empty trees from.
+     * @param <T> the Metadata type.
+     */
+    public static <T extends Metadata> void removeEmptyBranches(Collection<T> collection) {
+        Iterator<T> iterator = collection.iterator();
+        while (iterator.hasNext()) {
+            Metadata m = iterator.next();
+            if (m instanceof MetadataParent) {
+                removeEmptyBranches((MetadataParent)m);
+                if (((MetadataParent)m).getChildren().size() == 0) {
+                    m.setParent(null);
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+    /**
      * Replaces an existing value amongst the parent's children.
      *
      * @param parent the parent to add/replace the child to
-     * @param value  the value to replace
+     * @param value the value to replace
      */
     public static void replaceChild(MetadataParent<MetadataValue> parent, MetadataValue value) {
         if (value == null) {
             throw new IllegalArgumentException("The child value is null");
         }
-        MetadataValue my = parent.getChild(value.getName());
-        if (my != null) {
-            if (my instanceof MetadataParent && value instanceof MetadataParent) {
-                MetadataParent<MetadataValue> myParent = (MetadataParent<MetadataValue>)my;
+        MetadataValue metadata = parent.getChild(value.getName());
+        if (metadata != null) {
+            if (metadata instanceof MetadataParent && value instanceof MetadataParent) {
+                MetadataParent<MetadataValue> myParent = (MetadataParent<MetadataValue>)metadata;
                 MetadataParent<MetadataValue> valueParent = (MetadataParent<MetadataValue>)value;
                 if (myParent.requiresReplacement() || valueParent.requiresReplacement()) {
-                    parent.setChild(parent.indexOf(my.getName()), value);
+                    parent.setChild(parent.indexOf(metadata.getName()), value);
                     value.setParent(parent);
-                    value.replacementOf(my);
-                    my.setParent(null); //It should be prepared to be gc'ed
+                    value.replacementOf(metadata);
+                    metadata.setParent(null); //It should be prepared to be gc'ed
                 } else {
                     replaceChildren(myParent, new ArrayList<MetadataValue>(valueParent.getChildren()));
                 }
             } else {
                 //it exists! then it is time to replace it.
-                parent.setChild(parent.indexOf(my.getName()), value);
+                parent.setChild(parent.indexOf(metadata.getName()), value);
                 value.setParent(parent);
-                value.replacementOf(my);
-                my.setParent(null); //It should be prepared to be gc'ed
+                value.replacementOf(metadata);
+                metadata.setParent(null); //It should be prepared to be gc'ed
             }
         } else {
             //didn't exist lets just add it.
@@ -90,7 +155,7 @@ public final class ParentUtil {
     }
 
     /**
-     * Adds the children in the list to the parent, replacing any existing children already present.
+     * Adds the children in a list to a parent, replacing any existing children already present.
      *
      * @param parent   the parent to add to.
      * @param children the children to add/replace
@@ -102,7 +167,7 @@ public final class ParentUtil {
     }
 
     /**
-     * Adds the value as a child to the parent. Help utility for those who implement {@link
+     * Adds a value as a child to the parent. Help utility for those who implement {@link
      * com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#addChild(Metadata)}
      *
      * @param parent   the parent
@@ -112,7 +177,7 @@ public final class ParentUtil {
      * @return the value(s) that failed to be added.
      */
     public static <T extends Metadata> Collection<T> addChildValue(MetadataParent<T> parent,
-                                                                   List<T> children,
+                                                                   Collection<T> children,
                                                                    T value) {
 
         if (value == null) {
@@ -156,7 +221,7 @@ public final class ParentUtil {
     }
 
     /**
-     * Adds the values as a child to the parent. Help utility for those who implement {@link
+     * Adds the values as children to the parent. Help utility for those who implement {@link
      * com.sonyericsson.hudson.plugins.metadata.model.MetadataParent#
      * addChild(com.sonyericsson.hudson.plugins.metadata.model.Metadata)}
      *
@@ -167,7 +232,7 @@ public final class ParentUtil {
      * @return the values that failed to be added.
      */
     public static <T extends Metadata> Collection<T> addChildValues(MetadataParent parent,
-                                                                    List<T> children,
+                                                                    Collection<T> children,
                                                                     Collection<T> values) {
         List<T> leftovers = new LinkedList<T>();
         for (T value : values) {
@@ -233,6 +298,7 @@ public final class ParentUtil {
 
     /**
      * Gets the child names of the given parent.
+     *
      * @param parent the parent to get the child names from.
      * @return the child names.
      */

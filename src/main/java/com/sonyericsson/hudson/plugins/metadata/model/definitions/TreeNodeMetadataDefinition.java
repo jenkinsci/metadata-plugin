@@ -24,20 +24,20 @@
  */
 package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 
-import com.sonyericsson.hudson.plugins.metadata.Constants;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
+
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Hudson;
 import net.sf.json.JSON;
-import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.export.Exported;
+
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -65,6 +65,7 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
     @DataBoundConstructor
     public TreeNodeMetadataDefinition(String name, String description, List<MetadataDefinition> children) {
         super(name, description);
+        setChildren(children);
         this.children = children;
     }
 
@@ -97,7 +98,7 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
      */
     public TreeNodeMetadataDefinition(String name, List<MetadataDefinition> children) {
         super(name);
-        this.children = children;
+        setChildren(children);
     }
 
     @Override
@@ -113,6 +114,22 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
     @Override
     public synchronized MetadataDefinition setChild(int index, MetadataDefinition value) {
         return children.set(index, value);
+    }
+
+    /**
+     * Sets {@link #children} and sets their parent to this.
+     *
+     * @param children the children.
+     */
+    private synchronized void setChildren(List<MetadataDefinition> children) {
+        if (children != null) {
+            this.children = children;
+            for (MetadataDefinition child : this.children) {
+                child.setParent(this);
+            }
+        } else {
+            this.children = new LinkedList<MetadataDefinition>();
+        }
     }
 
     @Override
@@ -135,9 +152,10 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
 
     @Override
     public Collection<String> getChildNames() {
+        Collection<MetadataDefinition> childList = getChildren();
         List<String> list = new LinkedList<String>();
-        if (children != null) {
-            for (MetadataDefinition def : children) {
+        if (childList != null) {
+            for (MetadataDefinition def : childList) {
                 list.add(def.getName());
             }
         }
@@ -145,40 +163,13 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
     }
 
     @Override
-    public synchronized AbstractMetadataValue createValue(StaplerRequest req, JSONObject jo) {
-        TreeNodeMetadataValue value = req.bindJSON(TreeNodeMetadataValue.class, jo);
-        value.setDescription(getDescription());
-        return value;
-    }
-
-    @Override
-    public AbstractMetadataValue createValue(StaplerRequest req) {
-        return null;
-
-    }
-
-    /**
-     * This function will generate the full name.
-     *
-     * @return the full name.
-     */
-    @Exported
-    public synchronized String getFullName() {
-        MetadataParent parent = getParent();
-        if (parent != null) {
-            return parent.getFullName() + Constants.DISPLAY_NAME_SEPARATOR + getName();
+    public synchronized AbstractMetadataValue createValue(Object o) {
+        TreeNodeMetadataValue val = new TreeNodeMetadataValue(this.getName(), this.getDescription());
+        if (o instanceof MetadataValue) {
+            val.addChild((MetadataValue)o);
         }
-        return getName();
-    }
-
-    @Override
-    public String getFullNameFrom(MetadataParent<MetadataDefinition> base) {
-        MetadataParent parent = getParent();
-        if (parent == null || parent == base) {
-            return getName();
-        } else {
-            return parent.getFullNameFrom(base) + Constants.DISPLAY_NAME_SEPARATOR + getName();
-        }
+        val.setExposeToEnvironment(isExposedToEnvironment());
+        return val;
     }
 
     @Override
@@ -189,6 +180,11 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
     @Override
     public boolean requiresReplacement() {
         return false;
+    }
+
+    @Override
+    public synchronized Object getDefaultValue() {
+        return children;
     }
 
     /**

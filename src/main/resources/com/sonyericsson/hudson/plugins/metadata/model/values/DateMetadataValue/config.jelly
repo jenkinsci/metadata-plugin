@@ -2,6 +2,7 @@
   ~ The MIT License
   ~
   ~ Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+  ~ Copyright 2012 Sony Mobile Communications AB All rights reserved.
   ~
   ~ Permission is hereby granted, free of charge, to any person obtaining a copy
   ~ of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +22,8 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
-         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
     <f:block>
         <table cellpadding="0" cellspacing="2" border="0">
             <tr>

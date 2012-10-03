@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -490,6 +491,49 @@ public class ParentUtilTest {
         assertEquals("replace", TreeStructureUtil.getPath(startRoot, "child3", "child32").getValue());
         assertEquals("replace", TreeStructureUtil.getPath(startRoot, "child4", "child41").getValue());
         assertEquals("orig-replace", TreeStructureUtil.getPath(startRoot, "child5").getValue());
+    }
+
+    /**
+     * Tests
+     * {@link ParentUtil#removeChild(com.sonyericsson.hudson.plugins.metadata.model.MetadataParent,
+     * com.sonyericsson.hudson.plugins.metadata.model.Metadata)}
+     * and
+     * {@link ParentUtil#removeEmptyBranches(com.sonyericsson.hudson.plugins.metadata.model.MetadataParent)}.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testRemoveChildren() throws Exception {
+        TreeNodeMetadataValue[] startTree = TreeStructureUtil.createTreePath("", "root", "child1");
+
+        TreeNodeMetadataValue startRoot = startTree[0];
+        TreeStructureUtil.addValue(startRoot, "original", "", "child1", "child12");
+        TreeStructureUtil.addValue(startRoot, "original", "", "child1", "child13");
+        TreeStructureUtil.addValue(startRoot, "original", "", "child2");
+        TreeStructureUtil.prettyPrint(startRoot, " ");
+
+        MetadataValue val = TreeStructureUtil.getPath(startRoot, "child1", "child12");
+        MetadataValue val2 = TreeStructureUtil.getPath(startRoot, "child1", "child13");
+        TreeNodeMetadataValue tree = (TreeNodeMetadataValue)TreeStructureUtil.getPath(startRoot, "child1");
+        assertEquals(2, tree.getChildren().size());
+        ParentUtil.removeChild(tree, val);
+        ParentUtil.removeChild(tree, val2);
+        assertEquals(0, tree.getChildren().size());
+        ParentUtil.removeEmptyBranches(startRoot);
+        assertEquals(1, startRoot.getChildren().size());
+    }
+    /**
+     * Tests
+     * {@link ParentUtil#removeChild(java.util.Collection, com.sonyericsson.hudson.plugins.metadata.model.Metadata)}.
+     * @throws Exception if so.
+     */
+    @Test
+    public void testRemoveChildrenFromCollection() throws Exception {
+        List<MetadataValue> list = new LinkedList<MetadataValue>();
+        StringMetadataValue stringMetadataValue = new StringMetadataValue("test", "description", "myvalue");
+        list.add(stringMetadataValue);
+        assertEquals(1, list.size());
+        ParentUtil.removeChild(list, stringMetadataValue);
+        assertEquals(0, list.size());
     }
 
 

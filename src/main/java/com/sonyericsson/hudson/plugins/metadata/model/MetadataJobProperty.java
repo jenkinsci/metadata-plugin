@@ -25,20 +25,24 @@
 package com.sonyericsson.hudson.plugins.metadata.model;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
-import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetadataDefinition;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.definitions.MetadataDefinition;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
+import com.sonyericsson.hudson.plugins.metadata.util.ExtensionUtils;
+import com.sonyericsson.hudson.plugins.metadata.model.values.TreeStructureUtil;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
+import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import hudson.security.ACL;
 import net.sf.json.JSON;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
@@ -66,6 +70,7 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
 
     private List<MetadataValue> values;
     private transient MetadataJobAction metadataJobAction;
+    private transient MetadataValueDefinitionHelper helper;
 
     /**
      * Standard DataBound Constructor.
@@ -103,12 +108,20 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
     }
 
     /**
+     * Setter for the values.
+     * @param values the values.
+     */
+    public synchronized void setValues(List<MetadataValue> values) {
+        this.values = values;
+    }
+
+    /**
      * All the non generated values. I.e. the values that the user has put in.
      *
      * @return all user values.
      */
     public synchronized List<MetadataValue> getUserValues() {
-        List<MetadataValue> allValues = getValues();
+        List<? extends MetadataValue> allValues = getValues();
         List<MetadataValue> userValues = new LinkedList<MetadataValue>();
         for (MetadataValue value : allValues) {
             if (!value.isGenerated()) {
@@ -173,13 +186,48 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
     }
 
     /**
-     * All registered meta data descriptors. To be used by a hetero-list.
+     * Returns the registered MetadataDefinitions as a flattened out Collection, with only leaves.
      *
      * @param request the current http request.
-     * @return a list.
+     * @param <T> the MetadataDefinition type.
+     * @return a list of MetadataDefinitions.
      */
-    public synchronized List<AbstractMetadataDefinition> getDefinitions(StaplerRequest request) {
-        return PluginImpl.getInstance().getDefinitions();
+    public synchronized <T extends MetadataDefinition> List<MetadataDefinition> getDefinitionsAsFlatList(
+            StaplerRequest request) {
+        //TODO fix the templating hell that is going on here
+        List<T> definitionsAsFlatList = new LinkedList<T>();
+        List<? extends MetadataDefinition> definitions = PluginImpl.getInstance().getDefinitions();
+        TreeStructureUtil.findLeaves((Collection<T>)definitions, definitionsAsFlatList);
+        return (List<MetadataDefinition>)definitionsAsFlatList;
+    }
+
+/**
+     * Returns the user set value for a definition if one is set, if not, returns the default value for the definition.
+     * @param definition the MetadataDefinition to find a value for.
+     * @return the value for the MetadataDefinition if one is set, otherwise the default.
+ **/
+    public Object getValueForDefinition(MetadataDefinition definition) {
+        if (helper == null) {
+            helper = new MetadataValueDefinitionHelper(getUserValues());
+        }
+        return helper.getValueForDefinition(definition);
+    }
+
+    /**
+     * Getter for the Values not coming from definitions.
+     * @return the values.
+     */
+    public Collection<MetadataValue> getNonDefinitionValues() {
+        return helper.getValues();
+    }
+
+    /**
+     * Initiates and returns a MetadataValueDefinitionHelper.
+     *
+     * @return a new MetadataValueDefinitionHelper.
+     */
+    public MetadataValueDefinitionHelper initiateHelper() {
+        return new MetadataValueDefinitionHelper(getUserValues());
     }
 
     @Override
@@ -236,6 +284,64 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
             return Messages.MetadataJobProperty_DisplayName();
         }
 
+        @Override
+        public JobProperty<?> newInstance(StaplerRequest req,
+                                          JSONObject formData) throws FormException {
+            MetadataJobProperty prop = new MetadataJobProperty();
+            List<MetadataValue> presetValues = new LinkedList<MetadataValue>();
+            List<? extends MetadataDefinition> definitions = PluginImpl.getInstance().getDefinitions();
+            if (formData.has("definitions")) {
+                JSONObject formDefinitions = formData.getJSONObject("definitions");
+                if (!formDefinitions.isNullObject()) {
+                    for (int i = 0; i < formDefinitions.size(); i++) {
+                        String name = (String)formDefinitions.names().get(i);
+                        MetadataDefinition foundDefinition = TreeStructureUtil.getLeaf(definitions, name.split("_"));
+                        if (foundDefinition != null) {
+                            MetadataValue value = foundDefinition.createValue(formDefinitions.get(name));
+                            presetValues.add(createAncestry(foundDefinition, value));
+                        }
+                    }
+                }
+            }
+            List<AbstractMetadataValue> metadataValues = Descriptor.newInstancesFromHeteroList(
+                    req, formData, "values", ExtensionUtils.getMetadataValueDescriptors());
+            List<MetadataValue> convertedList = new LinkedList<MetadataValue>();
+            for (AbstractMetadataValue value : metadataValues) {
+                convertedList.add(value);
+            }
+            /*
+            addChildren will prevent duplicates from existing in the resulting MetadataJobProperty.
+            The ordering of the two addChildren is important, if duplicates exist, the first call will have its
+            values preserved.
+            */
+            prop.addChildren(presetValues);
+            prop.addChildren(convertedList);
+            return prop;
+        }
+
+        /**
+         * Converts the tree above the given MetadataDefinition to MetadataValues. Adds the new values to
+         * the given MetadataValue, causing it to have the same tree as the definition, but converted to values.
+         *
+         * @param definition the given definition to create the ancestry from.
+         * @param value the value to add the ancestors to.
+         * @return the MetadataValue nearest to the top of the tree, i.e. the MetadataValue corresponding to
+         * a MetadataDefinition that has a parent which is either null or is not a Metadata.
+         */
+        private MetadataValue createAncestry(MetadataDefinition definition, MetadataValue value) {
+            MetadataParent<MetadataDefinition> parent = definition.getParent();
+            //if no parent exists or the parent is not a Metadata ( which should mean that it is some kind of property
+            //or action, then we have reached the top of the tree.
+            if (parent == null || (parent instanceof MetadataContainer)) {
+                return value;
+            }
+            //create the corresponding MetadataValue from the MetadataDefinition by calling createValue,
+            //then continue walking up the tree.
+            MetadataValue valueParent = ((MetadataDefinition)parent).createValue(value);
+            return createAncestry((MetadataDefinition)parent, valueParent);
+        }
+
+
         /**
          * All registered meta data descriptors that applies to jobs. To be used by a hetero-list.
          *
@@ -263,7 +369,7 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
          * @param project the job.
          * @return the property created or found.
          *
-         * @throws IOException if an error occurs when adding the property to the node.
+         * @throws IOException if an error occurs when adding the property to the job.
          */
         public static MetadataJobProperty instanceFor(AbstractProject project) throws IOException {
             MetadataJobProperty property = (MetadataJobProperty)project.getProperty(MetadataJobProperty.class);

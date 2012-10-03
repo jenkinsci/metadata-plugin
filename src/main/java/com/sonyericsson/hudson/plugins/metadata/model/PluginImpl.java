@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +26,7 @@ package com.sonyericsson.hudson.plugins.metadata.model;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetadataDefinition;
+import com.sonyericsson.hudson.plugins.metadata.model.definitions.MetadataDefinition;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.DateMetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.NumberMetadataValue;
@@ -80,7 +82,7 @@ public class PluginImpl extends Plugin {
             new Permission(PERMISSION_GROUP, "Configure", Messages._Permission_Configure_definitions(),
                     Hudson.ADMINISTER);
 
-    private List<AbstractMetadataDefinition> definitions = new LinkedList<AbstractMetadataDefinition>();
+    private List<? extends MetadataDefinition> definitions;
 
     @Override
     public void start() throws Exception {
@@ -121,7 +123,10 @@ public class PluginImpl extends Plugin {
      *
      * @return the list of AbstractMetaDataDefinitions
      */
-    public List<AbstractMetadataDefinition> getDefinitions() {
+    public List<? extends MetadataDefinition> getDefinitions() {
+        if (definitions == null) {
+            definitions = new LinkedList<MetadataDefinition>();
+        }
         return definitions;
     }
 

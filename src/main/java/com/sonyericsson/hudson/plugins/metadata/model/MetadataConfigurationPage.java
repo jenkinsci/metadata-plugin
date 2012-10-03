@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +26,7 @@ package com.sonyericsson.hudson.plugins.metadata.model;
 
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.AbstractMetadataDefinition;
+import com.sonyericsson.hudson.plugins.metadata.model.definitions.MetadataDefinition;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Descriptor;
@@ -125,7 +127,7 @@ public class MetadataConfigurationPage implements RootAction {
      *
      * @return the list.
      */
-    public List<AbstractMetadataDefinition> getDefinitions() {
+    public List<? extends MetadataDefinition> getDefinitions() {
         return PluginImpl.getInstance().getDefinitions();
     }
 

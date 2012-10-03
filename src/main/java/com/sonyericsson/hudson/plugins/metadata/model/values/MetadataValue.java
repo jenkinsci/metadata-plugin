@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +25,6 @@
 package com.sonyericsson.hudson.plugins.metadata.model.values;
 
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
-import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import hudson.EnvVars;
 import net.sf.json.JSONObject;
 
@@ -68,14 +68,6 @@ public interface MetadataValue extends Metadata<MetadataValue>, Cloneable, Compa
      * @param exposeAll whether all Metadata should be added to the map. Inherited from the parent.
      */
     void addEnvironmentVariables(EnvVars variables, boolean exposeAll);
-
-    /**
-     * Gives the full name from the given parent.
-     *
-     * @param base the parent to base the tree structure from.
-     * @return a dot separated path from the base up to this item.
-     */
-    String getFullNameFrom(MetadataParent<MetadataValue> base);
 
     /**
      * Clones this MetadataValue.

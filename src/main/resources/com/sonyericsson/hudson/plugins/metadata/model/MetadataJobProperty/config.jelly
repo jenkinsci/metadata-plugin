@@ -2,6 +2,7 @@
   ~ The MIT License
   ~
   ~ Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+  ~ Copyright 2012 Sony Mobile Communications AB. All rights reserved.
   ~
   ~ Permission is hereby granted, free of charge, to any person obtaining a copy
   ~ of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +22,22 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
-         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
     <f:section title="${%Meta Data}">
+        <j:set var="helper" value="${instance.initiateHelper()}"/>
         <f:entry title="${%Preset Values}">
-            <j:set var="property" value="${instance}"/>
-            <j:forEach var="definition" items="${instance.getDefinitions(request)}">
-                <st:include it="${definition}" page="representation.jelly"/>
-            </j:forEach>
+            <table name="definitions">
+                <j:set var="property" value="${instance}"/>
+                <j:forEach var="definition" items="${instance.getDefinitionsAsFlatList(request)}">
+                    <j:set var="value" value="${helper.getValueForDefinition(definition)}"/>
+                    <st:include it="${definition}" page="representation.jelly"/>
+                </j:forEach>
+            </table>
         </f:entry>
         <f:entry title="${%Values}">
-            <f:hetero-list descriptors="${descriptor.getValueDescriptors(request)}" items="${instance.userValues}"
-                           name="values" hasHeader="true"/>
+            <f:hetero-list descriptors="${descriptor.getValueDescriptors(request)}" items="${helper.getValues()}"
+                            name="values" hasHeader="true"/>
         </f:entry>
     </f:section>
 </j:jelly>

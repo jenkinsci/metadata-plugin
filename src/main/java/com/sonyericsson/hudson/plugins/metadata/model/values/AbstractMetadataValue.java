@@ -219,6 +219,11 @@ public abstract class AbstractMetadataValue implements
     }
 
     @Override
+    public String[] getFullPath() {
+        return getFullName().split("\\.");
+    }
+
+    @Override
     public void replacementOf(MetadataValue old) {
         //Nothing needs to be done as most types should be replaced directly.
     }

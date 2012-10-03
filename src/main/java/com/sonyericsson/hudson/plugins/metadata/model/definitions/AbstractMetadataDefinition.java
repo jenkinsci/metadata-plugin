@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,14 +27,10 @@ package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 import com.sonyericsson.hudson.plugins.metadata.Constants;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
-import hudson.AbortException;
 import hudson.DescriptorExtensionList;
-import hudson.cli.CLICommand;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
-import net.sf.json.JSONObject;
-import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
@@ -126,11 +123,16 @@ public abstract class AbstractMetadataDefinition implements
      * @param separator the separator to use.
      * @return the full name.
      */
+    @Override
     @Exported
     public String getFullName(String separator) {
-        MetadataParent myParent = getParent();
-        if (myParent != null) {
-            return myParent.getFullName(separator) + separator + getName();
+        MetadataParent<MetadataDefinition> myParent = getParent();
+        if (myParent == null) {
+            return getName();
+        }
+        String fullName = myParent.getFullName(separator);
+        if (fullName != null && !"".equals(fullName)) {
+            return fullName + separator + getName();
         }
         return getName();
     }
@@ -139,9 +141,33 @@ public abstract class AbstractMetadataDefinition implements
      * This function will generate the full name.
      * @return the full name.
      */
+    @Override
     @Exported
     public String getFullName() {
         return getFullName(Constants.DISPLAY_NAME_SEPARATOR);
+    }
+
+    @Override
+    public synchronized String getFullNameFrom(MetadataParent<MetadataDefinition> base) {
+        MetadataParent<MetadataDefinition> myParent = getParent();
+        if (myParent == base || myParent == null) {
+            return name;
+        }
+        String fullNameFrom = myParent.getFullNameFrom(base);
+        if (fullNameFrom != null && !"".equals(fullNameFrom)) {
+            return fullNameFrom + Constants.DISPLAY_NAME_SEPARATOR + getName();
+        }
+        return name;
+    }
+
+    @Override
+    public String[] getFullPath() {
+        String fullName = getFullName();
+        String[] split = fullName.split("\\.");
+        if (split.length == 0) {
+            split = new String[]{fullName};
+        }
+        return split;
     }
 
     /**
@@ -165,53 +191,13 @@ public abstract class AbstractMetadataDefinition implements
     }
 
     /**
-     * Create a metadata values from a form submission.
-     * <p/>
-     * <p/>
-     * This method is invoked when the user fills in the metadata values in the HTML form
-     * and submits it to the server.
+     * Creates an AbstractMetadataValue from this definition. Uses the input parameter Object
+     * to create the AbstractMetadataValue.
      *
-     * @param req the stapler request.
-     * @param jo the JSON object.
-     * @return the metadata values.
+     * @param o the value to use as input for creating the AbstractMetadataValue.
+     * @return the AbstractMetadataValue.
      */
-
-    public abstract AbstractMetadataValue createValue(StaplerRequest req, JSONObject jo);
-
-    /**
-     * Create a metadata values from a GET with query string.
-     * If no values is available in the request, it returns a default values if possible, or null.
-     * <p/>
-     * <p/>
-     * Unlike {@link #createValue(StaplerRequest, JSONObject)}, this method is intended to support
-     * the programmatic POST-ing of the build URL. This form is less expressive (as it doesn't support
-     * the tree form), but it's more scriptable.
-     * <p/>
-     * <p/>
-     * If a {@link AbstractMetadataDefinition} can't really support this mode of creating a values,
-     * you may just always return null.
-     *
-     * @param req the stapler request.
-     * @return the metadata values.
-     */
-
-    public abstract AbstractMetadataValue createValue(StaplerRequest req);
-
-    /**
-     * Create a metadata values from the string given in the CLI.
-     *
-     * @param command This is the command that got the parameter. You can use its {@link CLICommand#channel}
-     *                for interacting with the CLI JVM.
-     * @param value   the values passed in the CLI command
-     * @return the metadata values.
-     * @throws AbortException If the CLI processing should be aborted. Hudson will report the error message
-     *                        without stack trace, and then exits this command. Useful for graceful termination.
-     */
-
-    public AbstractMetadataValue createValue(CLICommand command, String value) throws AbortException {
-        throw new AbortException("CLI parameter submission is not supported for the " + getClass()
-                + " type. Please file a bug report for this");
-    }
+    public abstract AbstractMetadataValue createValue(Object o);
 
     /**
      * Returns default metadata values for this definition.
@@ -219,12 +205,12 @@ public abstract class AbstractMetadataDefinition implements
      * @return default metadata values or null if no defaults are available
      */
     @Exported
-    public Object getDefaultValue() {
+    public synchronized Object getDefaultValue() {
         return null;
     }
 
     @Override
-    public Object getValue() {
+    public synchronized Object getValue() {
         return getDefaultValue();
     }
 

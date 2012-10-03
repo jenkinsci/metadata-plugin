@@ -257,12 +257,15 @@ public abstract class TreeStructureUtil {
     /**
      * Returns the node with the given path.
      *
-     * @param root the root to start from.
-     * @param path the path to get.
+     * @param root the root to start from when searching for the node with the given path.
+     * @param path the path for which a node should be returned.
      * @param <T>  The type of metadata.
      * @return the value or null if it wasn't found.
      */
     public static <T extends Metadata> T getPath(MetadataParent<T> root, String... path) {
+        if (path == null) {
+            return null;
+        }
         MetadataParent<T> parent = root;
         T currentValue = null;
         for (int i = 0; i < path.length; i++) {
@@ -282,10 +285,37 @@ public abstract class TreeStructureUtil {
     }
 
     /**
+     * Returns the node with the given path.
+     *
+     * @param collection a collection of nodes to use as root nodes when searching for the node with the given path.
+     * @param path the path for which a node should be returned.
+     * @param <T>  The type of metadata.
+     * @return the value or null if it wasn't found.
+     */
+    public static <T extends Metadata> T getPath(Collection<T> collection, String... path) {
+        if (path == null || path.length == 0) {
+            return null;
+        }
+        String name = path[0];
+        for (T metadata : collection) {
+            if (metadata.getName().equalsIgnoreCase(name)) {
+                if (path.length == 1) {
+                    return metadata;
+                }
+                if (metadata instanceof MetadataParent) {
+                    String[] subPath = Arrays.copyOfRange(path, 1, path.length);
+                    return getPath((MetadataParent<T>)metadata, subPath);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns the leaf with the given path.
      *
-     * @param root the root to start from.
-     * @param path the path to get.
+     * @param root the root to start from when searching for the leaf node with the given path.
+     * @param path the path for which a leaf node should be returned.
      * @param <T>  The type of metadata.
      * @return the leaf or null if it wasn't found or if the path doesn't represent a leaf.
      */
@@ -297,6 +327,43 @@ public abstract class TreeStructureUtil {
             return null;
         } else {
             return value;
+        }
+    }
+
+    /**
+     * Returns the leaf with the given path.
+     *
+     * @param collection the collection to start from.
+     * @param path the path for which a leaf node should be returned.
+     * @param <T>  The type of metadata.
+     * @return the leaf or null if it wasn't found or if the path doesn't represent a leaf.
+     */
+    public static <T extends Metadata> T getLeaf(Collection<T> collection, String... path) {
+        T value = getPath(collection, path);
+        if (value == null || value instanceof MetadataParent) {
+            return null;
+        }
+        return value;
+    }
+
+    /**
+     * Adds all the leaves in the collection to the newCollection.
+     *
+     * @param collection the Collection to find the leaves in.
+     * @param newCollection the result.
+     * @param <T> the type of Metadata.
+     */
+    public static <T extends Metadata> void findLeaves(Collection<T> collection, Collection<T> newCollection) {
+        if (collection == null || collection.isEmpty()) {
+            return;
+        }
+        for (Metadata def : collection) {
+            if (def instanceof MetadataParent) {
+                Collection children = ((MetadataParent)def).getChildren();
+                findLeaves(children, newCollection);
+            } else {
+                newCollection.add((T)def);
+            }
         }
     }
 
@@ -335,6 +402,7 @@ public abstract class TreeStructureUtil {
 
     /**
      * Find the first MetadataContainer that is an ancestor to the given Metadata.
+     *
      * @param metadata the Metadata to find a MetadataContainer for.
      * @return the first MetadataContainer ancestor.
      */

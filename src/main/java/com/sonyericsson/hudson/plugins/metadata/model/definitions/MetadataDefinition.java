@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +25,26 @@
 package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
+import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 
 /**
  * A metadata definition interface.
  */
-public interface MetadataDefinition extends Metadata {
+public interface MetadataDefinition extends Metadata<MetadataDefinition> {
+
+    /**
+     * Creates a MetadataValue from this definition. Uses the input parameter Object
+     * to create the MetadataValue.
+     *
+     * @param o the value to use as input for creating the MetadataValue.
+     * @return the MetadataValue.
+     */
+    MetadataValue createValue(Object o);
+
+    /**
+     * Generate the full name, using the chosen separator.
+     * @param separator the separator to use.
+     * @return the full name.
+     */
+    String getFullName(String separator);
 }

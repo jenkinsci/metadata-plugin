@@ -2,6 +2,7 @@
   ~ The MIT License
   ~
   ~ Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+  ~ Copyright 2012 Sony Mobile Communications AB. All rights reserved.
   ~
   ~ Permission is hereby granted, free of charge, to any person obtaining a copy
   ~ of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +23,7 @@
   ~ THE SOFTWARE.
   -->
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-         xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
-         xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+<j:jelly xmlns:j="jelly:core"  xmlns:f="/lib/form">
     <f:entry title="${%Name}">
         <f:textbox name="name" value="${instance.name}"
         checkUrl="'/MetadataChecks/checkName?value='+escape(this.value)"/>

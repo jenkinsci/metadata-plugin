@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -76,4 +77,26 @@ public interface Metadata<P extends Metadata> {
      * @param expose true if this should be exposed, false if not.
      */
     void setExposeToEnvironment(boolean expose);
+
+    /**
+     * Gives the full name.
+     *
+     * @return a dot separated path from the base up to this item.
+     */
+    String getFullName();
+
+    /**
+     * Gives the full name.
+     *
+     * @param base the parent to calculate the path from.
+     * @return a dot separated path from the base up to this item.
+     */
+    String getFullNameFrom(MetadataParent<P> base);
+
+    /**
+     * Gives the full path as a String array..
+     *
+     * @return the full name as a String array instead of a String.
+     */
+    String[] getFullPath();
 }

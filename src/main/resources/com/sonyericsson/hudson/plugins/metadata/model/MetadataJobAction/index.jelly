@@ -2,6 +2,7 @@
   ~ The MIT License
   ~
   ~ Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+  ~ Copyright 2012 Sony Mobile Communications AB. All rights reserved.
   ~
   ~ Permission is hereby granted, free of charge, to any person obtaining a copy
   ~ of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +33,7 @@
                         <td class="pane-header" width="25%">Name</td>
                         <td class="pane-header">Value</td>
                     </tr>
-                    <j:forEach var="child" items="${it.jobProperty.children}">
+                    <j:forEach var="child" items="${it.jobProperty.getValues()}">
                         <st:include it="${child}" page="display.jelly" />
                     </j:forEach>
                 </table>

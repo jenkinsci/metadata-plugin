@@ -27,11 +27,8 @@ package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.TimeDetails;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
-import com.sonyericsson.hudson.plugins.metadata.model.values.DateMetadataValue;
 import hudson.Extension;
-import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -142,20 +139,13 @@ public class DateMetadataDefinition extends AbstractMetadataDefinition {
     }
 
     @Override
-    public Date getDefaultValue() {
+    public synchronized Date getDefaultValue() {
         return defaultCal.getTime();
     }
 
-    //TODO as with the other definitions, creating values isn't tested yet. Add support for this.
+    //TODO Add support for creating values.
     @Override
-    public AbstractMetadataValue createValue(StaplerRequest req, JSONObject jo) {
-        DateMetadataValue value = req.bindJSON(DateMetadataValue.class, jo);
-        value.setDescription(getDescription());
-        return value;
-    }
-
-    @Override
-    public AbstractMetadataValue createValue(StaplerRequest req) {
+    public AbstractMetadataValue createValue(Object o) {
         return null;
     }
 
