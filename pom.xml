@@ -15,6 +15,7 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Metadata plugin</name>
+    <url>http://wiki.jenkins-ci.org/display/JENKINS/Metadata+Plugin</url>
 
     <licenses>
         <license>
