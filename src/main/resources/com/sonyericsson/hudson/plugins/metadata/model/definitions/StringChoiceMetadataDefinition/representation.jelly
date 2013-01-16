@@ -23,11 +23,11 @@
   -->
 
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
-    <f:entry title="${it.name}" description="${it.description}">
+    <f:entry title="${it.fullName}" description="${it.description}">
         <input type="hidden" name="name" value="${it.name}"/>
-        <select name="${it.fullName}">
+        <select name="${it.getFullName('_')}">
             <j:forEach var="choiceValue" items="${it.choices}">
-                <f:option selected="${choiceValue==value}">${choiceValue}</f:option>
+                <f:option selected="${choiceValue==value.getValue()}">${choiceValue}</f:option>
             </j:forEach>
         </select>
     </f:entry>

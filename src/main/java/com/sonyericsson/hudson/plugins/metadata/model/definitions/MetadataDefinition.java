@@ -26,6 +26,8 @@ package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 
 import com.sonyericsson.hudson.plugins.metadata.model.Metadata;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
+import hudson.model.Descriptor.FormException;
+
 
 /**
  * A metadata definition interface.
@@ -38,8 +40,9 @@ public interface MetadataDefinition extends Metadata<MetadataDefinition> {
      *
      * @param o the value to use as input for creating the MetadataValue.
      * @return the MetadataValue.
+     * @throws FormException if the definition has a faulty configuration, e.g. a String instead of a number.
      */
-    MetadataValue createValue(Object o);
+    MetadataValue createValue(Object o) throws FormException;
 
     /**
      * Generate the full name, using the chosen separator.

@@ -28,9 +28,11 @@ package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.values.NumberMetadataValue;
 import hudson.Extension;
+import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataChecks;
 
 /**
  * A metadata definition of the type Number..
@@ -66,10 +68,17 @@ public class NumberMetadataDefinition extends AbstractMetadataDefinition {
     }
 
     @Override
-    public NumberMetadataValue createValue(Object o) {
-        long value = defaultValue;
+    public NumberMetadataValue createValue(Object o) throws Descriptor.FormException {
+        MetadataChecks checks = new MetadataChecks();
+        long value;
         if (o instanceof String) {
+            FormValidation formValidation = checks.doCheckNumberValue((String)o);
+            if (!formValidation.equals(FormValidation.ok())) {
+                throw new Descriptor.FormException(formValidation.getMessage(), "");
+            }
             value = Long.parseLong((String)o);
+        } else {
+            throw new Descriptor.FormException("Wrong number format", "");
         }
         NumberMetadataValue metadataValue =
                 new NumberMetadataValue(getName(), getDescription(), value, isExposedToEnvironment());

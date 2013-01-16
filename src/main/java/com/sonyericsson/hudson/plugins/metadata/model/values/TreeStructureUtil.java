@@ -29,8 +29,8 @@ import com.sonyericsson.hudson.plugins.metadata.model.MetadataContainer;
 import com.sonyericsson.hudson.plugins.metadata.model.MetadataParent;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 
 /**
  * Utility methods for easier creation of tree structures of values.
@@ -87,14 +87,16 @@ public abstract class TreeStructureUtil {
      * @param root        the root to add the tree to.
      * @param value       the date value of the leaf node.
      * @param description the description of the leaf node.
+     * @param timeDetailsEnabled   true if the value has TimeDetails.
      * @param exposedToEnvironment if this value should be exposed to the build as an
      *                      environment variable.
      *  @param path        the path to the leaf from the root.
      * @return true if there was no merge conflicts.
      */
-    public static boolean addValue(MetadataParent root, Date value, String description,
+    public static boolean addValue(MetadataParent root, Calendar value, String description, boolean timeDetailsEnabled,
                                    boolean exposedToEnvironment, String... path) {
-        DateMetadataValue sVal = new DateMetadataValue(path[path.length - 1], description, value, exposedToEnvironment);
+        DateMetadataValue sVal = new DateMetadataValue(path[path.length - 1],
+                description, value, timeDetailsEnabled, exposedToEnvironment);
         sVal.setGenerated(true);
         return addValue(root, sVal, Arrays.copyOf(path, path.length - 1));
     }
@@ -168,14 +170,16 @@ public abstract class TreeStructureUtil {
      *
      * @param value       the value
      * @param description the description
+     * @param timeDetailsEnabled   true if TimeDetails should exist for the value.
      * @param exposedToEnvironment if this value should be exposed to the build as an
      *                   environment variable.
      * @param path        the full path to the leaf.
      * @return the tree.
      */
-    public static TreeNodeMetadataValue createPath(Date value, String description,
+    public static TreeNodeMetadataValue createPath(Calendar value, String description, boolean timeDetailsEnabled,
                                                    boolean exposedToEnvironment, String... path) {
-        DateMetadataValue val = new DateMetadataValue(path[path.length - 1], description, value, exposedToEnvironment);
+        DateMetadataValue val = new DateMetadataValue(path[path.length - 1], description, value,
+                timeDetailsEnabled, exposedToEnvironment);
         val.setGenerated(true);
         return createPath(val, Arrays.copyOf(path, path.length - 1));
     }

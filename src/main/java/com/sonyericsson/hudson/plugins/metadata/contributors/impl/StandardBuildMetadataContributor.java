@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2011 Sony Ericsson Mobile Communications. All rights reserved.
+ *  Copyright 2013 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +56,7 @@ public class StandardBuildMetadataContributor extends BuildMetadataContributor {
         mdv.setGenerated(true);
         TreeStructureUtil.addValue(buildNode, mdv, "duration");
         TreeStructureUtil.addValue(buildNode, build.getBuiltOnStr(), null, "builtOn");
-        TreeStructureUtil.addValue(buildNode, build.getTime(), null, false, "scheduled");
+        TreeStructureUtil.addValue(buildNode, build.getTimestamp(), null, true, false, "scheduled");
         List<MetadataValue> values = new LinkedList<MetadataValue>();
         values.add(buildNode);
         return values;

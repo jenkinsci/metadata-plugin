@@ -30,6 +30,7 @@ import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataVal
 import hudson.DescriptorExtensionList;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
+import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
@@ -196,8 +197,9 @@ public abstract class AbstractMetadataDefinition implements
      *
      * @param o the value to use as input for creating the AbstractMetadataValue.
      * @return the AbstractMetadataValue.
+     * @throws FormException if the definition has a faulty configuration, e.g. a String instead of a number.
      */
-    public abstract AbstractMetadataValue createValue(Object o);
+    public abstract AbstractMetadataValue createValue(Object o) throws FormException;
 
     /**
      * Returns default metadata values for this definition.

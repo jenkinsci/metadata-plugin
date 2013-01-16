@@ -56,12 +56,13 @@ public class MetadataSearchPageTest extends HudsonTestCase {
         List<MetadataValue> list = new LinkedList<MetadataValue>();
         StringMetadataValue value = new StringMetadataValue("name", "description", "value");
         list.add(value);
-        MetadataJobProperty property = new MetadataJobProperty(list);
-        project.addProperty(property);
+        MetadataJobProperty property = project.getProperty(MetadataJobProperty.class);
+        property.addChildren(list);
         list = new LinkedList<MetadataValue>();
         value = new StringMetadataValue("name", "description", "value");
         list.add(value);
-        project2.addProperty(new MetadataJobProperty(list));
+        MetadataJobProperty property2 = project2.getProperty(MetadataJobProperty.class);
+        property2.addChildren(list);
 
         //First search without ACL
         WebClient web = createWebClient();

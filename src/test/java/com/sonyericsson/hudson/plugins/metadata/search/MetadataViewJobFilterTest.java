@@ -58,8 +58,10 @@ public class MetadataViewJobFilterTest extends HudsonTestCase {
         List<MetadataValue> list = new LinkedList<MetadataValue>();
         StringMetadataValue value = new StringMetadataValue("name", "description", "value");
         list.add(value);
-        MetadataJobProperty property = new MetadataJobProperty(list);
-        project.addProperty(property);
+
+        MetadataJobProperty property = project.getProperty(MetadataJobProperty.class);
+        assertNotNull(property);
+        property.addChildren(list);
         MetadataViewJobFilter filter = new MetadataViewJobFilter("name=value");
         List<TopLevelItem> items = Hudson.getInstance().getItems();
         List<TopLevelItem> filter1 = filter.filter(null, items, Hudson.getInstance().getPrimaryView());
@@ -80,12 +82,13 @@ public class MetadataViewJobFilterTest extends HudsonTestCase {
         List<MetadataValue> list = new LinkedList<MetadataValue>();
         StringMetadataValue value = new StringMetadataValue("name", "description", "value");
         list.add(value);
-        MetadataJobProperty property = new MetadataJobProperty(list);
-        project.addProperty(property);
+        MetadataJobProperty property = project.getProperty(MetadataJobProperty.class);
+        property.addChildren(list);
         list = new LinkedList<MetadataValue>();
         value = new StringMetadataValue("name", "description", "value");
         list.add(value);
-        project2.addProperty(new MetadataJobProperty(list));
+        MetadataJobProperty property2 = project2.getProperty(MetadataJobProperty.class);
+        property2.addChildren(list);
 
         MetadataViewJobFilter filter = new MetadataViewJobFilter("name=value");
 

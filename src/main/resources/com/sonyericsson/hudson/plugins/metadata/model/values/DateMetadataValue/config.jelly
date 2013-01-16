@@ -27,7 +27,7 @@
     <f:block>
         <table cellpadding="0" cellspacing="2" border="0">
             <tr>
-                <td>${%Name}</td>
+                <td width="40">${%Name}</td>
                 <td colspan="5">
                     <f:textbox name="name" value="${instance.name}"
                                checkUrl="'/MetadataChecks/checkName?value='+escape(this.value)"/>
@@ -36,32 +36,32 @@
             <!--used to display the form validation error -->
             <tr class="validation-error-area"><td/><td colspan="5" /></tr>
             <tr>
-                <td>
+                <td width="40">
                     <st:nbsp/>
                     <st:nbsp/>${%Year}
                 </td>
-                <td width="50">
+                <td width="40">
                     <f:textbox name="year" value="${instance.year}"
                                checkUrl="'/MetadataChecks/checkDateValue?yearValue='+escape(Form.findMatchingInput(this,'year').value)
                                +'&amp;monthValue='+escape(Form.findMatchingInput(this,'month').value)
                                +'&amp;dayValue='+escape(Form.findMatchingInput(this,'day').value)"/>
                 </td>
 
-                <td>
+                <td width="40">
                     <st:nbsp/>
                     <st:nbsp/>${%Month}
                 </td>
-                <td width="50">
+                <td width="40">
                     <f:textbox name="month" value="${instance.month}"
                                checkUrl="'/MetadataChecks/checkDateValue?yearValue='+escape(Form.findMatchingInput(this,'year').value)
                                +'&amp;monthValue='+escape(Form.findMatchingInput(this,'month').value)
                                +'&amp;dayValue='+escape(Form.findMatchingInput(this,'day').value)"/>
                 </td>
-                <td>
+                <td width="40">
                     <st:nbsp/>
                     <st:nbsp/>${%Day}
                 </td>
-                <td width="50">
+                <td width="40">
                     <f:textbox name="day" value="${instance.day}"
                                checkUrl="'/MetadataChecks/checkDateValue?yearValue='+escape(Form.findMatchingInput(this,'year').value)
                                +'&amp;monthValue='+escape(Form.findMatchingInput(this,'month').value)
@@ -77,31 +77,31 @@
         <f:block>
             <table cellpadding="0" cellspacing="2" border="0">
                 <tr>
-                    <td>
+                    <td width="40">
                         <st:nbsp/>
                         <st:nbsp/>${%Hour}
                     </td>
-                    <td width="50">
+                    <td width="40">
                         <f:textbox name="hour" value="${instance.hour}"
                                    checkUrl="'/MetadataChecks/checkTimeValue?hourValue='+escape(Form.findMatchingInput(this,'hour').value)
                                        +'&amp;minuteValue='+escape(Form.findMatchingInput(this,'minute').value)
                                        +'&amp;secondValue='+escape(Form.findMatchingInput(this,'second').value)"/>
                     </td>
-                    <td>
+                    <td width="40">
                         <st:nbsp/>
                         <st:nbsp/>${%Minute}
                     </td>
-                    <td width="50">
+                    <td width="40">
                         <f:textbox name="minute" value="${instance.minute}"
                                    checkUrl="'/MetadataChecks/checkTimeValue?hourValue='+escape(Form.findMatchingInput(this,'hour').value)
                                        +'&amp;minuteValue='+escape(Form.findMatchingInput(this,'minute').value)
                                        +'&amp;secondValue='+escape(Form.findMatchingInput(this,'second').value)"/>
                     </td>
-                    <td>
+                    <td width="40">
                         <st:nbsp/>
                         <st:nbsp/>${%Second}
                     </td>
-                    <td width="50">
+                    <td width="40">
                         <f:textbox name="second" value="${instance.second}"
                                    checkUrl="'/MetadataChecks/checkTimeValue?hourValue='+escape(Form.findMatchingInput(this,'hour').value)
                                        +'&amp;minuteValue='+escape(Form.findMatchingInput(this,'minute').value)

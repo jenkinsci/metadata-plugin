@@ -38,6 +38,7 @@ import com.sonyericsson.hudson.plugins.metadata.model.definitions.TreeNodeMetada
 import com.sonyericsson.hudson.plugins.metadata.model.definitions.StringMetadataDefinition;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.TreeNodeMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.StringMetadataValue;
 
 /**
  * Tests for the {@link MetadataValueDefinitionHelper}.
@@ -73,9 +74,9 @@ public class HelperTest {
         MetadataValueDefinitionHelper helper = new MetadataValueDefinitionHelper(values);
         MetadataDefinition definitionLeaf = TreeStructureUtil.getLeaf(startTreeNode, "child1", "child12");
         Object valueForDefinition = helper.getValueForDefinition(definitionLeaf);
-        Assert.assertThat(valueForDefinition, instanceOf(String.class));
-        String stringValue = (String)valueForDefinition;
-        assertThat(stringValue, equalTo("nonDefaultVal"));
+        Assert.assertThat(valueForDefinition, instanceOf(StringMetadataValue.class));
+        StringMetadataValue stringMetadataValue = (StringMetadataValue)valueForDefinition;
+        assertThat(stringMetadataValue.getValue(), equalTo("nonDefaultVal"));
         assertThat(helper.getValues().size(), equalTo(0));
     }
 }

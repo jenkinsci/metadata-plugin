@@ -41,8 +41,8 @@ import hudson.model.User;
 import hudson.model.listeners.SaveableListener;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -157,7 +157,7 @@ public class JobContributorsController extends SaveableListener {
             TreeNodeMetadataValue[] tree = TreeStructureUtil.createTreePath("", "job-info", "last-saved");
             TreeNodeMetadataValue jobInfo = tree[0];
             TreeNodeMetadataValue lastSaved = tree[1];
-            TreeStructureUtil.addValue(lastSaved, new Date(), "", false, "time");
+            TreeStructureUtil.addValue(lastSaved, Calendar.getInstance(), "", true, false, "time");
             TreeStructureUtil.addValue(lastSaved, currentUser.getDisplayName(), "", "user", "display-name");
             TreeStructureUtil.addValue(lastSaved, currentUser.getFullName(), "", "user", "full-name");
             if (project instanceof MatrixConfiguration) {

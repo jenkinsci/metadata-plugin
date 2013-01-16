@@ -38,7 +38,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import com.sonyericsson.hudson.plugins.metadata.model.TimeDetails;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.NAME;
 import static com.sonyericsson.hudson.plugins.metadata.model.JsonUtils.VALUE;
@@ -69,12 +68,12 @@ public class DateMetadataValueTest {
         MockUtils.mockDateMetadataValueDescriptor(hudson);
         String name = "nameTest";
         String description = "descrText";
-        Date value = new Date();
-        DateMetadataValue metadataValue = new DateMetadataValue(name, description, value, false);
+        Calendar value = Calendar.getInstance();
+        DateMetadataValue metadataValue = new DateMetadataValue(name, description, value, false, false);
         JSONObject json = metadataValue.toJson();
         assertEquals(name, json.getString(NAME));
         assertEquals(description, json.getString(DESCRIPTION));
-        assertEquals(value.getTime(), json.getLong(VALUE));
+        assertEquals(value.getTimeInMillis(), json.getLong(VALUE));
     }
 
     /**
@@ -88,13 +87,13 @@ public class DateMetadataValueTest {
         MockUtils.mockMetadataValueDescriptors(hudson);
         String name = "nameTest";
         String description = "descrText";
-        Date value = new Date();
+        Calendar value = Calendar.getInstance();
         boolean exposed = true;
 
         JSONObject json = new JSONObject();
         json.put(NAME, name);
         json.put(DESCRIPTION, description);
-        json.put(VALUE, value.getTime());
+        json.put(VALUE, value.getTimeInMillis());
         json.put(EXPOSED, exposed);
         json.put(JsonUtils.METADATA_TYPE, "metadata-date");
 
@@ -112,8 +111,8 @@ public class DateMetadataValueTest {
      */
     @Test
     public void testClone() throws Exception {
-        Date value = new Date();
-        DateMetadataValue originalValue = new DateMetadataValue("name", "description", value, false);
+        Calendar value = Calendar.getInstance();
+        DateMetadataValue originalValue = new DateMetadataValue("name", "description", value, false, false);
         DateMetadataValue clonedValue = originalValue.clone();
         assertEquals(originalValue.getValue(), clonedValue.getValue());
 

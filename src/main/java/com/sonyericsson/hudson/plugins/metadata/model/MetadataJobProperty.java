@@ -295,9 +295,10 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
                 if (!formDefinitions.isNullObject()) {
                     for (int i = 0; i < formDefinitions.size(); i++) {
                         String name = (String)formDefinitions.names().get(i);
+                        Object definition = formDefinitions.get(name);
                         MetadataDefinition foundDefinition = TreeStructureUtil.getLeaf(definitions, name.split("_"));
                         if (foundDefinition != null) {
-                            MetadataValue value = foundDefinition.createValue(formDefinitions.get(name));
+                            MetadataValue value = foundDefinition.createValue(definition);
                             presetValues.add(createAncestry(foundDefinition, value));
                         }
                     }
@@ -327,8 +328,9 @@ public class MetadataJobProperty extends JobProperty<AbstractProject<?, ?>> impl
          * @param value the value to add the ancestors to.
          * @return the MetadataValue nearest to the top of the tree, i.e. the MetadataValue corresponding to
          * a MetadataDefinition that has a parent which is either null or is not a Metadata.
+         * @throws FormException if one of the definitions has a faulty configuration, e.g. a String instead of a number.
          */
-        private MetadataValue createAncestry(MetadataDefinition definition, MetadataValue value) {
+        private MetadataValue createAncestry(MetadataDefinition definition, MetadataValue value) throws FormException {
             MetadataParent<MetadataDefinition> parent = definition.getParent();
             //if no parent exists or the parent is not a Metadata ( which should mean that it is some kind of property
             //or action, then we have reached the top of the tree.

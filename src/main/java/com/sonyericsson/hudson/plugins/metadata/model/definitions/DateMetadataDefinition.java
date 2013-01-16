@@ -27,11 +27,14 @@ package com.sonyericsson.hudson.plugins.metadata.model.definitions;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.TimeDetails;
 import com.sonyericsson.hudson.plugins.metadata.model.values.AbstractMetadataValue;
+import com.sonyericsson.hudson.plugins.metadata.model.values.DateMetadataValue;
 import hudson.Extension;
+import hudson.model.Descriptor;
+import com.sonyericsson.hudson.plugins.metadata.model.MetadataChecks;
+import hudson.util.FormValidation;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
-
 import java.util.Calendar;
-import java.util.Date;
 
 import static com.sonyericsson.hudson.plugins.metadata.Constants.DEFAULT_MONTH_ADJUSTMENT;
 import static com.sonyericsson.hudson.plugins.metadata.Constants.DEFAULT_TIME_DETAILS;
@@ -51,7 +54,7 @@ public class DateMetadataDefinition extends AbstractMetadataDefinition {
      *
      * @return the default year.
      */
-    public int getDefaultYear() {
+    public int getYear() {
         return defaultCal.get(Calendar.YEAR);
     }
 
@@ -60,7 +63,7 @@ public class DateMetadataDefinition extends AbstractMetadataDefinition {
      *
      * @return the default month of the year.
      */
-    public int getDefaultMonth() {
+    public int getMonth() {
         return defaultCal.get(Calendar.MONTH) + DEFAULT_MONTH_ADJUSTMENT;
     }
 
@@ -69,7 +72,7 @@ public class DateMetadataDefinition extends AbstractMetadataDefinition {
      *
      * @return the default day of the month.
      */
-    public int getDefaultDay() {
+    public int getDay() {
         return defaultCal.get(Calendar.DAY_OF_MONTH);
     }
 
@@ -78,7 +81,7 @@ public class DateMetadataDefinition extends AbstractMetadataDefinition {
      *
      * @return the default hour of the day..
      */
-    public int getDefaultHour() {
+    public int getHour() {
         return defaultCal.get(Calendar.HOUR_OF_DAY);
     }
 
@@ -87,7 +90,7 @@ public class DateMetadataDefinition extends AbstractMetadataDefinition {
      *
      * @return the default minute of the hour.
      */
-    public int getDefaultMinute() {
+    public int getMinute() {
         return defaultCal.get(Calendar.MINUTE);
     }
 
@@ -96,7 +99,7 @@ public class DateMetadataDefinition extends AbstractMetadataDefinition {
      *
      * @return the default second.
      */
-    public int getDefaultSecond() {
+    public int getSecond() {
         return defaultCal.get(Calendar.SECOND);
     }
 
@@ -114,39 +117,101 @@ public class DateMetadataDefinition extends AbstractMetadataDefinition {
      * Standard Constructor.
      *
      * @param name         the name
-     * @param defaultYear  the default year.
-     * @param defaultMonth the default month of the year.
-     * @param defaultDay   the default day of the month.
+     * @param year  the default year.
+     * @param month the default month of the year.
+     * @param day   the default day of the month.
      * @param description  the description.
      * @param details      the optional time details, hour/minute/second.
      */
     @DataBoundConstructor
-    public DateMetadataDefinition(String name, String description, int defaultYear,
-                                  int defaultMonth, int defaultDay, TimeDetails details) {
+    public DateMetadataDefinition(String name, String description, int year,
+                                  int month, int day, TimeDetails details) {
         super(name, description);
         defaultCal = Calendar.getInstance();
 
 
         if (details != null) {
-            defaultCal.set(defaultYear, defaultMonth - DEFAULT_MONTH_ADJUSTMENT, defaultDay,
+            defaultCal.set(year, month - DEFAULT_MONTH_ADJUSTMENT, day,
                     details.getHour(), details.getMinute(), details.getSecond());
             checked = details.isChecked();
         } else {
-            defaultCal.set(defaultYear, defaultMonth - DEFAULT_MONTH_ADJUSTMENT, defaultDay,
+            defaultCal.set(year, month - DEFAULT_MONTH_ADJUSTMENT, day,
                     DEFAULT_TIME_DETAILS, DEFAULT_TIME_DETAILS, DEFAULT_TIME_DETAILS);
         }
         defaultCal.set(Calendar.MILLISECOND, 0);
     }
 
     @Override
-    public synchronized Date getDefaultValue() {
-        return defaultCal.getTime();
+    public synchronized Calendar getDefaultValue() {
+        return (Calendar)defaultCal.clone();
     }
 
-    //TODO Add support for creating values.
     @Override
-    public AbstractMetadataValue createValue(Object o) {
-        return null;
+    public AbstractMetadataValue createValue(Object o) throws Descriptor.FormException {
+        boolean detailsCheck = false;
+        DateMetadataValue dateMetadataValue;
+        Calendar cal = Calendar.getInstance();
+        MetadataChecks checks = new MetadataChecks();
+
+        if (o instanceof JSONObject) {
+            String day = "";
+            String month = "";
+            String year = "";
+            JSONObject jsonObject = (JSONObject)o;
+            if (jsonObject.has("day")) {
+                day = jsonObject.getString("day");
+            }
+            if (jsonObject.has("month")) {
+                month = jsonObject.getString("month");
+            }
+            if (jsonObject.has("year")) {
+                year = jsonObject.getString("year");
+            }
+            FormValidation dateValidation = checks.doCheckDateValue(year, month, day);
+            if (!dateValidation.equals(FormValidation.ok())) {
+                throw new Descriptor.FormException("Wrong date format " + dateValidation.getMessage(), "");
+            }
+            cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(day));
+            cal.set(Calendar.MONTH, Integer.parseInt(month) - DEFAULT_MONTH_ADJUSTMENT);
+            cal.set(Calendar.YEAR, Integer.parseInt(year));
+
+
+            if (jsonObject.has("details")) {
+                String hour = "";
+                String minute = "";
+                String second = "";
+                detailsCheck = true;
+                JSONObject details = jsonObject.getJSONObject("details");
+                if (details.has("hour")) {
+                    hour = details.getString("hour");
+                }
+                if (details.has("minute")) {
+                    minute = details.getString("minute");
+                }
+                if (details.has("second")) {
+                    second = details.getString("second");
+                }
+                FormValidation timeValidation = checks.doCheckTimeValue(hour, minute, second);
+                if (!timeValidation.equals(FormValidation.ok())) {
+                    throw new Descriptor.FormException("Wrong time format: " + timeValidation.getMessage(), "");
+                }
+                cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
+                cal.set(Calendar.MINUTE, Integer.parseInt(minute));
+                cal.set(Calendar.SECOND, Integer.parseInt(second));
+            } else {
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+            }
+            cal.set(Calendar.MILLISECOND, 0);
+            dateMetadataValue = new DateMetadataValue(getName(), getDescription(),
+                    cal, detailsCheck, isExposedToEnvironment());
+        } else {
+            //maybe we should throw an exception here instead of going with default.
+            dateMetadataValue = new DateMetadataValue(getName(), getDescription(),
+                    getDefaultValue(), detailsCheck, isExposedToEnvironment());
+        }
+        return dateMetadataValue;
     }
 
     /**

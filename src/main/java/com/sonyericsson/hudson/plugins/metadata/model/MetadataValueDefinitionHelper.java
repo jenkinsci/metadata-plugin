@@ -87,15 +87,15 @@ public class MetadataValueDefinitionHelper {
         String[] fullPath = definition.getFullPath();
         MetadataValue m = TreeStructureUtil.getLeaf(values, fullPath);
         if (m == null) {
-            return definition.getValue();
+            return definition;
         } else if (m.getParent() instanceof Metadata) {
             MetadataParent parent = m.getParent();
             ParentUtil.removeChild(parent, m);
             ParentUtil.removeEmptyBranches(values);
-            return m.getValue();
+            return m;
         } else {
             ParentUtil.removeChild(values, m);
-            return m.getValue();
+            return m;
         }
     }
 }

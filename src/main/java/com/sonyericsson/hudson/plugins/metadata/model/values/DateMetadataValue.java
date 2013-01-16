@@ -167,11 +167,14 @@ public class DateMetadataValue extends AbstractMetadataValue {
      * @param name                 the name.
      * @param description          the description.
      * @param value                the value.
+     * @param checked               the checked boolean value, true if TimeDetails exist for this value.
      * @param exposedToEnvironment if this value should be exposed to the build as an
      *                             environment variable.
      */
-    public DateMetadataValue(String name, String description, Date value, boolean exposedToEnvironment) {
+    public DateMetadataValue(String name, String description, Calendar value,
+                             boolean checked, boolean exposedToEnvironment) {
         super(name, description, exposedToEnvironment);
+        this.checked = checked;
         setValue(value);
     }
 
@@ -182,7 +185,7 @@ public class DateMetadataValue extends AbstractMetadataValue {
      * @param description the description.
      * @param value       the value.
      */
-    public DateMetadataValue(String name, String description, Date value) {
+    public DateMetadataValue(String name, String description, Calendar value) {
         super(name, description);
         setValue(value);
     }
@@ -193,14 +196,14 @@ public class DateMetadataValue extends AbstractMetadataValue {
      * @param name  the name.
      * @param value the value.
      */
-    public DateMetadataValue(String name, Date value) {
+    public DateMetadataValue(String name, Calendar value) {
         super(name);
         setValue(value);
     }
 
     @Override
-    public Date getValue() {
-        return value.getTime();
+    public Calendar getValue() {
+        return value;
     }
 
     @Override
@@ -213,9 +216,8 @@ public class DateMetadataValue extends AbstractMetadataValue {
      *
      * @param dateValue the value.
      */
-    private synchronized void setValue(Date dateValue) {
-        this.value = Calendar.getInstance();
-        this.value.setTime(dateValue);
+    private synchronized void setValue(Calendar dateValue) {
+        this.value = dateValue;
     }
 
     /**
@@ -278,7 +280,7 @@ public class DateMetadataValue extends AbstractMetadataValue {
         //if it is being compared to a DateMetadataValue, just compare the values.
         if (userValue instanceof DateMetadataValue) {
             DateMetadataValue dateMetadataValue = (DateMetadataValue)userValue;
-            Date userDate = dateMetadataValue.getValue();
+            Date userDate = dateMetadataValue.getValue().getTime();
             return date.compareTo(userDate);
         }
         try {
@@ -403,9 +405,11 @@ public class DateMetadataValue extends AbstractMetadataValue {
             checkRequiredJsonAttribute(json, VALUE);
 
             //TODO Deserialize timezone info?
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(json.getLong(VALUE));
             DateMetadataValue value = new DateMetadataValue(
                     json.getString(NAME), json.optString(DESCRIPTION),
-                    new Date(json.getLong(VALUE)));
+                    cal);
             if (json.has(EXPOSED)) {
                 value.setExposeToEnvironment(json.getBoolean(EXPOSED));
             }
