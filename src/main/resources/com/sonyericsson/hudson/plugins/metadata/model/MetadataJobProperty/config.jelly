@@ -26,7 +26,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
     <f:section title="${%Meta Data}">
         <j:set var="helper" value="${instance.initiateHelper()}"/>
-        <f:entry title="${%Preset Values}">
+        <f:entry>
             <table name="definitions">
                 <j:set var="property" value="${instance}"/>
                 <j:forEach var="definition" items="${instance.getDefinitionsAsFlatList(request)}">
@@ -35,9 +35,12 @@
                 </j:forEach>
             </table>
         </f:entry>
-        <f:entry title="${%Values}">
-            <f:hetero-list descriptors="${descriptor.getValueDescriptors(request)}" items="${helper.getValues()}"
-                            name="values" hasHeader="true"/>
+        <f:entry>
+            <f:hetero-list descriptors="${descriptor.getValueDescriptors(request)}"
+                           items="${helper.getValues()}"
+                           name="values"
+                           hasHeader="true"
+                           addCaption="${%Add Metadata}"/>
         </f:entry>
     </f:section>
 </j:jelly>

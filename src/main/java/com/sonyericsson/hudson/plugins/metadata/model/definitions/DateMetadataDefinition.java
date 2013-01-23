@@ -34,6 +34,7 @@ import com.sonyericsson.hudson.plugins.metadata.model.MetadataChecks;
 import hudson.util.FormValidation;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
+
 import java.util.Calendar;
 
 import static com.sonyericsson.hudson.plugins.metadata.Constants.DEFAULT_MONTH_ADJUSTMENT;
@@ -122,11 +123,13 @@ public class DateMetadataDefinition extends AbstractMetadataDefinition {
      * @param day   the default day of the month.
      * @param description  the description.
      * @param details      the optional time details, hour/minute/second.
+     * @param exposedToEnvironment if values of this definition should be exposed to the build as an
+     *                      environment variable.
      */
     @DataBoundConstructor
-    public DateMetadataDefinition(String name, String description, int year,
-                                  int month, int day, TimeDetails details) {
-        super(name, description);
+    public DateMetadataDefinition(String name, String description, int year, int month,
+                                  int day, TimeDetails details, boolean exposedToEnvironment) {
+        super(name, description, exposedToEnvironment);
         defaultCal = Calendar.getInstance();
 
 
