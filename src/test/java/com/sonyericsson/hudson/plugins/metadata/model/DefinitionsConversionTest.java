@@ -124,7 +124,8 @@ public class DefinitionsConversionTest extends HudsonTestCase {
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH),
-                details);
+                details,
+                false);
         List<AbstractMetadataDefinition> list = new LinkedList<AbstractMetadataDefinition>();
         list.add(def);
         PluginImpl.getInstance().setDefinitions(list);
