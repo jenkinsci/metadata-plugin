@@ -61,10 +61,13 @@ public class TreeNodeMetadataDefinition extends AbstractMetadataDefinition
      * @param name the name.
      * @param description the description.
      * @param children the children of this node.
+     * @param exposedToEnvironment if all children of the value of this definition should be exposed to the build as an
+     *                      environment variable.
      */
     @DataBoundConstructor
-    public TreeNodeMetadataDefinition(String name, String description, List<MetadataDefinition> children) {
-        super(name, description);
+    public TreeNodeMetadataDefinition(String name, String description, List<MetadataDefinition> children,
+                                      boolean exposedToEnvironment) {
+        super(name, description, exposedToEnvironment);
         setChildren(children);
         this.children = children;
     }

@@ -49,10 +49,12 @@ public class NumberMetadataDefinition extends AbstractMetadataDefinition {
      * @param name         the name.
      * @param description  the description.
      * @param defaultValue the default value for this definition
+     * @param exposedToEnvironment if values of this this definition should be exposed to the build as an
+     *                      environment variable.
      */
     @DataBoundConstructor
-    public NumberMetadataDefinition(String name, String description, long defaultValue) {
-        super(name, description);
+    public NumberMetadataDefinition(String name, String description, long defaultValue, boolean exposedToEnvironment) {
+        super(name, description, exposedToEnvironment);
         this.defaultValue = defaultValue;
     }
 
