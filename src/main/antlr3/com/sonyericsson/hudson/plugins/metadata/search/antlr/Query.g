@@ -2,6 +2,7 @@
  *  The MIT License
  *
  *  Copyright 2012 Sony Mobile Communications AB. All rights reserved.
+ *  Copyright 2013 Sony Mobile Communications AB. All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +43,11 @@ andexpression : orexpression (AND^ orexpression)*;
 
 orexpression : query (OR^ query)*;
 
-basicexpr : (NAME EQLS^ NAME);
+basicexpr : (NAME EQLS^ NAME)
+            |(NAME GTR^ NAME)
+            |(NAME GREQ^ NAME)
+            |(NAME LSR^ NAME)
+            |(NAME LSEQ^ NAME) ;
 
 query : basicexpr
     | '('!andexpression')'!;
@@ -51,7 +56,7 @@ query : basicexpr
 
 NONWORD
     :
-     ( 
+     (
       '#'
      |'$'
      |'%'
@@ -69,5 +74,8 @@ NAME
 AND : '&&';
 OR : '||';
 EQLS : '=';
+GREQ : '>=';
+GTR : '>';
+LSEQ : '<=';
+LSR : '<';
 WS : ( ' ' | '\t' | '\r' | '\n' )+ { $channel = HIDDEN; };
-
