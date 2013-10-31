@@ -149,7 +149,7 @@ public class JobContributorsController extends SaveableListener {
                 logger.finest("interrupted");
             }
 
-            if (!project.getRootDir().exists() && !Jenkins.getInstance().getJobNames().contains(project.getName())) {
+            if (!project.getRootDir().exists()) {
                 return;
             }
 
