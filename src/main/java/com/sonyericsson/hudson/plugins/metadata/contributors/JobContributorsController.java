@@ -39,6 +39,7 @@ import hudson.model.AbstractProject;
 import hudson.model.Saveable;
 import hudson.model.User;
 import hudson.model.listeners.SaveableListener;
+import jenkins.model.Jenkins;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -147,6 +148,11 @@ public class JobContributorsController extends SaveableListener {
             } catch (InterruptedException e) {
                 logger.finest("interrupted");
             }
+
+            if (!project.getRootDir().exists()) {
+                return;
+            }
+
             MetadataJobProperty property = getOrCreateProperty();
             if (property == null) {
                 return;
