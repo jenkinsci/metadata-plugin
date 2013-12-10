@@ -363,7 +363,6 @@ public class CliUtilsTest {
 
         MetadataParent container = CliUtils.getContainer(null, "theJob", 1, true);
         assertNotNull(container);
-        assertSame(build, Whitebox.getInternalState(container, "run"));
         verify(build).addAction(isA(MetadataBuildAction.class));
     }
 
