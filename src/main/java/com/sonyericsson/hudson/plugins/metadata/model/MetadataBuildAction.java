@@ -28,7 +28,6 @@ import com.sonyericsson.hudson.plugins.metadata.Constants;
 import com.sonyericsson.hudson.plugins.metadata.Messages;
 import com.sonyericsson.hudson.plugins.metadata.model.values.MetadataValue;
 import com.sonyericsson.hudson.plugins.metadata.model.values.ParentUtil;
-import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.model.Run;
 import hudson.security.ACL;
@@ -38,6 +37,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import jenkins.model.RunAction2;
 
 /**
  * Holds the meta data for a run.
@@ -47,17 +47,12 @@ import java.util.List;
 @edu.umd.cs.findbugs.annotations.SuppressWarnings(
         value = "UG_SYNC_SET_UNSYNC_GET",
         justification = "It is synchronized")
-public class MetadataBuildAction implements Action, MetadataContainer<MetadataValue> {
+public class MetadataBuildAction implements RunAction2, MetadataContainer<MetadataValue> {
 
-    private Run run;
+    private transient Run run;
     private List<MetadataValue> values;
 
-    /**
-     * Standard constructor.
-     *
-     * @param run    The run that this action is added to.
-     * @param values the meta data for this run.
-     */
+    @Deprecated
     public MetadataBuildAction(Run run, List<MetadataValue> values) {
         this.run = run;
         if (values == null) {
@@ -66,11 +61,7 @@ public class MetadataBuildAction implements Action, MetadataContainer<MetadataVa
         this.values = values;
     }
 
-    /**
-     * Standard constructor.
-     *
-     * @param run The run that this action is added to.
-     */
+    @Deprecated
     public MetadataBuildAction(Run run) {
         this(run, null);
     }
@@ -95,6 +86,16 @@ public class MetadataBuildAction implements Action, MetadataContainer<MetadataVa
     @Override
     public String getUrlName() {
         return Constants.COMMON_URL_NAME;
+    }
+
+    @Override
+    public void onAttached(Run<?,?> r) {
+        this.run = r;
+    }
+
+    @Override
+    public void onLoad(Run<?,?> r) {
+        this.run = r;
     }
 
     /**
