@@ -168,7 +168,7 @@ public abstract class CliUtils {
                         if (action != null) {
                             container = action;
                         } else if (createContainer) {
-                            action = new MetadataBuildAction(buildByNumber);
+                            action = new MetadataBuildAction();
                             buildByNumber.addAction(action);
                             container = action;
                         } else {

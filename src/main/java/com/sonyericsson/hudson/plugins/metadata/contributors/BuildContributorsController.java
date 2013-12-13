@@ -55,7 +55,7 @@ public class BuildContributorsController extends RunListener<AbstractBuild> {
         logger.entering(BuildContributorsController.class.getName(), "onCompleted({0})", build);
         MetadataBuildAction action = build.getAction(MetadataBuildAction.class);
         if (action == null) {
-            action = new MetadataBuildAction(build);
+            action = new MetadataBuildAction();
             build.addAction(action);
         }
         listener.getLogger().println(Messages.BuildContributorsController_LogMessage_Collecting());
@@ -91,7 +91,7 @@ public class BuildContributorsController extends RunListener<AbstractBuild> {
         }
         MetadataBuildAction action = build.getAction(MetadataBuildAction.class);
         if (action == null) {
-            action = new MetadataBuildAction(build);
+            action = new MetadataBuildAction();
             build.addAction(action);
         }
 
