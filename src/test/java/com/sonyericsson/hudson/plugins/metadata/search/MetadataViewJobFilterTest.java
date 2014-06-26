@@ -97,7 +97,7 @@ public class MetadataViewJobFilterTest extends HudsonTestCase {
         hudson.addView(view);
 
         WebClient web = createWebClient();
-        Page page = web.goTo("/view/Test/api/json", "application/javascript");
+        Page page = web.goTo("/view/Test/api/json", "application/json");
         JSONObject json = (JSONObject)JSONSerializer.toJSON(page.getWebResponse().getContentAsString());
         //Just to test that we can find both in an open installation.
         assertTrue(json.has("jobs"));
@@ -111,7 +111,7 @@ public class MetadataViewJobFilterTest extends HudsonTestCase {
         web = createWebClient();
         web = web.login("testuser");
 
-        page = web.goTo("/view/Test/api/json", "application/javascript");
+        page = web.goTo("/view/Test/api/json", "application/json");
         json = (JSONObject)JSONSerializer.toJSON(page.getWebResponse().getContentAsString());
         //Does it still applies to secured projects?
         assertTrue(json.has("jobs"));
