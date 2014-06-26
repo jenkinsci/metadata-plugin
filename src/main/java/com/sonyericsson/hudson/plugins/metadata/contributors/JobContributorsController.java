@@ -39,7 +39,6 @@ import hudson.model.AbstractProject;
 import hudson.model.Saveable;
 import hudson.model.User;
 import hudson.model.listeners.SaveableListener;
-import jenkins.model.Jenkins;
 
 import java.io.IOException;
 import java.util.Calendar;

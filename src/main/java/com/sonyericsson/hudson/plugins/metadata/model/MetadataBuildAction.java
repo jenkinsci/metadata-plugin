@@ -52,6 +52,12 @@ public class MetadataBuildAction implements RunAction2, MetadataContainer<Metada
     private transient Run run;
     private List<MetadataValue> values;
 
+    /**
+     * Constructor.
+     *
+     * @param run the run
+     * @param values preset values
+     */
     @Deprecated
     public MetadataBuildAction(Run run, List<MetadataValue> values) {
         this.run = run;
@@ -61,6 +67,11 @@ public class MetadataBuildAction implements RunAction2, MetadataContainer<Metada
         this.values = values;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param run the run
+     */
     @Deprecated
     public MetadataBuildAction(Run run) {
         this(run, null);
@@ -89,12 +100,12 @@ public class MetadataBuildAction implements RunAction2, MetadataContainer<Metada
     }
 
     @Override
-    public void onAttached(Run<?,?> r) {
+    public void onAttached(Run<?, ?> r) {
         this.run = r;
     }
 
     @Override
-    public void onLoad(Run<?,?> r) {
+    public void onLoad(Run<?, ?> r) {
         this.run = r;
     }
 
