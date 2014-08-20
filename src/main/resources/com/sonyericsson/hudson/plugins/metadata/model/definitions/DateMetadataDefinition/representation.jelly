@@ -42,7 +42,7 @@
                 </td>
                 <td width="40">
                     <f:textbox name="year" value="${value.getYear()}"
-                               checkUrl="'/MetadataChecks/checkDateValue?yearValue='+escape(Form.findMatchingInput(this,'year').value)
+                               checkUrl="'${rootURL}/MetadataChecks/checkDateValue?yearValue='+escape(Form.findMatchingInput(this,'year').value)
                                +'&amp;monthValue='+escape(Form.findMatchingInput(this,'month').value)
                                +'&amp;dayValue='+escape(Form.findMatchingInput(this,'day').value)"/>
                 </td>
@@ -53,7 +53,7 @@
                 </td>
                 <td width="40">
                     <f:textbox name="month" value="${value.getMonth()}"
-                               checkUrl="'/MetadataChecks/checkDateValue?yearValue='+escape(Form.findMatchingInput(this,'year').value)
+                               checkUrl="'${rootURL}/MetadataChecks/checkDateValue?yearValue='+escape(Form.findMatchingInput(this,'year').value)
                                +'&amp;monthValue='+escape(Form.findMatchingInput(this,'month').value)
                                +'&amp;dayValue='+escape(Form.findMatchingInput(this,'day').value)"/>
                 </td>
@@ -63,7 +63,7 @@
                 </td>
                 <td width="40">
                     <f:textbox name="day" value="${value.getDay()}"
-                               checkUrl="'/MetadataChecks/checkDateValue?yearValue='+escape(Form.findMatchingInput(this,'year').value)
+                               checkUrl="'${rootURL}/MetadataChecks/checkDateValue?yearValue='+escape(Form.findMatchingInput(this,'year').value)
                                +'&amp;monthValue='+escape(Form.findMatchingInput(this,'month').value)
                                +'&amp;dayValue='+escape(Form.findMatchingInput(this,'day').value)"/>
                 </td>
@@ -85,7 +85,7 @@
                                         </td>
                                         <td width="40">
                                             <f:textbox name="hour" value="${value.getHour()}"
-                                                       checkUrl="'/MetadataChecks/checkTimeValue?hourValue='+escape(Form.findMatchingInput(this,'hour').value)
+                                                       checkUrl="'${rootURL}/MetadataChecks/checkTimeValue?hourValue='+escape(Form.findMatchingInput(this,'hour').value)
                                        +'&amp;minuteValue='+escape(Form.findMatchingInput(this,'minute').value)
                                        +'&amp;secondValue='+escape(Form.findMatchingInput(this,'second').value)"/>
                                         </td>
@@ -95,7 +95,7 @@
                                         </td>
                                         <td width="40">
                                             <f:textbox name="minute" value="${value.getMinute()}"
-                                                       checkUrl="'/MetadataChecks/checkTimeValue?hourValue='+escape(Form.findMatchingInput(this,'hour').value)
+                                                       checkUrl="'${rootURL}/MetadataChecks/checkTimeValue?hourValue='+escape(Form.findMatchingInput(this,'hour').value)
                                        +'&amp;minuteValue='+escape(Form.findMatchingInput(this,'minute').value)
                                        +'&amp;secondValue='+escape(Form.findMatchingInput(this,'second').value)"/>
                                         </td>
@@ -105,7 +105,7 @@
                                         </td>
                                         <td width="40">
                                             <f:textbox name="second" value="${value.getSecond()}"
-                                                       checkUrl="'/MetadataChecks/checkTimeValue?hourValue='+escape(Form.findMatchingInput(this,'hour').value)
+                                                       checkUrl="'${rootURL}/MetadataChecks/checkTimeValue?hourValue='+escape(Form.findMatchingInput(this,'hour').value)
                                        +'&amp;minuteValue='+escape(Form.findMatchingInput(this,'minute').value)
                                        +'&amp;secondValue='+escape(Form.findMatchingInput(this,'second').value)"/>
                                         </td>

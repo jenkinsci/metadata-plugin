@@ -26,7 +26,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
     <f:entry title="${%Name}">
         <f:textbox name="name" value="${instance.name}"
-                   checkUrl="'/MetadataChecks/checkName?value='+escape(this.value)"/>
+                   checkUrl="'${rootURL}/MetadataChecks/checkName?value='+escape(this.value)"/>
     </f:entry>
     <f:entry title="${%Values}">
         <f:hetero-list descriptors="${descriptor.getValueDescriptors(request)}" items="${instance.children}"
