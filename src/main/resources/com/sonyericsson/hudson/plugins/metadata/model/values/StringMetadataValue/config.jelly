@@ -29,7 +29,7 @@
             <tr>
                 <td>${%Name}</td>
                 <td width="48%"><f:textbox name="name" value="${instance.name}"
-                                           checkUrl="'/MetadataChecks/checkName?value='+escape(this.value)"/></td>
+                                           checkUrl="'${rootURL}/MetadataChecks/checkName?value='+escape(this.value)"/></td>
                 <td><st:nbsp/><st:nbsp/>${%Value}</td>
                 <td width="48%"><f:textbox name="value" value="${instance.value}"/></td>
             </tr>

@@ -26,7 +26,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
     <f:entry title="${it.fullName}" description="${it.description}">
         <f:textbox value="${value.getValue()}" field="${it.getFullName('_')}"
-                checkUrl="'/MetadataChecks/checkNumberValue?value='+escape(this.value)"/>
+                checkUrl="'${rootURL}/MetadataChecks/checkNumberValue?value='+escape(this.value)"/>
     </f:entry>
 </j:jelly>
 

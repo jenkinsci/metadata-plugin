@@ -27,11 +27,11 @@
     <!--TODO could not get this page to work like string value, with name and value on same line, due to the checkurl-->
     <f:entry title="${%Name}">
         <f:textbox name="name" value="${instance.name}"
-                   checkUrl="'/MetadataChecks/checkName?value='+escape(this.value)"/>
+                   checkUrl="'${rootURL}/MetadataChecks/checkName?value='+escape(this.value)"/>
     </f:entry>
     <f:entry title="${%Value}">
         <f:textbox name="value" value="${instance.value}"
-                   checkUrl="'/MetadataChecks/checkNumberValue?value='+escape(this.value)"/>
+                   checkUrl="'${rootURL}/MetadataChecks/checkNumberValue?value='+escape(this.value)"/>
     </f:entry>
     <f:entry title="${%Expose to environment}" help="/plugin/metadata/help/environment.html">
         <f:checkbox name="exposedToEnvironment" checked="${instance.isExposedToEnvironment()}"/>
