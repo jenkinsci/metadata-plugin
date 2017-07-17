@@ -135,6 +135,11 @@
                     <artifactId>cobertura-maven-plugin</artifactId>
                     <version>2.4</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.kohsuke</groupId>
+                    <artifactId>access-modifier-checker</artifactId>
+                    <version>1.4</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
