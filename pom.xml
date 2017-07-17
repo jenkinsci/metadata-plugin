@@ -66,6 +66,10 @@
             <id>powermock-repo</id>
             <url>http://powermock.googlecode.com/svn/repo/</url>
         </repository>
+        <repository>
+            <id>atlassian-3rdparty</id>
+            <url>https://maven.atlassian.com/3rdparty/</url>
+        </repository>
     </repositories>
 
     <dependencies>
