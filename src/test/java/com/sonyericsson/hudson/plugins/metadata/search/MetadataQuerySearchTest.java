@@ -136,6 +136,36 @@ public class MetadataQuerySearchTest extends HudsonTestCase {
         itemList.add(tli2);
        assertEquals(1, mqs.searchQuery(itemList).size());
     }
+    
+    
+    /**
+     * Tests a search with Equal operator. Value contains underscore character
+     *
+     * @throws Exception if so.
+     */
+    public void testSearchEqualOperatorWithUnderscores() throws Exception {
+        FreeStyleProject project = createFreeStyleProject("open");
+        FreeStyleProject project2 = createFreeStyleProject("secure");
+        List<MetadataValue> list = new LinkedList<MetadataValue>();
+        StringMetadataValue name = new StringMetadataValue("name", "description", "somc");
+        StringMetadataValue dept = new StringMetadataValue("dept", "description", "tool_1");
+        list.add(name);
+        list.add(dept);
+        MetadataJobProperty property = project.getProperty(MetadataJobProperty.class);
+        property.addChildren(list);
+        list = new LinkedList<MetadataValue>();
+        name = new StringMetadataValue("name", "description", "somc");
+        list.add(name);
+        MetadataJobProperty property2 = project2.getProperty(MetadataJobProperty.class);
+        property2.addChildren(list);
+        MetadataQuerySearch mqs = MetadataQuerySearch.parseQuery("dept=tool_1");
+        TopLevelItem tli1 = project;
+        TopLevelItem tli2 = project2;
+        List itemList = new ArrayList();
+        itemList.add(tli1);
+        itemList.add(tli2);
+       assertEquals(1, mqs.searchQuery(itemList).size());
+    }
 
     /**
      * Tests a search with Greater than or Equal to operator.
